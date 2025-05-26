@@ -5,6 +5,7 @@ import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { DashboardWirin } from './app/pages/dashboard/wirin/dashboardWirin';
+import { Tareas } from './app/pages/wirin/tareas/tareas';
 
 export const appRoutes: Routes = [
     {
@@ -22,6 +23,7 @@ export const appRoutes: Routes = [
         component: AppLayout, 
         children: [
             { path: '', component: DashboardWirin },
+            { path: 'tareas', component: Tareas },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

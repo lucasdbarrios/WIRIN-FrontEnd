@@ -1,0 +1,116 @@
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { DataViewModule } from 'primeng/dataview';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { TagModule } from 'primeng/tag';
+import { ApiService } from '../../../services/api.service';
+
+@Component({
+    selector: 'app-tareas',
+    standalone: true,
+    imports: [CommonModule, DataViewModule, FormsModule, SelectButtonModule, TagModule, ButtonModule],
+    template: ` <div class="flex flex-col">
+        <div class="card">
+            <div class="font-semibold text-xl">Tareas</div>
+            <p-dataview [value]="tasks" [layout]="layout">
+                <ng-template #header>
+                    <div class="flex justify-end">
+                        <p-select-button [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
+                            <ng-template #item let-option>
+                                <i class="pi " [ngClass]="{ 'pi-bars': option === 'list', 'pi-table': option === 'grid' }"></i>
+                            </ng-template>
+                        </p-select-button>
+                    </div>
+                </ng-template>
+
+                <ng-template #list let-items>
+                    <div class="flex flex-col">
+                        <div *ngFor="let item of items; let i = index">
+                            <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4" [ngClass]="{ 'border-t border-surface': i !== 0 }">
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ item.limitDate | date:'dd/MM/yyyy' }}</span>
+                                            <div class="text-lg font-medium mt-2">{{ item.name }}</div>
+                                            <p class="text-surface-600 mt-2">{{ item.description }}</p>
+                                        </div>
+                                        <p-tag [value]="item.status" [severity]="getSeverity(item)"></p-tag>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                            <p-button icon="pi pi-pencil" styleClass="p-button-warning" (onClick)="editTask(item)"></p-button>
+                                            <p-button icon="pi pi-trash" styleClass="p-button-danger" (onClick)="deleteTask(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #grid let-items>
+                    <div class="grid grid-cols-12 gap-4">
+                        <div *ngFor="let item of items; let i = index" class="col-span-12 sm:col-span-6 lg:col-span-4 p-2">
+                            <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
+                                <div class="flex justify-between mb-4">
+                                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ item.limitDate | date:'dd/MM/yyyy' }}</span>
+                                    <p-tag [value]="item.status" [severity]="getSeverity(item)"></p-tag>
+                                </div>
+                                <div class="text-lg font-medium mb-3">{{ item.name }}</div>
+                                <p class="text-surface-600 mb-4">{{ item.description }}</p>
+                                <div class="flex justify-end gap-2 mt-auto">
+                                    <p-button icon="pi pi-pencil" styleClass="p-button-warning" (onClick)="editTask(item)"></p-button>
+                                    <p-button icon="pi pi-trash" styleClass="p-button-danger" (onClick)="deleteTask(item)"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </div>
+    </div>
+    `
+})
+export class Tareas {
+    tasks: any[] = [];
+    layout: 'list' | 'grid' = 'list';
+    options = [
+        { icon: 'pi pi-bars', value: 'list' },
+        { icon: 'pi pi-th-large', value: 'grid' }
+    ];
+
+    constructor(private apiService: ApiService) {
+        this.loadTasks();
+    }
+
+    loadTasks() {
+        this.apiService.get('/order').subscribe((data: any) => {
+            this.tasks = data;
+        });
+    }
+
+    getSeverity(task: any): string {
+        switch (task.status) {
+            case 'Pendiente':
+                return 'warning';
+            case 'Completada':
+                return 'success';
+            case 'Cancelada':
+                return 'danger';
+            default:
+                return 'info';
+        }
+    }
+
+    editTask(task: any) {
+        // Implementar la lógica de edición
+        console.log('Editar tarea:', task);
+    }
+
+    deleteTask(task: any) {
+        // Implementar la lógica de eliminación
+        console.log('Eliminar tarea:', task);
+    }
+}
