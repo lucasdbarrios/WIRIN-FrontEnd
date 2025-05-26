@@ -1,0 +1,90 @@
+<div class="container max-w-3xl mx-auto mt-10 shadow-lg rounded-lg bg-blue-200 p-6">
+
+    <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
+        <span class="ml-2">{{isEditMode ? 'Editar Tarea' : 'Crear Nueva Tarea'}}</span>
+    </div>
+
+    <form [formGroup]="formTask" (ngSubmit)="onSubmit()">
+
+        <div class="mb-4">
+            <label for="name" class="block text-black">Titulo de la Tarea</label>
+            <div class="flex items-center bg-white rounded-md p-2">
+                <input id="name" type="text" formControlName="name" placeholder="Ingresá un titulo"
+                    class="w-full focus:outline-none">
+            </div>
+            <span class="text-red-500 text-sm" *ngIf="formTask.get('name')?.invalid && formTask.get('name')?.touched">
+                {{ getErrorMessage('name') }}
+            </span>
+        </div>
+
+        <div class="mb-4">
+            <label for="description" class="block text-black-700">Descripción</label>
+            <textarea id="description" formControlName="description" placeholder="Agrega una breve descripción"
+                class="w-full bg-white rounded-md p-2 focus:outline-none"></textarea>
+            <span class="text-red-500 text-sm"
+                *ngIf="formTask.get('description')?.invalid && formTask.get('description')?.touched">
+                {{ getErrorMessage('description') }}
+            </span>
+        </div>
+
+        <div class="mb-4">
+            <label for="fechaLimite" class="block text-black-700">Fecha Límite</label>
+            <input id="limitDate" type="date" formControlName="limitDate"
+                class="w-full bg-white rounded-md p-2 focus:outline-none">
+            <span class="text-red-500 text-sm"
+                *ngIf="formTask.get('limitDate')?.invalid && formTask.get('limitDate')?.touched">
+                {{ getErrorMessage('limitDate') }}
+            </span>
+        </div>
+
+        <div class="mb-4" *ngIf="!isEditMode">
+            <label class="block text-white-700">Estudiante</label>
+            <select id="studient" class="w-full bg-white rounded-md p-2 focus:outline-none">
+                <option value="" selected disabled>Selecciona al solicitante</option>
+                <option value="">Jose Gonzales</option>
+                <option value="">Miguel Nuñez</option>
+                <option value="">Martin Gago</option>
+            </select>
+        </div>
+
+        <div class="mb-4" *ngIf="isEditMode">
+            <label for="status" class="block text-black-700">Estado de la tarea</label>
+            <select id="status" formControlName="status" class="w-full bg-white rounded-md p-2 focus:outline-none">
+                <option value="" disabled>Selecciona un estado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Proceso">En Proceso</option>
+                <option value="En Revisión">En Revisión</option>
+                <option value="Denegada">Denegada</option>
+                <option value="Completada">Completada</option>
+            </select>
+            <span class="text-red-500 text-sm" *ngIf="formTask.get('status')?.invalid && formTask.get('status')?.touched">
+                {{ getErrorMessage('status') }}
+            </span>
+        </div>
+
+        <div class="mb-4 flex items-center gap-2">
+            <div class="flex items-center bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer w-fit"
+                onclick="document.getElementById('archivo').click()">
+                <span>{{ isEditMode ? 'Cambiar Archivo' : 'Adjuntar Archivo' }}</span>
+                <input type="file" id="archivo" (change)="onFileSelected($event)" class="hidden">
+            </div>
+            <span id="file-name" class="text-gray-700">{{ currentFileName || 'No hay archivo seleccionado' }}</span>
+            <span class="text-red-500 text-sm" *ngIf="!isEditMode && !selectedFile && formTask.get('file')?.touched">
+                {{ getErrorMessage('file') }}
+            </span>
+        </div>
+
+        <div class="flex justify-between items-center mt-6">
+            <button type="button" (click)="goBack()"
+                class="bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600">
+                Volver
+            </button>
+            <button type="submit"
+                class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                Guardar Tarea
+            </button>
+        </div>
+
+    </form>
+</div>
+
