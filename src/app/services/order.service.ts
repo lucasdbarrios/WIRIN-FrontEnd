@@ -10,7 +10,7 @@ export class OrderService {
   private apiUrl: string;
 
   constructor(private http: HttpClient, private envService: EnvService) {
-    this.apiUrl = this.envService.getApiUrl() + "/order";
+    this.apiUrl = this.envService.getApiUrl() + "/Order";
   }
 
   getOrders(): Observable<any[]> {
@@ -33,9 +33,8 @@ export class OrderService {
   }
 
   deleteOrder(id: number): Observable<any> {
-    const deleteUrl = `${this.apiUrl}/${id}`;
-
-    return this.http.delete(deleteUrl);
+    console.log(this.apiUrl);
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   updateOrder(id: number, formData: FormData): Observable<any> {

@@ -1,0 +1,73 @@
+<p-fluid>
+
+    <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
+        <h2 class="ml-2">{{isEditMode ? 'Editar Tarea' : 'Crear Nueva Tarea'}}</h2>
+    </div>
+
+    <form [formGroup]="formTask" (ngSubmit)="onSubmit()">
+        <div class="flex mt-8">
+            <div class="card flex flex-col gap-6 w-full">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <label for="name">Titulo de la Tarea</label>
+                        <input pInputText id="name" type="text" formControlName="name"
+                            placeholder="Ingresá un titulo" />
+                    </div>
+                    <span class="text-red-500 text-sm"
+                        *ngIf="formTask.get('name')?.invalid && formTask.get('name')?.touched">
+                        {{ getErrorMessage('name') }}
+                    </span>
+
+                    <div class="flex flex-col gap-2 w-full">
+                        <label for="limitDate">Fecha Límite</label>
+                        <p-datepicker placeholder="Ingresa fecha" [showIcon]="true" [showButtonBar]="true"
+                            [(ngModel)]="calendarValue" formControlName="limitDate"></p-datepicker>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap">
+                    <label for="address">Descripción</label>
+                    <textarea pTextarea id="description" formControlName="description"
+                        placeholder="Agrega una breve descripción" rows="4"></textarea>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6" *ngIf="isEditMode">
+                    <div class="flex flex-col gap-2">
+                        <label for="status">Estado</label>
+                        <p-select id="status" formControlName="status" [(ngModel)]="dropdownItem"
+                            [options]="dropdownItems" optionLabel="name" placeholder="Selecciona el estado"></p-select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6" *ngIf="!isEditMode">
+                    <div class="flex flex-col gap-2">
+                        <label for="status">Seleccionar usuario</label>
+                        <p-select id="users" formControlName="users" [(ngModel)]="dropdownItemUsers"
+                            [options]="dropdownItemsUsers" optionLabel="name"
+                            placeholder="Selecciona el usuario"></p-select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex flex-wrap gap-2 w-full">
+                        <p-fileupload (onSelect)="onFileSelected($event)" accept="application/pdf" maxFileSize="1000000"
+                            mode="advanced">
+
+                            <ng-template #content>
+                                <ul *ngIf="uploadedFiles.length">
+                                    <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
+                                </ul>
+                            </ng-template>
+                        </p-fileupload>
+                    </div>
+                </div>
+                <div class="flex flex-col justify-between md:flex-row gap-6">
+                    <p-button label="Volver" type="button" class="mt-4" (click)="goBack()"></p-button>
+                    <p-button label="Guardar" type="submit" class="mt-4"></p-button>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</p-fluid>

@@ -5,7 +5,6 @@ import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
-import { ApiService } from '../../../services/api.service';
 import { PickListModule } from 'primeng/picklist';
 import { OrderListModule } from 'primeng/orderlist';
 import { AuthService } from '../../../services/auth.service';
@@ -13,11 +12,12 @@ import { OrderManagmentService } from '../../../services/orderManagment.service'
 import { OrderService } from '../../../services/order.service';
 import { SelectModule } from 'primeng/select';
 import { DropDown } from '../../../types/dropDown';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-tareas',
     standalone: true,
-    imports: [CommonModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, OrderListModule, TagModule, ButtonModule,SelectModule],
+    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, OrderListModule, TagModule, ButtonModule,SelectModule],
     templateUrl: './tareasComponent.html',
    
 })
@@ -42,7 +42,11 @@ export class Tareas implements OnInit{
    
    
 
-    constructor(private orderService: OrderService, private authService: AuthService, private orderManagmentService: OrderManagmentService ) {
+    constructor(private orderService: OrderService, 
+      private authService: AuthService, 
+      private orderManagmentService: OrderManagmentService,
+      private router: Router 
+    ) {
         this.loadTasks();
     }
 
@@ -96,13 +100,27 @@ export class Tareas implements OnInit{
         }
     }
 
+    newTask() {
+        this.router.navigate(['/wirin/task-form']);
+    }
+
+    
+
     editTask(task: any) {
         // Implementar la lógica de edición
         console.log('Editar tarea:', task);
     }
 
-    deleteTask(task: any) {
-        // Implementar la lógica de eliminación
-        console.log('Eliminar tarea:', task);
-    }
+    deleteTask(taskId: number, event: Event): void {
+      event.stopPropagation();
+  
+      this.orderService.deleteOrder(taskId).subscribe({
+          next: () => {
+              this.loadTasks();
+          },
+          error: error => {
+              console.error('❌ Error al eliminar tarea:', error);
+          }
+      });
+  }
 }
