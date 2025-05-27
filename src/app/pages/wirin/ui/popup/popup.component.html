@@ -1,0 +1,8 @@
+<p-dialog [(visible)]="isVisible" header="{{ title }}" modal="true" [closable]="false">
+    <p>{{ question }}</p>
+    <ng-template pTemplate="footer">
+        <button pButton label="{{ secondaryActionText }}" class="p-button-secondary"
+            (click)="onSecondaryAction()"></button>
+        <button pButton label="{{ primaryActionText }}" class="p-button-primary" (click)="onPrimaryAction()"></button>
+    </ng-template>
+</p-dialog>

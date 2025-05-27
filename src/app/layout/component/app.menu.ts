@@ -28,7 +28,7 @@ export class AppMenu {
                 label: 'WIRIN',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/wirin'] },
-                    { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tareas'] }
+                    { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] }
                 ]
             },
             {

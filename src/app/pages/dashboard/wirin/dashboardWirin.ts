@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { StatsWidget } from '../components/statswidget';
 import { RecentSalesWidget } from '../components/recentsaleswidget';
 import { ApiService } from '../../../services/api.service';
-import { TaskFormComponent } from '../../wirin/form/form';
 
 
 @Component({

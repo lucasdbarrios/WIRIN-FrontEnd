@@ -15,13 +15,12 @@ import { DropDown } from '../../../types/dropDown';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
-    selector: 'app-tareas',
+    selector: 'app-tasks-component',
     standalone: true,
     imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, OrderListModule, TagModule, ButtonModule,SelectModule],
-    templateUrl: './tareasComponent.html',
-   
+    templateUrl: './tasks.component.html',
 })
-export class Tareas implements OnInit{ 
+export class TasksComponent implements OnInit{ 
     tasks: any[] = [];
     layout: 'list' | 'grid' = 'list';
     options = ['list', 'grid'];
@@ -31,13 +30,14 @@ export class Tareas implements OnInit{
     isBibliotecario: boolean = false;
     isAlumno: boolean = false;
     isLoading: boolean = false;
-    dropdownValue:  DropDown = {name: 'Pendiente', value: 'Pendiente'};
+    dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
+        { name: 'Todos', value: '' },
         { name: 'Pendiente', value: 'Pendiente' },
         { name: 'Completada', value: 'Completada' },
         { name: 'Denegada', value: 'Denegada' },
         { name: 'En Revisión', value: 'En Revisión' },
-        { name: 'En Proceso', value: 'En Proceso' }
+        { name: 'En Progreso', value: 'En Progreso' }
     ];
    
    
@@ -60,11 +60,11 @@ export class Tareas implements OnInit{
 
       async loadTasks(): Promise<void> {
         this.isLoading = true;
-        
-        const request = this.dropdownValue
-          ? this.orderManagmentService.getOrdersByState(this.dropdownValue.value)
+        const selectedState = this.dropdownValue?.value || '';
+        const request = selectedState
+          ? this.orderManagmentService.getOrdersByState(selectedState)
           : this.orderService.getOrders();
-    
+          
         await request.subscribe({
           next: (data: any[]) => {
             let filteredTasks = data;
@@ -101,14 +101,12 @@ export class Tareas implements OnInit{
     }
 
     newTask() {
-        this.router.navigate(['/wirin/task-form']);
+        this.router.navigate(['/wirin/add-task-form']);
     }
 
-    
-
-    editTask(task: any) {
-        // Implementar la lógica de edición
-        console.log('Editar tarea:', task);
+    editTask(id: number) {
+      console.log(id);
+      this.router.navigate([`/wirin/edit-task-form/${id}`]);
     }
 
     deleteTask(taskId: number, event: Event): void {
@@ -119,7 +117,7 @@ export class Tareas implements OnInit{
               this.loadTasks();
           },
           error: error => {
-              console.error('❌ Error al eliminar tarea:', error);
+              console.error('Error al eliminar tarea:', error);
           }
       });
   }

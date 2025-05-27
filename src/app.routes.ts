@@ -5,8 +5,9 @@ import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { DashboardWirin } from './app/pages/dashboard/wirin/dashboardWirin';
-import { Tareas } from './app/pages/wirin/tareas/tareas';
-import { TaskFormComponent } from './app/pages/wirin/form/form';
+import { TasksComponent } from './app/pages/wirin/tasks/tasks.component';
+import { AddTaskFormComponent } from './app/pages/wirin/form-add-task/form-add-task.component';
+import { EditTaskComponent } from './app/pages/wirin/form-edit-task/form-edit-task.component';
 
 export const appRoutes: Routes = [
     {
@@ -24,8 +25,9 @@ export const appRoutes: Routes = [
         component: AppLayout, 
         children: [
             { path: '', component: DashboardWirin },
-            { path: 'tareas', component: Tareas },
-            { path: 'task-form', component: TaskFormComponent },
+            { path: 'tasks', component: TasksComponent },
+            { path: 'add-task-form', component: AddTaskFormComponent },
+            { path: 'edit-task-form/:id', component: EditTaskComponent },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

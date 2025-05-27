@@ -1,0 +1,8 @@
+<p-fluid>
+    <app-form-task [isEditMode]="false" (formSubmitted)="onFormSubmit($event)"></app-form-task>
+</p-fluid>
+
+<app-popup [isVisible]="showConfirmPopup" title="Crear Tarea" question="¿Estás seguro de que deseas crear esta tarea?"
+    primaryActionText="Crear" secondaryActionText="Cancelar" (primaryAction)="onConfirmSubmit()"
+    (secondaryAction)="showConfirmPopup = false">
+</app-popup>
