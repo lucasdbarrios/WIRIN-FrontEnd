@@ -1,95 +1,87 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
 import { ApiService } from '../../../services/api.service';
+import { PickListModule } from 'primeng/picklist';
+import { OrderListModule } from 'primeng/orderlist';
+import { AuthService } from '../../../services/auth.service';
+import { OrderManagmentService } from '../../../services/orderManagment.service';
+import { OrderService } from '../../../services/order.service';
+import { SelectModule } from 'primeng/select';
+import { DropDown } from '../../../types/dropDown';
 
 @Component({
     selector: 'app-tareas',
     standalone: true,
-    imports: [CommonModule, DataViewModule, FormsModule, SelectButtonModule, TagModule, ButtonModule],
-    template: ` <div class="flex flex-col">
-        <div class="card">
-            <div class="font-semibold text-xl">Tareas</div>
-            <p-dataview [value]="tasks" [layout]="layout">
-                <ng-template #header>
-                    <div class="flex justify-end">
-                        <p-select-button [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
-                            <ng-template #item let-option>
-                                <i class="pi " [ngClass]="{ 'pi-bars': option === 'list', 'pi-table': option === 'grid' }"></i>
-                            </ng-template>
-                        </p-select-button>
-                    </div>
-                </ng-template>
-
-                <ng-template #list let-items>
-                    <div class="flex flex-col">
-                        <div *ngFor="let item of items; let i = index">
-                            <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4" [ngClass]="{ 'border-t border-surface': i !== 0 }">
-                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
-                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
-                                        <div>
-                                            <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ item.limitDate | date:'dd/MM/yyyy' }}</span>
-                                            <div class="text-lg font-medium mt-2">{{ item.name }}</div>
-                                            <p class="text-surface-600 mt-2">{{ item.description }}</p>
-                                        </div>
-                                        <p-tag [value]="item.status" [severity]="getSeverity(item)"></p-tag>
-                                    </div>
-                                    <div class="flex flex-col md:items-end gap-8">
-                                        <div class="flex flex-row-reverse md:flex-row gap-2">
-                                            <p-button icon="pi pi-pencil" styleClass="p-button-warning" (onClick)="editTask(item)"></p-button>
-                                            <p-button icon="pi pi-trash" styleClass="p-button-danger" (onClick)="deleteTask(item)"></p-button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ng-template>
-
-                <ng-template #grid let-items>
-                    <div class="grid grid-cols-12 gap-4">
-                        <div *ngFor="let item of items; let i = index" class="col-span-12 sm:col-span-6 lg:col-span-4 p-2">
-                            <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
-                                <div class="flex justify-between mb-4">
-                                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ item.limitDate | date:'dd/MM/yyyy' }}</span>
-                                    <p-tag [value]="item.status" [severity]="getSeverity(item)"></p-tag>
-                                </div>
-                                <div class="text-lg font-medium mb-3">{{ item.name }}</div>
-                                <p class="text-surface-600 mb-4">{{ item.description }}</p>
-                                <div class="flex justify-end gap-2 mt-auto">
-                                    <p-button icon="pi pi-pencil" styleClass="p-button-warning" (onClick)="editTask(item)"></p-button>
-                                    <p-button icon="pi pi-trash" styleClass="p-button-danger" (onClick)="deleteTask(item)"></p-button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ng-template>
-            </p-dataview>
-        </div>
-    </div>
-    `
+    imports: [CommonModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, OrderListModule, TagModule, ButtonModule,SelectModule],
+    templateUrl: './tareasComponent.html',
+   
 })
-export class Tareas {
+export class Tareas implements OnInit{ 
     tasks: any[] = [];
     layout: 'list' | 'grid' = 'list';
-    options = [
-        { icon: 'pi pi-bars', value: 'list' },
-        { icon: 'pi pi-th-large', value: 'grid' }
+    options = ['list', 'grid'];
+    selectedEstado: string = '';
+    isRevisor: boolean = false;
+    isVoluntario: boolean = false;
+    isBibliotecario: boolean = false;
+    isAlumno: boolean = false;
+    isLoading: boolean = false;
+    dropdownValue:  DropDown = {name: 'Pendiente', value: 'Pendiente'};
+    dropdownValues: DropDown[] = [
+        { name: 'Pendiente', value: 'Pendiente' },
+        { name: 'Completada', value: 'Completada' },
+        { name: 'Denegada', value: 'Denegada' },
+        { name: 'En Revisión', value: 'En Revisión' },
+        { name: 'En Proceso', value: 'En Proceso' }
     ];
+   
+   
 
-    constructor(private apiService: ApiService) {
+    constructor(private orderService: OrderService, private authService: AuthService, private orderManagmentService: OrderManagmentService ) {
         this.loadTasks();
     }
 
-    loadTasks() {
-        this.apiService.get('/order').subscribe((data: any) => {
-            this.tasks = data;
+    ngOnInit(): void {
+        this.loadTasks();
+        this.isRevisor = this.authService.hasRole('Voluntario Administrativo');
+        this.isVoluntario = this.authService.hasRole('Voluntario');
+        this.isBibliotecario = this.authService.hasRole('Bibliotecario') || this.authService.hasRole('Admin');
+        this.isAlumno = this.authService.hasRole('Alumno');
+      }
+
+      async loadTasks(): Promise<void> {
+        this.isLoading = true;
+        
+        const request = this.dropdownValue
+          ? this.orderManagmentService.getOrdersByState(this.dropdownValue.value)
+          : this.orderService.getOrders();
+    
+        await request.subscribe({
+          next: (data: any[]) => {
+            let filteredTasks = data;
+            if (this.isVoluntario) {
+              filteredTasks = filteredTasks.filter(task => task.status.toLowerCase() !== 'completada'
+                && task.status.toLowerCase() !== 'en revisión' && task.status.toLowerCase() !== 'en proceso');
+            } else if (this.isRevisor) {
+              filteredTasks = filteredTasks.filter(task => task.status.toLowerCase() === 'en revisión');
+            } else if (this.isAlumno) {
+              filteredTasks = filteredTasks.filter(task => task.status.toLowerCase() === 'completada');
+            }
+    
+            this.tasks = filteredTasks;
+            this.isLoading = false;
+          },
+          error: error => {
+            console.error('Error al obtener las tareas:', error);
+            this.isLoading = false;
+          }
         });
-    }
+      }
 
     getSeverity(task: any): string {
         switch (task.status) {

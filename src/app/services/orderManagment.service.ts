@@ -14,6 +14,7 @@ export class OrderManagmentService {
   }
 
   getOrdersByState(status: string): Observable<any[]> {
+    console.log(status);
     return this.http.get<any[]>(`${this.apiUrl}/status?status=${status}`);
   }
 

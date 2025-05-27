@@ -26,6 +26,7 @@ import { Product, ProductService } from '../service/product.service';
                         </p-select-button>
                     </div>
                 </ng-template>
+                
 
                 <ng-template #list let-items>
                     <div class="flex flex-col">
