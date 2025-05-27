@@ -1,0 +1,29 @@
+<div class="container max-w-5xl mx-auto mt-10 shadow-lg rounded-lg border border-blue-500 dark:border-blue-300 p-6 
+    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200">
+
+  <div class="flex justify-between items-center mb-6">
+    <h5 class="text-xl font-semibold text-blue-600 dark:text-blue-300">Visualizador OCR</h5>
+    <div *ngIf="!isToRevision()" class="flex gap-4">
+      <app-action-button label="Finalizar proceso"
+        styleEdit="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500"
+        [onActionClick]="finalizarProceso.bind(this)" />
+    </div>
+    <div class="flex gap-4" *ngIf="isToRevision()">
+      <app-action-button label="Denegar resultado"
+        styleEdit="bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500"
+        [onActionClick]="denegarResultado.bind(this)" />
+      <app-action-button label="Finalizar revisión"
+        styleEdit="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500"
+        [onActionClick]="finalizarRevision.bind(this)" />
+    </div>
+  </div>
+
+  <div *ngIf="!ocrData" class="bg-gray-200 dark:bg-gray-700 text-center p-6 rounded-md">
+    <p class="text-blue-600 dark:text-blue-300">No hay datos OCR disponibles.</p>
+  </div>
+
+  <app-ocr-text-viewer [ocrData]="ocrData" [currentPage]="currentPage" [isEditing]="isEditing"
+    [editingText]="editingText" (editClicked)="startEditing()" (saveChanges)="saveChanges()"
+    (cancelEditing)="cancelEditing()" (pageChange)="goToPage($event)">
+  </app-ocr-text-viewer>
+</div>

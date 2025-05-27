@@ -38,6 +38,8 @@
                                         (onClick)="editTask(item.id)"></p-button>
                                     <p-button icon="pi pi-trash" styleClass="p-button-danger"
                                         (onClick)="deleteTask(item.id, $event)"></p-button>
+                                    <p-button icon="pi pi-eye" styleClass="p-button-"
+                                        [routerLink]="['/wirin/task-detail', item.id]"></p-button>
                                 </div>
                             </div>
                         </div>
@@ -56,8 +58,6 @@
                             <div class="flex flex-row justify-between items-start gap-2">
 
                                 <div>
-                                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{
-                                        item.category }}</span>
                                     <div class="text-lg font-medium mt-1">{{ item.name }}</div>
                                 </div>
                             </div>
@@ -67,6 +67,8 @@
                                         (onClick)="editTask(item.id)"></p-button>
                                     <p-button icon="pi pi-trash" styleClass="p-button-danger"
                                         (onClick)="deleteTask(item.id, $event)"></p-button>
+                                    <p-button icon="pi pi-plus" styleClass="p-button-"
+                                        [routerLink]="['/wirin/task-detail', item.id]"></p-button>
                                 </div>
                             </div>
                         </div>

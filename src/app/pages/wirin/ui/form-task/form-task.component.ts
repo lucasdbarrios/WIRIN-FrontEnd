@@ -30,7 +30,7 @@ export class FormTaskComponent implements OnInit {
   existingFile: string = '';
   dropdownItems: DropDown[] = [
       { name: 'Pendiente', value: 'Pendiente' },
-      { name: 'En Progreso', value: 'En Progreso' },
+      { name: 'En Proceso', value: 'En Proceso' },
       { name: 'En Revisión', value: 'En Revisión' },
       { name: 'Denegada', value: 'Denegada' },
       { name: 'Finalizado', value: 'Finalizado' }

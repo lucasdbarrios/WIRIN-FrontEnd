@@ -8,6 +8,8 @@ import { DashboardWirin } from './app/pages/dashboard/wirin/dashboardWirin';
 import { TasksComponent } from './app/pages/wirin/tasks/tasks.component';
 import { AddTaskFormComponent } from './app/pages/wirin/form-add-task/form-add-task.component';
 import { EditTaskComponent } from './app/pages/wirin/form-edit-task/form-edit-task.component';
+import { TaskDetailComponent } from './app/pages/wirin/task-detail/task-detail.component';
+import { OcrViewerComponent } from './app/pages/wirin/ocr-viewer/ocr-viewer.component';
 
 export const appRoutes: Routes = [
     {
@@ -28,6 +30,8 @@ export const appRoutes: Routes = [
             { path: 'tasks', component: TasksComponent },
             { path: 'add-task-form', component: AddTaskFormComponent },
             { path: 'edit-task-form/:id', component: EditTaskComponent },
+            { path: 'task-detail/:id', component: TaskDetailComponent },
+            { path: 'ocr-viewer/:id', component: OcrViewerComponent },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

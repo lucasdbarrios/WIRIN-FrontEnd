@@ -1,0 +1,43 @@
+<p-card class="dark:bg-gray-800 text-gray-900 dark:text-gray-200">
+    <ng-template pTemplate="content">
+        <p-panel header="Texto Procesado por el OCR:" class="dark:bg-gray-700 text-gray-900 dark:text-gray-300">
+            <ng-container *ngIf="!isEditing">
+                <p-scrollPanel [style]="{ maxHeight: '250px', overflow: 'auto' }">
+                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ getCurrentPage()?.text }}</pre>
+                </p-scrollPanel>
+            </ng-container>
+
+            <ng-container *ngIf="isEditing">
+                <textarea [(ngModel)]="editingText" class="w-full h-40 border border-gray-400 dark:border-gray-600 rounded-md p-2 mt-2 
+                    whitespace-pre-wrap overflow-auto dark:bg-gray-800 text-gray-900 dark:text-gray-200">
+                </textarea>
+                <div class="flex justify-end gap-4 mt-3">
+                    <p-button label="Guardar cambios" class="p-button-success" (click)="onSaveChanges()"></p-button>
+                    <p-button label="Cancelar" class="p-button-secondary" (click)="cancelEditing.emit()"></p-button>
+                </div>
+            </ng-container>
+        </p-panel>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end mt-3">
+            <p-button label="Editar texto" class="p-button-primary" *ngIf="!isEditing"
+                (click)="onStartEditing()"></p-button>
+        </div>
+
+        <div *ngIf="ocrData" class="flex justify-center gap-2 mt-3">
+            <p-button icon="pi pi-angle-left" *ngIf="currentPage > 1" (click)="goToPage(currentPage - 1)"
+                class="p-button-rounded p-button-secondary"></p-button>
+
+            <p-button *ngFor="let page of ocrData.pages.slice(currentPage - 1, currentPage - 1 + pagesPerView)"
+                (click)="goToPage(page.number)"
+                [ngClass]="{'p-button-primary': currentPage === page.number, 'p-button-secondary': currentPage !== page.number}"
+                class="p-button-rounded">
+                {{ page.number }}
+            </p-button>
+
+            <p-button icon="pi pi-angle-right" *ngIf="currentPage + pagesPerView <= totalPages"
+                (click)="goToPage(currentPage + 1)" class="p-button-rounded p-button-secondary"></p-button>
+        </div>
+    </ng-template>
+</p-card>
