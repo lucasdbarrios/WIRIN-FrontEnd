@@ -9,6 +9,7 @@ import { OrderService } from '../../../services/order.service';
 import { OcrResponse } from '../../../types/ocr.interface';
 import { OcrTextViewerComponent } from '../ui/ocr-text-viewer/ocr-text-viewer.component';
 import { ActionButtonComponent } from '../ui/button/button.component';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ocr-viewer',
@@ -18,6 +19,7 @@ import { ActionButtonComponent } from '../ui/button/button.component';
 })
 export class OcrViewerComponent implements OnInit {
   @Input() ocrData: OcrResponse | null = null;
+  fileName: string = '';
   isEditing: boolean = false;
   editingText: string = '';
   currentPage: number = 1;
@@ -27,12 +29,14 @@ export class OcrViewerComponent implements OnInit {
   isRevision = false;
   taskId: number = 0;
   formData?: FormData;
+  urlSafe: SafeResourceUrl = '';
 
   constructor(private router: Router, 
     private orderManagmentService: OrderManagmentService,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    public sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +45,21 @@ export class OcrViewerComponent implements OnInit {
     const storedData = localStorage.getItem('ocrData');
     if (storedData) {
       this.ocrData = JSON.parse(storedData);
-      this.totalPages = this.ocrData?.metadata?.totalPages ?? 1; // Evita undefined/null
+      this.totalPages = this.ocrData?.metadata?.totalPages ?? 1; 
+      this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop() ?? ''
+      
+      this.orderService.recoveryFile(this.taskId).subscribe({
+        next: (data) => {
+          const blob = new Blob([data], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        },
+        error: (error) => {
+          console.error('Error al recuperar el archivo:', error);
+        }
+      })
+
+     // this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.ocrData?.metadata?.fileName?? '');
     }
 
     this.orderService.getTaskById(this.taskId).subscribe(task => {

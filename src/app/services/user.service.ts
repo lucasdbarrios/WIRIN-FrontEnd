@@ -20,4 +20,10 @@ export class UserService {
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
+
+  getAllStudents(): Observable<any[]> {
+    const url = `${this.apiUrl}/students`; 
+    
+    return this.http.get<any[]>(url);
+  }
 }

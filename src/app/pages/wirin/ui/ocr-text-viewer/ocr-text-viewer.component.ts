@@ -40,8 +40,8 @@ export class OcrTextViewerComponent {
     onStartEditing(): void {
         const currentPage = this.getCurrentPage();
         if (currentPage) {
-        this.editingText = currentPage.text;
-        this.editClicked.emit();
+            this.editingText = currentPage.text;
+            this.editClicked.emit();
         }
     }
 

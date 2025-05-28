@@ -32,6 +32,14 @@ export class OrderService {
     });
   }
 
+  recoveryFile(id: number): Observable<Blob> {
+    const downloadUrl = `${this.apiUrl}/recovery/${id}`;
+
+    return this.http.get(downloadUrl, {
+      responseType: 'blob'
+    });
+  }
+
   deleteOrder(id: number): Observable<any> {
     console.log(this.apiUrl);
     return this.http.delete(`${this.apiUrl}/${id}`);

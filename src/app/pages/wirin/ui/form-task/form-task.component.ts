@@ -9,6 +9,8 @@ import { RouterModule } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
+import { UserService } from '../../../../services/user.service';
+import { Order } from '../../../../types/order.interface';
 
 @Component({
   standalone: true,
@@ -35,13 +37,9 @@ export class FormTaskComponent implements OnInit {
       { name: 'Denegada', value: 'Denegada' },
       { name: 'Finalizado', value: 'Finalizado' }
   ]
-  dropdownItemsUsers: DropDown[] = [
-      { name: 'Maria Becerra', value: 'Maria Becerra' },
-      { name: 'Manuel Ignacio', value: 'Manuel Ignacio' },
-      { name: 'Emanuel Rodriguez', value: 'Emanuel Rodriguez' }
-  ]
+  dropdownItemsUsers: DropDown[] = []
 
-  @Input() set taskData(data: any) {
+  @Input() set taskData(data: Order) {
     if (data) {
       let formattedDate = null;
       if (data.limitDate) {
@@ -49,11 +47,13 @@ export class FormTaskComponent implements OnInit {
       }
 
       this.formTask.patchValue({
+        id: data.id,
         name: data.name,
         description: data.description,
         limitDate: formattedDate,
-        user: data.user,
+        assignedUserId: data.assignedUserId,
         status: data.status,
+
       });
 
       if (data.filePath) {
@@ -65,19 +65,30 @@ export class FormTaskComponent implements OnInit {
   }
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private userService: UserService
   ) {
     this.formTask = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(5)]],
       limitDate: ['', Validators.required],
       status: ['Pendiente'],
-      user: [''],
+      assignedUserId: [''],
       file: ['']
     });
+
+    this.userService.getAllStudents().subscribe({
+      next: (response) => {
+        this.dropdownItemsUsers = response.map((user: any) => ({
+          name: user.fullName,
+          value: user.id
+        }));
+      },
+    });
+    
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     if (this.isEditMode) {
       this.formTask.get('status')?.enable();
     } else {
@@ -110,7 +121,7 @@ export class FormTaskComponent implements OnInit {
       formData.append('description', this.formTask.get('description')?.value);
       formData.append('limitDate', formattedDate);
       formData.append('status', this.formTask.get('status')?.value || '');
-      formData.append('user', this.formTask.get('user')?.value || '');
+      formData.append('assignedUserId', this.formTask.get('assignedUserId')?.value || '');
 
       if (this.selectedFile) {
         formData.append('file', this.selectedFile);

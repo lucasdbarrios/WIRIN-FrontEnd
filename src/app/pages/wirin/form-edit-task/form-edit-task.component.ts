@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { FluidModule } from 'primeng/fluid';
+import { Order } from '../../../types/order.interface';
 
 @Component({
   selector: 'app-form-edit-task',
@@ -17,7 +18,7 @@ export class EditTaskComponent implements OnInit {
   taskId: string | null = null;
   uploadProgress: number = 0;
   uploadStatus: 'initial' | 'uploading' | 'success' | 'error' = 'initial';
-  taskData: any = null;
+  taskData: Order | null = null;
   showConfirmPopup: boolean = false;
   formDataToSubmit?: FormData;
 
