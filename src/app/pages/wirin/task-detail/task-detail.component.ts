@@ -142,15 +142,15 @@ export class TaskDetailComponent implements OnInit {
     });
   }
 
-  processOcr(orderId: number, condition: boolean): void {
+  processOcr(orderId: number, condition: boolean, status: string): void {
     this.uploadStatus = 'uploading';
     this.uploadProgress = 0;
     this.ocrResponse = null;
 
     if(condition){
       this.formData = new FormData();
-    this.formData.append('id', this.taskId.toString());
-    this.formData.append('status', 'En Proceso');
+      this.formData.append('id', this.taskId.toString());
+      this.formData.append('status', status);
       this.orderManagmentService.changeStatus(this.formData).subscribe({
       error: (err) => {
         console.error('Error al cambiar el estado:', err);

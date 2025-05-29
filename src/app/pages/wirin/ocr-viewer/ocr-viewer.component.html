@@ -1,8 +1,7 @@
-<div class="container max-w-5xl mx-auto mt-10 dark:text-gray-200">
-
+<div class="container max-w-6xl mx-auto mt-10 dark:text-gray-200 min-h-screen flex flex-col">
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-xl">{{fileName}}</h2>
-    
+    <h2 class="text-2xl font-semibold">{{fileName}}</h2>
+
     <div *ngIf="!isToRevision()" class="flex gap-4">
       <app-action-button label="Finalizar proceso"
         styleEdit="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500"
@@ -19,15 +18,16 @@
   </div>
 
   <div *ngIf="!ocrData" class="bg-gray-200 dark:bg-gray-700 text-center p-6 rounded-md">
-    <p class="text-blue-600 dark:text-blue-300">No hay datos OCR disponibles.</p>
+    <p class="text-blue-600 dark:text-blue-300 text-lg">No hay datos OCR disponibles.</p>
   </div>
-<div class="flex">
 
-  <iframe [src]="urlSafe" type="application/pdf"></iframe>
+  <div class="flex gap-6 lg:flex-row sm:flex-col min-h-[70vh]">
+    <app-ocr-text-viewer class="w-full lg:w-1/2 h-[70vh]" [ocrData]="ocrData" [currentPage]="currentPage"
+      [isEditing]="isEditing" [editingText]="editingText" (editClicked)="startEditing()" (saveChanges)="saveChanges()"
+      (cancelEditing)="cancelEditing()" (pageChange)="goToPage($event)">
+    </app-ocr-text-viewer>
 
-  <app-ocr-text-viewer [ocrData]="ocrData" [currentPage]="currentPage" [isEditing]="isEditing"
-    [editingText]="editingText" (editClicked)="startEditing()" (saveChanges)="saveChanges()"
-    (cancelEditing)="cancelEditing()" (pageChange)="goToPage($event)">
-  </app-ocr-text-viewer>
-</div>
+    <iframe [src]="urlSafe" type="application/pdf"
+      class="w-full lg:w-1/2 h-[70vh] border rounded-lg shadow-lg"></iframe>
+  </div>
 </div>

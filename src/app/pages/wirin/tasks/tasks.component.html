@@ -5,9 +5,11 @@
     <p-dataview [value]="tasks" [layout]="layout">
         <ng-template #header>
             <div class="flex justify-between">
-                <p-button label="Nueva Tarea" icon="pi pi-plus" (onClick)="newTask()"></p-button>
+                <p-button label="Nueva Tarea" icon="pi pi-plus" (onClick)="newTask()"
+                    *ngIf="isBibliotecario"></p-button>
                 <p-select class="w-[150px] mr-3" [(ngModel)]="dropdownValue" [options]="dropdownValues"
-                    optionLabel="name" placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()" />
+                    optionLabel="name" placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()"
+                    *ngIf="isBibliotecario" />
 
                 <p-select-button [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
                     <ng-template #item let-option>
@@ -35,9 +37,9 @@
                                 <p-tag [value]="item.status" [severity]="getSeverity(item)"></p-tag>
                                 <div class="flex flex-row-reverse md:flex-row gap-2">
                                     <p-button icon="pi pi-pencil" styleClass="p-button-warning"
-                                        (onClick)="editTask(item.id)"></p-button>
+                                        (onClick)="editTask(item.id)" *ngIf="isBibliotecario"></p-button>
                                     <p-button icon="pi pi-trash" styleClass="p-button-danger"
-                                        (onClick)="deleteTask(item.id, $event)"></p-button>
+                                        (onClick)="deleteTask(item.id, $event)" *ngIf="isBibliotecario"></p-button>
                                     <p-button icon="pi pi-eye" styleClass="p-button-"
                                         [routerLink]="['/wirin/task-detail', item.id]"></p-button>
                                 </div>
@@ -64,9 +66,9 @@
                             <div class="flex flex-col gap-6 mt-6">
                                 <div class="flex gap-2 justify-end">
                                     <p-button icon="pi pi-pencil" styleClass="p-button-warning"
-                                        (onClick)="editTask(item.id)"></p-button>
+                                        (onClick)="editTask(item.id)" *ngIf="isBibliotecario"></p-button>
                                     <p-button icon="pi pi-trash" styleClass="p-button-danger"
-                                        (onClick)="deleteTask(item.id, $event)"></p-button>
+                                        (onClick)="deleteTask(item.id, $event)" *ngIf="isBibliotecario"></p-button>
                                     <p-button icon="pi pi-plus" styleClass="p-button-"
                                         [routerLink]="['/wirin/task-detail', item.id]"></p-button>
                                 </div>
