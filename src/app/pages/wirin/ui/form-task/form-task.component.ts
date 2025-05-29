@@ -43,28 +43,25 @@ export class FormTaskComponent implements OnInit {
 
   @Input() set taskData(data: Order) {
     if (data) {
-      let formattedDate = null;
-      if (data.limitDate) {
-        formattedDate = new Date(data.limitDate);
-      }
+        let formattedDate = data.limitDate ? new Date(data.limitDate) : null;
 
-      this.formTask.patchValue({
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        limitDate: formattedDate,
-        assignedUserId: data.assignedUserId,
-        status: data.status,
+        this.formTask.patchValue({
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            limitDate: formattedDate,
+            assignedUserId: data.assignedUserId,
+            status: data.status,
+        });
 
-      });
-
-      if (data.filePath) {
-        this.currentFileName = data.filePath.split('\\').pop() || data.filePath.split('/').pop() || data.filePath;
-        this.existingFile = this.currentFileName;
-        this.uploadedFiles = [{ name: this.currentFileName }];
-      }
+        if (data.filePath) {
+            this.currentFileName = data.filePath.split('\\').pop() || data.filePath.split('/').pop() || data.filePath;
+            this.existingFile = this.currentFileName;
+            this.uploadedFiles = [{ name: this.currentFileName }];
+            this.formTask.patchValue({ file: this.currentFileName }); // 🔥 Asigna el archivo al formulario
+        }
     }
-  }
+}
 
   constructor(
     private fb: FormBuilder,
@@ -115,11 +112,12 @@ export class FormTaskComponent implements OnInit {
     }
 }
 
-  onSubmit(): void {
-    if (this.formTask.valid) {
+onSubmit(): void {
+  if (this.formTask.valid) {
       const formData = new FormData();
       const rawDate = this.formTask.get('limitDate')?.value;
       const formattedDate = rawDate ? new Date(rawDate).toISOString().split('T')[0] : '';
+
       formData.append('name', this.formTask.get('name')?.value);
       formData.append('description', this.formTask.get('description')?.value);
       formData.append('limitDate', formattedDate);
@@ -127,16 +125,19 @@ export class FormTaskComponent implements OnInit {
       formData.append('assignedUserId', this.formTask.get('assignedUserId')?.value || '');
 
       if (this.selectedFile) {
-        formData.append('file', this.selectedFile);
+          formData.append('file', this.selectedFile);
+      } else if (this.existingFile) {
+          formData.append('file', this.existingFile); // 🔥 Agrega el archivo existente
       }
+
       this.formSubmitted.emit(formData);
-    } else {
+  } else {
       Object.keys(this.formTask.controls).forEach(key => {
-        const control = this.formTask.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
-        }
+          const control = this.formTask.get(key);
+          if (control?.invalid) {
+              control.markAsTouched();
+          }
       });
-    }
   }
+}
 }
