@@ -11,6 +11,9 @@ import { EditTaskComponent } from './app/pages/wirin/form-edit-task/form-edit-ta
 import { TaskDetailComponent } from './app/pages/wirin/task-detail/task-detail.component';
 import { OcrViewerComponent } from './app/pages/wirin/ocr-viewer/ocr-viewer.component';
 import { UsersListComponent } from './app/pages/wirin/users-list/users-list.component';
+import { AuthGuard } from './app/guards/auth.guard';
+import { LoginComponent } from './app/pages/wirin/login/login.component';
+import { ProfileComponent } from './app/pages/wirin/profile/profile.component';
 
 export const appRoutes: Routes = [
     {
@@ -23,17 +26,20 @@ export const appRoutes: Routes = [
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },
+    { path: 'login', component: LoginComponent },
     {
         path: 'wirin',
         component: AppLayout, 
         children: [
-            { path: '', component: DashboardWirin },
-            { path: 'tasks', component: TasksComponent },
-            { path: 'add-task-form', component: AddTaskFormComponent },
-            { path: 'edit-task-form/:id', component: EditTaskComponent },
-            { path: 'task-detail/:id', component: TaskDetailComponent },
-            { path: 'ocr-viewer/:id', component: OcrViewerComponent },
-            { path: 'users', component: UsersListComponent },
+            { path: '', redirectTo: '/login', pathMatch: 'full' },
+            { path: '', component: DashboardWirin, canActivate: [AuthGuard] },
+            { path: 'tasks', component: TasksComponent, canActivate: [AuthGuard] },
+            { path: 'add-task-form', component: AddTaskFormComponent, canActivate: [AuthGuard] },
+            { path: 'edit-task-form/:id', component: EditTaskComponent, canActivate: [AuthGuard] },
+            { path: 'task-detail/:id', component: TaskDetailComponent, canActivate: [AuthGuard] },
+            { path: 'ocr-viewer/:id', component: OcrViewerComponent, canActivate: [AuthGuard] },
+            { path: 'users', component: UsersListComponent, canActivate: [AuthGuard] },
+            { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

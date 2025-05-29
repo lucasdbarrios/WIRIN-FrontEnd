@@ -1,0 +1,16 @@
+<div class="flex items-center justify-center">
+  <div class="flex flex-col items-center justify-center">
+    <div class="card border-round-lg shadow-2 p-6 border-primary">
+      <h5 class="text-3xl font-semibold text-primary text-center">Mi Perfil</h5>
+
+      <div *ngIf="user && !isLoading">
+        <div class="mt-6 p-4">
+          <p class="text-surface-900 dark:text-surface-0"><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
+          <p class="text-surface-900 dark:text-surface-0"><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
+          <p class="text-surface-900 dark:text-surface-0"><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+          <p class="text-surface-900 dark:text-surface-0"><strong>Rol:</strong> {{ user.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<app-floating-configurator />
+<div
+    class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+    <div class="flex flex-col items-center justify-center">
+        <div
+            style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+            <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+                <div class="flex justify-center mb-8">
+                    <img src="logo/wirin.png" alt="Logo Wirin">
+                </div>
+
+                <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-2 rounded-md text-center">
+                    {{ errorMessage }}
+                </div>
+
+                <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+                    <div class="mb-4">
+                        <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
+                            Correo Electrónico
+                        </label>
+                        <input pInputText id="email1" name="email" type="email" [(ngModel)]="loginData.email" required
+                            email placeholder="Email address" class="w-full md:w-[30rem] mb-8" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password1"
+                            class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">
+                            Contraseña
+                        </label>
+                        <p-password id="password1" name="password" placeholder="Password"
+                            [(ngModel)]="loginData.password" required minlength="6" [toggleMask]="true"
+                            styleClass="mb-4" [fluid]="true" [feedback]="false">
+                        </p-password>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                        <div class="flex items-center">
+                            <p-checkbox id="rememberme1" binary class="mr-2"></p-checkbox>
+                            <label for="rememberme1">Recuerdamela</label>
+                        </div>
+                        <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">
+                            ¿Olvidaste la contraseña?
+                        </span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" [disabled]="loginForm.invalid || isLoading"
+                            class="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600">
+                            Iniciar Sesión
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
