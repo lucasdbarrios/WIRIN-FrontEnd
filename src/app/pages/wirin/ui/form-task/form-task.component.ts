@@ -73,8 +73,8 @@ export class FormTaskComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(5)]],
       limitDate: ['', Validators.required],
       status: ['Pendiente'],
-      assignedUserId: [''],
-      file: ['']
+      assignedUserId: ['', Validators.required],
+      file: ['', Validators.required]
     });
 
     this.userService.getAllStudents().subscribe({
@@ -102,13 +102,14 @@ export class FormTaskComponent implements OnInit {
 
   onFileSelected(event: any): void {
     if (event.files && event.files.length > 0) {
-        const selectedFile = event.files[0]; 
+        const selectedFile = event.files[0];
         this.selectedFile = selectedFile;
         this.existingFile = '';
         this.uploadedFiles = [];
         this.formTask.patchValue({ file: selectedFile });
     } else {
         this.formTask.patchValue({ file: null });
+        this.formTask.get('file')?.markAsTouched();
     }
 }
 
