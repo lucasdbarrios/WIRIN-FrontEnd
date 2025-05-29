@@ -8,6 +8,7 @@ import { FileUploadService } from '../../../services/file-upload.service';
 import { OrderManagmentService } from '../../../services/orderManagment.service';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -35,6 +36,7 @@ export class TaskDetailComponent implements OnInit {
   isEarring = false;
   isProcess = false;
   formData?: FormData;
+  userName: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -42,7 +44,8 @@ export class TaskDetailComponent implements OnInit {
     private orderService: OrderService,
     private authService: AuthService,
     private fileUploadService: FileUploadService,
-    private orderManagmentService: OrderManagmentService
+    private orderManagmentService: OrderManagmentService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -83,10 +86,21 @@ export class TaskDetailComponent implements OnInit {
 
     this.orderService.getTaskById(this.taskId).subscribe({
       next: (data: any) => {
+        console.log('Datos de la tarea:', data);
         this.task = {
           ...data,
           fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
         };
+        this.userService.getUserById(data.assignedUserId).subscribe({
+          next: (user) => {
+              this.userName = user.name;
+          },
+          error: (err) => {
+              console.error('Error al obtener el usuario:', err);
+              this.userName = 'Usuario no encontrado';
+          }
+      });
+
         this.isLoading = false;
       },
       error: (error) => {

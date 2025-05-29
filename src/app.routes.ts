@@ -10,6 +10,7 @@ import { AddTaskFormComponent } from './app/pages/wirin/form-add-task/form-add-t
 import { EditTaskComponent } from './app/pages/wirin/form-edit-task/form-edit-task.component';
 import { TaskDetailComponent } from './app/pages/wirin/task-detail/task-detail.component';
 import { OcrViewerComponent } from './app/pages/wirin/ocr-viewer/ocr-viewer.component';
+import { UsersListComponent } from './app/pages/wirin/users-list/users-list.component';
 
 export const appRoutes: Routes = [
     {
@@ -32,6 +33,7 @@ export const appRoutes: Routes = [
             { path: 'edit-task-form/:id', component: EditTaskComponent },
             { path: 'task-detail/:id', component: TaskDetailComponent },
             { path: 'ocr-viewer/:id', component: OcrViewerComponent },
+            { path: 'users', component: UsersListComponent },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

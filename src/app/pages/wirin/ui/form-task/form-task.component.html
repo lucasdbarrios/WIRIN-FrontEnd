@@ -1,30 +1,28 @@
 <form [formGroup]="formTask" (ngSubmit)="onSubmit()">
-
     <div class="flex mt-8">
-
         <div class="card flex flex-col gap-6 w-full">
             <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
                 <h2 class="ml-2">{{isEditMode ? 'Editar Tarea' : 'Crear Nueva Tarea'}}</h2>
             </div>
+
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-wrap gap-2 w-full">
                     <label for="name">Titulo de la Tarea</label>
                     <input pInputText id="name" type="text" formControlName="name" placeholder="Ingresá un titulo" />
-                    <span class="text-red-500 text-sm"
-                        *ngIf="formTask.get('name')?.invalid && formTask.get('name')?.touched">
-                        {{ getErrorMessage('name') }}
-                    </span>
+                    <p-message *ngIf="formTask.get('name')?.invalid && formTask.get('name')?.touched" severity="error"
+                        variant="simple" size="small">
+                        El título es requerido
+                    </p-message>
                 </div>
-
 
                 <div class="flex flex-col gap-2 w-full">
                     <label for="limitDate">Fecha Límite</label>
                     <p-datepicker placeholder="Ingresa fecha" [showIcon]="true" [showButtonBar]="true"
                         formControlName="limitDate"></p-datepicker>
-                    <span class="text-red-500 text-sm"
-                        *ngIf="formTask.get('limitDate')?.invalid && formTask.get('limitDate')?.touched">
-                        {{ getErrorMessage('limitDate') }}
-                    </span>
+                    <p-message *ngIf="formTask.get('limitDate')?.invalid && formTask.get('limitDate')?.touched"
+                        severity="error" variant="simple" size="small">
+                        La fecha es requerida
+                    </p-message>
                 </div>
             </div>
 
@@ -32,10 +30,10 @@
                 <label for="address">Descripción</label>
                 <textarea pTextarea id="description" formControlName="description"
                     placeholder="Agrega una breve descripción" rows="4"></textarea>
-                <span class="text-red-500 text-sm"
-                    *ngIf="formTask.get('description')?.invalid && formTask.get('description')?.touched">
-                    {{ getErrorMessage('description') }}
-                </span>
+                <p-message *ngIf="formTask.get('description')?.invalid && formTask.get('description')?.touched"
+                    severity="error" variant="simple" size="small">
+                    La descripción es requerida
+                </p-message>
             </div>
 
             <div class="flex flex-col md:flex-row gap-6" *ngIf="isEditMode">
@@ -43,6 +41,11 @@
                     <label for="status">Estado</label>
                     <p-select id="status" formControlName="status" [options]="dropdownItems" optionLabel="name"
                         optionValue="value" placeholder="Selecciona el estado"></p-select>
+                    <p-message
+                        *ngIf="formTask.get('assignedUserId')?.invalid && formTask.get('assignedUserId')?.touched"
+                        severity="error" variant="simple" size="small">
+                        El estado es requerido
+                    </p-message>
                 </div>
             </div>
 
@@ -51,10 +54,11 @@
                     <label for="assignedUserId">Seleccionar usuario</label>
                     <p-select id="assignedUserId" formControlName="assignedUserId" [options]="dropdownItemsUsers"
                         optionLabel="name" optionValue="value" placeholder="Selecciona el usuario"></p-select>
-                    <span class="text-red-500 text-sm"
-                        *ngIf="formTask.get('assignedUserId')?.invalid && formTask.get('assignedUserId')?.touched">
-                        {{ getErrorMessage('assignedUserId') }}
-                    </span>
+                    <p-message
+                        *ngIf="formTask.get('assignedUserId')?.invalid && formTask.get('assignedUserId')?.touched"
+                        severity="error" variant="simple" size="small">
+                        El usuario es requerido
+                    </p-message>
                 </div>
             </div>
 
@@ -68,18 +72,17 @@
                             </div>
                         </ng-template>
                     </p-fileupload>
-                    <span class="text-red-500 text-sm"
-                        *ngIf="formTask.get('file')?.invalid && formTask.get('file')?.touched">
-                        {{ getErrorMessage('file') }}
-                    </span>
+                    <p-message *ngIf="formTask.get('file')?.invalid && formTask.get('file')?.touched" severity="error"
+                        variant="simple" size="small">
+                        El archivo es requerido
+                    </p-message>
                 </div>
             </div>
+
             <div class="flex flex-col md:flex-row md:justify-between gap-4 w-full">
                 <p-button label="Volver" type="button" class="w-full md:w-auto mt-2" (click)="goBack()"></p-button>
                 <p-button label="Guardar" type="submit" class="w-full md:w-auto mt-2"></p-button>
             </div>
         </div>
-
     </div>
-
 </form>

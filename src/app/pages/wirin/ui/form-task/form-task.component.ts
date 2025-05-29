@@ -11,12 +11,14 @@ import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { UserService } from '../../../../services/user.service';
 import { Order } from '../../../../types/order.interface';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   standalone: true,
   selector: 'app-form-task',
   templateUrl: './form-task.component.html',
-  imports: [ReactiveFormsModule, ButtonModule, CommonModule, RouterModule, SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule]
+  imports: [ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, 
+    SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule]
 })
 export class FormTaskComponent implements OnInit {
   @Input() isEditMode: boolean = false;
@@ -136,17 +138,5 @@ export class FormTaskComponent implements OnInit {
         }
       });
     }
-  }
-
-  getErrorMessage(controlName: string): string {
-    const control = this.formTask.get(controlName);
-    if (control?.hasError('required')) {
-      return 'Este campo es requerido';
-    }
-    if (control?.hasError('minlength')) {
-      const requiredLength = control.errors?.['minlength'].requiredLength;
-      return `Debe tener al menos ${requiredLength} caracteres`;
-    }
-    return '';
   }
 }
