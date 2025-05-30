@@ -37,7 +37,8 @@ export class FormTaskComponent implements OnInit {
       { name: 'En Proceso', value: 'En Proceso' },
       { name: 'En Revisión', value: 'En Revisión' },
       { name: 'Denegada', value: 'Denegada' },
-      { name: 'Finalizado', value: 'Finalizado' }
+      { name: 'Completada', value: 'Completada' },
+      { name: 'Entregada', value: 'Entregada' }
   ]
   dropdownItemsUsers: DropDown[] = []
 

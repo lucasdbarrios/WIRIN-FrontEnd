@@ -14,7 +14,6 @@ export class OrderManagmentService {
   }
 
   getOrdersByState(status: string): Observable<any[]> {
-    console.log(status);
     return this.http.get<any[]>(`${this.apiUrl}/status?status=${status}`);
   }
 
@@ -23,7 +22,12 @@ export class OrderManagmentService {
   }
 
   changeStatus(formData: FormData): Observable<any> {
-    return this.http.put(`${this.apiUrl}/changeStatus`, {id: formData.get('id'), status: formData.get('status')});
+    console.log(formData);
+    return this.http.put(`${this.apiUrl}/changeStatus`, {id: formData.get('id'), 
+      status: formData.get('status'), 
+      assignedUserId: formData.get('assignedUserId')
+
+    });
   }
 
 }

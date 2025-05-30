@@ -27,9 +27,9 @@ export class OcrViewerComponent implements OnInit {
   user: any;
   errorMessage: string = '';
   isRevision = false;
-  taskId: number = 0;
   formData?: FormData;
   urlSafe: SafeResourceUrl = '';
+  task: any;
 
   constructor(private router: Router, 
     private orderManagmentService: OrderManagmentService,
@@ -40,15 +40,17 @@ export class OcrViewerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.taskId = Number(this.route.snapshot.paramMap.get('id'));
-
+    const taskId = Number(this.route.snapshot.paramMap.get('id'));
+    this.orderService.getTaskById(taskId).subscribe(task => {
+      this.task = task;
+    });
     const storedData = localStorage.getItem('ocrData');
     if (storedData) {
       this.ocrData = JSON.parse(storedData);
       this.totalPages = this.ocrData?.metadata?.totalPages ?? 1; 
       this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop() ?? ''
       
-      this.orderService.recoveryFile(this.taskId).subscribe({
+      this.orderService.recoveryFile(this.task.id).subscribe({
         next: (data) => {
           const blob = new Blob([data], { type: 'application/pdf' });
           const url = URL.createObjectURL(blob);
@@ -62,9 +64,8 @@ export class OcrViewerComponent implements OnInit {
      // this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.ocrData?.metadata?.fileName?? '');
     }
 
-    this.orderService.getTaskById(this.taskId).subscribe(task => {
+    this.orderService.getTaskById(this.task.id).subscribe(task => {
       this.isRevision = task?.status === 'En Revisión';
-      console.log('Estado de la tarea:', task?.status);
     });
 
     this.authService.getCurrentUser().subscribe({
@@ -116,8 +117,10 @@ export class OcrViewerComponent implements OnInit {
 
   getFormData(status: string): FormData {
     this.formData = new FormData();
-    this.formData.append('id', this.taskId.toString());
+    this.formData.append('id', this.task.id);
     this.formData.append('status', status);
+    this.formData.append('assignedUserId', this.task.assignedUserId);
+    
     return this.formData;
   }
 
@@ -142,6 +145,6 @@ export class OcrViewerComponent implements OnInit {
   }
 
   isToRevision(): boolean {
-    return this.isRevision;
+    return this.task?.status === 'En Revisión';
   }
 }

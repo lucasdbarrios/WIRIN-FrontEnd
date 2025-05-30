@@ -25,11 +25,12 @@
         <div class="flex justify-between md:flex-row md:justify-between gap-4">
             <p-button label="Volver" type="button" class="md:w-auto mt-2" (click)="goBack()"></p-button>
             <p-button label="Procesar" type="button" class="md:w-auto mt-2"
-                (click)="processOcr(task.id, true, 'En Proceso')" *ngIf="isProcess || isEarring"></p-button>
+                (click)="processOcr(task.id, true, 'En Proceso')"
+                *ngIf="isProcess || isEarring || isDenegated"></p-button>
             <p-button label="Revisar" type="button" class="md:w-auto mt-2" (click)="processOcr(task.id, false, '')"
                 *ngIf="isRevision"></p-button>
-            <p-button label="Confirmar entrega" type="button" class="md:w-auto mt-2"
-                (click)="processOcr(task.id, true, 'Entregado')" *ngIf="isCompleted"></p-button>
+            <p-button label="Confirmar entrega" type="button" class="md:w-auto mt-2" (click)="confirmarEntrega()"
+                *ngIf="isCompleted"></p-button>
         </div>
     </ng-template>
 </p-card>

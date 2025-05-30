@@ -86,14 +86,14 @@ export class TaskDetailComponent implements OnInit {
 
     this.orderService.getTaskById(this.taskId).subscribe({
       next: (data: any) => {
-        console.log('Datos de la tarea:', data);
         this.task = {
           ...data,
           fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
         };
         this.userService.getUserById(data.assignedUserId).subscribe({
+          
           next: (user) => {
-              this.userName = user.name;
+              this.userName = user.fullName;
           },
           error: (err) => {
               console.error('Error al obtener el usuario:', err);
@@ -151,6 +151,7 @@ export class TaskDetailComponent implements OnInit {
       this.formData = new FormData();
       this.formData.append('id', this.taskId.toString());
       this.formData.append('status', status);
+      this.formData.append('assignedUserId', this.task.assignedUserId);
       this.orderManagmentService.changeStatus(this.formData).subscribe({
       error: (err) => {
         console.error('Error al cambiar el estado:', err);
@@ -178,6 +179,22 @@ export class TaskDetailComponent implements OnInit {
       }
     });
   }
+
+  confirmarEntrega(): void {
+    this.formData = new FormData();
+    this.formData.append('id', this.taskId.toString());
+    this.formData.append('status', 'Entregada');
+    this.formData.append('assignedUserId', this.task.assignedUserId);
+
+    this.orderManagmentService.changeStatus(this.formData).subscribe({
+        next: () => {
+            this.goBack();
+        },
+        error: (err) => {
+            console.error('Error al cambiar el estado:', err);
+        }
+    });
+}
 
   goBack(): void {
     this.router.navigate(['/wirin/tasks']);
