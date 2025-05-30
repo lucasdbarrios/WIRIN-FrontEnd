@@ -8,13 +8,13 @@ import { AuthService } from '../../../services/auth.service';
 import { OrderService } from '../../../services/order.service';
 import { OcrResponse } from '../../../types/ocr.interface';
 import { OcrTextViewerComponent } from '../ui/ocr-text-viewer/ocr-text-viewer.component';
-import { ActionButtonComponent } from '../ui/button/button.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-ocr-viewer',
   standalone: true,
-  imports: [CommonModule, FormsModule, OcrTextViewerComponent, ActionButtonComponent],
+  imports: [CommonModule, FormsModule, OcrTextViewerComponent, ButtonModule],
   templateUrl: './ocr-viewer.component.html',
 })
 export class OcrViewerComponent implements OnInit {

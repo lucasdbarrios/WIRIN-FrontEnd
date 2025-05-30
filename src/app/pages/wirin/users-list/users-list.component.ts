@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { UserService } from '../../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { AccordionModule } from 'primeng/accordion';
-import { ActionButtonComponent } from "../ui/button/button.component";
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-users-list',
   templateUrl: './users-list.component.html',
   standalone: true,
-  imports: [CommonModule, AccordionModule, ActionButtonComponent],
+  imports: [CommonModule, AccordionModule, ButtonModule],
 })
 export class UsersListComponent {
   users: any[] = [];

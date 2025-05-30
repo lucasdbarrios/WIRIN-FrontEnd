@@ -89,11 +89,13 @@ export class TasksComponent implements OnInit{
 
     getSeverity(task: any): string {
         switch (task.status) {
-            case 'Pendiente':
+            case 'En Revisión':
                 return 'warning';
             case 'Completada':
                 return 'success';
-            case 'Cancelada':
+              case 'Entregada':
+                return 'success';
+            case 'Denegada':
                 return 'danger';
             default:
                 return 'info';

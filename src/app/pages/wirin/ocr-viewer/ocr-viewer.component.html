@@ -1,19 +1,19 @@
 <div class="container max-w-6xl mx-auto mt-10 dark:text-gray-200 min-h-screen flex flex-col">
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-semibold">{{fileName}}</h2>
+    <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
 
     <div *ngIf="!isToRevision()" class="flex gap-4">
-      <app-action-button label="Finalizar proceso"
-        styleEdit="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500"
-        [onActionClick]="finalizarProceso.bind(this)" />
+      <p-button label="Finalizar proceso" icon="pi pi-plus" styleClass="p-button-primary" (click)="finalizarProceso()">
+      </p-button>
     </div>
+
     <div class="flex gap-4" *ngIf="isToRevision()">
-      <app-action-button label="Denegar resultado"
-        styleEdit="bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500"
-        [onActionClick]="denegarResultado.bind(this)" />
-      <app-action-button label="Finalizar revisión" *ngIf="isToRevision()"
-        styleEdit="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500"
-        [onActionClick]="finalizarRevision.bind(this)" />
+      <p-button label="Denegar resultado" icon="pi pi-times" styleClass="p-button-warning" (click)="denegarResultado()">
+      </p-button>
+
+      <p-button label="Finalizar revisión" icon="pi pi-check" styleClass="p-button-success"
+        (click)="finalizarRevision()">
+      </p-button>
     </div>
   </div>
 
