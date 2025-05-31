@@ -13,14 +13,25 @@ import { OrderService } from '../../../services/order.service';
 import { SelectModule } from 'primeng/select';
 import { DropDown } from '../../../types/dropDown';
 import { Router, RouterModule } from '@angular/router';
+import { ToolbarModule } from 'primeng/toolbar';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { FluidModule } from 'primeng/fluid';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     selector: 'app-tasks-component',
     standalone: true,
-    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, OrderListModule, TagModule, ButtonModule,SelectModule],
+    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
+      OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
+    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule
+  ],
     templateUrl: './tasks.component.html',
 })
-export class TasksComponent implements OnInit{ 
+export class TasksComponent implements OnInit{
+    allTasks: any[] = [];
     tasks: any[] = [];
     layout: 'list' | 'grid' = 'list';
     options = ['list', 'grid'];
@@ -34,13 +45,13 @@ export class TasksComponent implements OnInit{
     dropdownValues: DropDown[] = [
         { name: 'Todos', value: '' },
         { name: 'Pendiente', value: 'Pendiente' },
-        { name: 'Completada', value: 'Completada' },
-        { name: 'Denegada', value: 'Denegada' },
+        { name: 'En Proceso', value: 'En Proceso' },
         { name: 'En Revisión', value: 'En Revisión' },
-        { name: 'En Progreso', value: 'En Progreso' }
+        { name: 'Denegada', value: 'Denegada' },
+        { name: 'Completada', value: 'Completada' },
+        { name: 'Entregado', value: 'Entregado' },
+        
     ];
-   
-   
 
     constructor(private orderService: OrderService, 
       private authService: AuthService, 
@@ -50,53 +61,67 @@ export class TasksComponent implements OnInit{
         this.loadTasks();
     }
 
+
     ngOnInit(): void {
         this.loadTasks();
         this.isRevisor = this.authService.hasRole('Voluntario Administrativo');
         this.isVoluntario = this.authService.hasRole('Voluntario');
         this.isBibliotecario = this.authService.hasRole('Bibliotecario') || this.authService.hasRole('Admin');
         this.isAlumno = this.authService.hasRole('Alumno');
-      }
+    }
 
-      async loadTasks(): Promise<void> {
+    async loadTasks(): Promise<void> {
         this.isLoading = true;
         const selectedState = this.dropdownValue?.value || '';
         const request = selectedState
-          ? this.orderManagmentService.getOrdersByState(selectedState)
-          : this.orderService.getOrders();
-          
+            ? this.orderManagmentService.getOrdersByState(selectedState)
+            : this.orderService.getOrders();
+            
         await request.subscribe({
-          next: (data: any[]) => {
-            let filteredTasks = data;
-            if (this.isVoluntario) {
-              filteredTasks = filteredTasks.filter(task => task.status.toLowerCase() !== 'completada'
-                && task.status.toLowerCase() !== 'en revisión' && task.status.toLowerCase() !== 'en proceso');
-            } else if (this.isRevisor) {
-              filteredTasks = filteredTasks.filter(task => task.status.toLowerCase() === 'en revisión');
-            } else if (this.isAlumno) {
-              filteredTasks = filteredTasks.filter(task => task.status.toLowerCase() === 'completada');
+            next: (data: any[]) => {
+                this.allTasks = data;
+                this.tasks = [...data];
+                
+                if (this.isVoluntario) {
+                    this.tasks = this.tasks.filter(task => 
+                        task.status.toLowerCase() !== 'completada' &&
+                        task.status.toLowerCase() !== 'en revisión' &&
+                        task.status.toLowerCase() !== 'en proceso'
+                    );
+                } else if (this.isRevisor) {
+                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'en revisión');
+                } else if (this.isAlumno) {
+                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'completada');
+                }
+
+                this.isLoading = false;
+            },
+            error: error => {
+                console.error('Error al obtener las tareas:', error);
+                this.isLoading = false;
             }
-    
-            this.tasks = filteredTasks;
-            this.isLoading = false;
-          },
-          error: error => {
-            console.error('Error al obtener las tareas:', error);
-            this.isLoading = false;
-          }
         });
-      }
+    }
+
+    searchTasks(event: Event): void {
+        const query = (event.target as HTMLInputElement).value.toLowerCase();
+        this.tasks = this.allTasks.filter(task =>
+            task.name.toLowerCase().includes(query)
+        );
+    }
 
     getSeverity(task: any): string {
         switch (task.status) {
+            case 'En Proceso':
+                return 'Help';
             case 'En Revisión':
-                return 'warning';
+                return 'warn';
             case 'Completada':
-                return 'success';
+                return 'Success';
               case 'Entregada':
                 return 'success';
             case 'Denegada':
-                return 'danger';
+                return 'Danger';
             default:
                 return 'info';
         }
@@ -107,7 +132,6 @@ export class TasksComponent implements OnInit{
     }
 
     editTask(id: number) {
-      console.log(id);
       this.router.navigate([`/wirin/edit-task-form/${id}`]);
     }
 
