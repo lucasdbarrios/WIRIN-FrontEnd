@@ -40,7 +40,6 @@ export class TasksComponent implements OnInit{
     isVoluntario: boolean = false;
     isBibliotecario: boolean = false;
     isAlumno: boolean = false;
-    isLoading: boolean = false;
     dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
         { name: 'Todos', value: '' },
@@ -71,7 +70,6 @@ export class TasksComponent implements OnInit{
     }
 
     async loadTasks(): Promise<void> {
-        this.isLoading = true;
         const selectedState = this.dropdownValue?.value || '';
         const request = selectedState
             ? this.orderManagmentService.getOrdersByState(selectedState)
@@ -93,12 +91,9 @@ export class TasksComponent implements OnInit{
                 } else if (this.isAlumno) {
                     this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'completada');
                 }
-
-                this.isLoading = false;
             },
             error: error => {
                 console.error('Error al obtener las tareas:', error);
-                this.isLoading = false;
             }
         });
     }

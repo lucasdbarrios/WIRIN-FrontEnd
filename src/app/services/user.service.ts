@@ -26,4 +26,13 @@ export class UserService {
     
     return this.http.get<any[]>(url);
   }
+
+  getUsersByRole(role: string): Observable<any[]> {
+    const url = `${this.apiUrl}/by-role/${role}`;
+    return this.http.get<any[]>(url);
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
+  }
 }
