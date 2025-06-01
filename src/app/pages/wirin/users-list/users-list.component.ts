@@ -21,6 +21,7 @@ import { InputTextModule } from 'primeng/inputtext';
   ],
 })
 export class UsersListComponent {
+  allUsers: any[] = [];
   users: any[] = [];
   dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
@@ -50,7 +51,8 @@ export class UsersListComponent {
 
         await request.subscribe({
           next: (data: any[]) => {
-              this.users = data;
+            this.allUsers = data;
+            this.users = [...data];
           },
           error: error => {
               console.error('Error al obtener los usuarios:', error);
@@ -60,10 +62,10 @@ export class UsersListComponent {
 
   searchUsers(event: Event): void {
     const query = (event.target as HTMLInputElement).value.toLowerCase();
-    this.users = this.users.filter(user =>
-      user.name.toLowerCase().includes(query)
-    );
-  }
+    this.users = this.allUsers.filter(user =>
+      user.fullName.toLowerCase().includes(query)
+  );
+}
 
   newUser(): void {
     this.router.navigate(['/wirin/add-user-form']);
