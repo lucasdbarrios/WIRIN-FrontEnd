@@ -1,29 +1,35 @@
 <p-card>
-    <ng-template pTemplate="header">
-        <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
-            <h2>{{ task.name }}</h2>
-        </div>
-    </ng-template>
+    <div class="font-semibold text-xl mb-4">{{task.name}}</div>
 
     <ng-template pTemplate="content">
-        <div *ngIf="!isLoading && !errorMessage && task">
-            <p><strong>Descripción:</strong> {{ task.description }}</p>
-            <p><strong>Vencimiento:</strong> {{ task.limitDate | date:'medium' }}</p>
-            <p><strong>Alumno:</strong> {{ userName }}</p>
-            <p class="flex items-center">
+        <div *ngIf="!isLoading && !errorMessage && task" class="grid grid-cols-2 gap-4">
+
+            <div><strong>Descripción:</strong> {{ task.description }}</div>
+            <div><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd MMMM yyyy' : 'es' }}</div>
+
+            <div><strong>Fecha de creación:</strong> {{ task.creationDate | date:'dd MMMM yyyy - HH:mm:ss' : 'es' }}
+            </div>
+            <div><strong>Archivo a digitalizar:</strong> {{ task.fileName || 'Sin archivo'}}</div>
+
+            <div><strong>Solicitante del material:</strong> {{ requesterName }}</div>
+            <div><strong>Tarea creada por:</strong> {{ creatorName }}</div>
+
+            <div class="flex items-center">
                 <strong>Estado:</strong>
-                <span class="ml-2 px-3 py-1 rounded-md" [ngClass]="getStatusBadgeClass(task.status)">
-                    {{ task.status }}
-                </span>
-            </p>
-            <p-button icon="pi pi-download" label="Descargar archivo" class="p-button-link text-blue-500"
-                (click)="downloadFile(task.id, task.fileName)"></p-button>
+                <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
+            </div>
+        </div>
+
+        <div class="mt-4"> <!-- Separado para que el botón no esté dentro de las columnas -->
+            <p-button *ngIf="task.fileName" icon="pi pi-download" label="Descargar archivo"
+                class="p-button-link text-blue-500" (click)="downloadFile(task.id, task.fileName)">
+            </p-button>
         </div>
     </ng-template>
 
     <ng-template pTemplate="footer">
         <div class="flex justify-between md:flex-row md:justify-between gap-4">
-            <p-button label="Volver" type="button" class="md:w-auto mt-2" (click)="goBack()"></p-button>
+            <app-back-button></app-back-button>
             <p-button label="Procesar" type="button" class="md:w-auto mt-2"
                 (click)="processOcr(task.id, true, 'En Proceso')"
                 *ngIf="isProcess || isEarring || isDenegated"></p-button>

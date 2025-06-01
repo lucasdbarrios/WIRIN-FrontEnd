@@ -9,11 +9,14 @@ import { OrderManagmentService } from '../../../services/orderManagment.service'
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { UserService } from '../../../services/user.service';
+import { TagModule } from 'primeng/tag';
+import { firstValueFrom } from 'rxjs';
+import { BackButtonComponent } from '../ui/back-button/back-button.component';
 
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule],
+  imports: [CommonModule, CardModule, ButtonModule, TagModule, BackButtonComponent],
   templateUrl: './task-detail.component.html',
 })
 export class TaskDetailComponent implements OnInit {
@@ -36,7 +39,8 @@ export class TaskDetailComponent implements OnInit {
   isEarring = false;
   isProcess = false;
   formData?: FormData;
-  userName: string = '';
+  requesterName: string = '';
+  creatorName: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -85,31 +89,35 @@ export class TaskDetailComponent implements OnInit {
     }
 
     this.orderService.getTaskById(this.taskId).subscribe({
-      next: (data: any) => {
-        this.task = {
-          ...data,
-          fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
-        };
-        this.userService.getUserById(data.assignedUserId).subscribe({
-          
-          next: (user) => {
-              this.userName = user.fullName;
-          },
-          error: (err) => {
-              console.error('Error al obtener el usuario:', err);
-              this.userName = 'Usuario no encontrado';
-          }
-      });
-
-        this.isLoading = false;
+      next: async (data: any) => { 
+          this.task = {
+              ...data,
+              fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
+          };
+  
+          // Esperar los valores antes de asignarlos
+          this.creatorName = await this.getUserName(data.createdByUserId);
+          this.requesterName = await this.getUserName(data.assignedUserId);
+  
+          this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error al cargar los detalles de la tarea:', error);
-        this.errorMessage = 'No se pudo cargar los detalles de la tarea';
-        this.isLoading = false;
+          console.error('Error al cargar los detalles de la tarea:', error);
+          this.errorMessage = 'No se pudo cargar los detalles de la tarea';
+          this.isLoading = false;
       }
-    });
+  });
   }
+
+async getUserName(userId: string): Promise<string> {
+    try {
+        const user = await firstValueFrom(this.userService.getUserById(userId));
+        return user.fullName;
+    } catch (err) {
+        console.error(`Error al obtener el usuario con ID ${userId}:`, err);
+        return "Usuario no encontrado";
+    }
+}
 
   getStatusBadgeClass(status: string): string {
     switch (status.toLowerCase()) {
@@ -132,7 +140,7 @@ export class TaskDetailComponent implements OnInit {
       alert('No hay un nombre de archivo válido para descargar.');
       return;
     }
-  
+
     this.orderService.downloadFile(taskId).subscribe({
       next: (blob) => saveAs(blob, fileName),
       error: (error) => {
@@ -188,7 +196,7 @@ export class TaskDetailComponent implements OnInit {
 
     this.orderManagmentService.changeStatus(this.formData).subscribe({
         next: () => {
-            this.goBack();
+          this.router.navigate(['/wirin/tasks']);
         },
         error: (err) => {
             console.error('Error al cambiar el estado:', err);
@@ -196,7 +204,20 @@ export class TaskDetailComponent implements OnInit {
     });
 }
 
-  goBack(): void {
-    this.router.navigate(['/wirin/tasks']);
+getSeverity(task: any): string {
+  switch (task.status) {
+      case 'En Proceso':
+          return 'Help';
+      case 'En Revisión':
+          return 'warn';
+      case 'Completada':
+          return 'Success';
+        case 'Entregada':
+          return 'success';
+      case 'Denegada':
+          return 'Danger';
+      default:
+          return 'info';
   }
+}
 }

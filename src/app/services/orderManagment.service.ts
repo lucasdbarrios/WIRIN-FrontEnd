@@ -22,7 +22,6 @@ export class OrderManagmentService {
   }
 
   changeStatus(formData: FormData): Observable<any> {
-    console.log(formData);
     return this.http.put(`${this.apiUrl}/changeStatus`, {id: formData.get('id'), 
       status: formData.get('status'), 
       assignedUserId: formData.get('assignedUserId')

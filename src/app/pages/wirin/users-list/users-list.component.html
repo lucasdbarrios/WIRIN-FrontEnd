@@ -1,29 +1,30 @@
-<div class="flex flex-col md:flex-row gap-8">
-    <div class="md:w-full">
-        <div class="card">
-            <div class="font-semibold text-xl mb-4">Accordion</div>
-            <p-accordion value="0">
-                <p-accordion-panel *ngFor="let user of users" value={{user.id}}>
-                    <p-accordion-header>{{user.fullName}}</p-accordion-header>
-                    <p-accordion-content>
-                        <p class="m-0">
-                            Nombre de Usuario: {{ user.userName }}
-                        </p>
-                        <p class="m-0">
-                            Correo Electrónico: {{ user.email }}
-                        </p>
-                        <p class="m-0">
-                            Rol: {{ user.roles[0] || 'Sin rol' }}
-                        </p>
+<p-card class="">
+    <div class="font-semibold text-xl mb-4">Usuarios</div>
+    <p-accordion value="0">
+        <p-accordion-panel *ngFor="let user of users" value={{user.id}}>
+            <p-accordion-header>{{user.fullName}}</p-accordion-header>
+            <p-accordion-content>
+                <p class="m-0">
+                    Nombre Completo: {{ user.fullName }}
+                </p>
+                <p class="m-0">
+                    Nombre de Usuario: {{ user.userName }}
+                </p>
+                <p class="m-0">
+                    Correo Electrónico: {{ user.email }}
+                </p>
+                <p class="m-0">
+                    Rol: {{ user.roles[0] || 'Sin rol' }}
+                </p>
 
-                        <div class="flex justify-end gap-2 mt-4">
-                            <p-button label="Editar" icon="pi pi-pencil" styleClass="p-button-warning">
-                            </p-button>
+                <div class="flex justify-end gap-2 mt-4">
+                    <p-button label="Editar" icon="pi pi-pencil" styleClass="p-button-warning">
+                    </p-button>
 
-                            <p-button label="Eliminar" icon="pi pi-trash" styleClass="p-button-danger">
-                            </p-button>
-                        </div>
-                    </p-accordion-content>
-                </p-accordion-panel>
-            </p-accordion>
-        </div>
+                    <p-button label="Eliminar" icon="pi pi-trash" styleClass="p-button-danger">
+                    </p-button>
+                </div>
+            </p-accordion-content>
+        </p-accordion-panel>
+    </p-accordion>
+</p-card>

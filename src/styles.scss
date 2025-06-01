@@ -3,3 +3,10 @@
 @use './assets/layout/layout.scss';
 @use 'primeicons/primeicons.css';
 @use './assets/demo/demo.scss';
+
+@media (min-width: 1024px) { /* Aplica solo a pantallas de PC */
+    .p-card{
+        max-width: 800px; /* Ajusta el ancho del card */
+        margin: 0 auto; /* Lo centra en la pantalla */
+    }
+}

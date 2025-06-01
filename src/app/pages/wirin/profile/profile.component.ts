@@ -2,13 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, User } from '../../../services/auth.service';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { BackButtonComponent } from '../ui/back-button/back-button.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ButtonModule],
+  imports: [CommonModule, FormsModule, RouterModule, ButtonModule, CardModule, BackButtonComponent],
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
@@ -16,7 +18,7 @@ export class ProfileComponent implements OnInit {
   isLoading: boolean = true;
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadUserProfile();
