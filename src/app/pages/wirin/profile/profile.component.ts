@@ -31,6 +31,7 @@ export class ProfileComponent implements OnInit {
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
+        console.log('Perfil cargado:', this.user);
         this.isLoading = false;
       },
       error: (error) => {

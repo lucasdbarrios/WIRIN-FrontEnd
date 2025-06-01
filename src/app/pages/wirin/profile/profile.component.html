@@ -1,19 +1,20 @@
 <p-card class="border-round-lg shadow-2 p-6 border-primary w-full max-w-lg">
-  <div class="font-semibold text-4xl mb-4">Mi perfil</div>
+  <div class="font-semibold text-4xl mb-6">Mi perfil</div>
 
   <ng-template pTemplate="content">
-    <div *ngIf="user && !isLoading" class="flex flex-col">
-      <p class="text-surface-900 dark:text-surface-0"><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
-      <p class="text-surface-900 dark:text-surface-0"><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
-      <p class="text-surface-900 dark:text-surface-0"><strong>Correo Electrónico:</strong> {{ user.email }}</p>
-      <p class="text-surface-900 dark:text-surface-0"><strong>Rol:</strong> {{ user.role }}</p>
+    <div *ngIf="user && !isLoading" class="flex flex-col p-4 rounded-md">
+      <p class="text-gray-800"><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
+      <p class="text-gray-800"><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
+      <p class="text-gray-800"><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+      <p class="text-gray-800"><strong>Rol:</strong> {{ user.role }}</p>
     </div>
   </ng-template>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-between md:flex-row md:justify-between gap-4">
       <app-back-button></app-back-button>
-      <p-button label="Modificar" type="button" class="md:w-auto mt-2"></p-button>
+      <p-button label="Modificar" type="button" class="md:w-auto mt-2 border border-blue-500 rounded-md">
+      </p-button>
     </div>
   </ng-template>
 </p-card>
