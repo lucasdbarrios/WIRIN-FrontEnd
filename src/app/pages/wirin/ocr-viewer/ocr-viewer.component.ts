@@ -40,50 +40,41 @@ export class OcrViewerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const taskId = Number(this.route.snapshot.paramMap.get('id'));
-    
-    if (!taskId) {
-        console.error("Error: `id` no está definido en la ruta.");
-        return;
+    this.task = Number(this.route.snapshot.paramMap.get('id'));
+
+    const storedData = localStorage.getItem('ocrData');
+    if (storedData) {
+      this.ocrData = JSON.parse(storedData);
+      this.totalPages = this.ocrData?.metadata?.totalPages ?? 1; 
+      this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop() ?? ''
+      
+      this.orderService.recoveryFile(this.task).subscribe({
+        next: (data) => {
+          const blob = new Blob([data], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        },
+        error: (error) => {
+          console.error('Error al recuperar el archivo:', error);
+        }
+      })
+
+     // this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.ocrData?.metadata?.fileName?? '');
     }
 
-    this.orderService.getTaskById(taskId).subscribe({
-        next: (task) => {
-            if (!task) {
-                console.error("Error: La tarea no tiene un `id` válido.");
-                return;
-            }
-            this.task = task; // ✅ Ahora `task` está definido
-
-            // ✅ Llamamos a `recoveryFile` solo después de que `task` existe
-            this.orderService.recoveryFile(this.task.id).subscribe({
-                next: (data) => {
-                    const blob = new Blob([data], { type: 'application/pdf' });
-                    const url = URL.createObjectURL(blob);
-                    this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-                },
-                error: (error) => {
-                    console.error('Error al recuperar el archivo:', error);
-                }
-            });
-
-            // ✅ Verificación del estado de revisión
-            this.isRevision = this.task.status === 'En Revisión';
-        },
-        error: (error) => {
-            console.error('Error al obtener la tarea:', error);
-        }
+    this.orderService.getTaskById(this.task).subscribe(task => {
+      this.isRevision = task?.status === 'En Revisión';
+      console.log('Estado de la tarea:', task?.status);
     });
 
-    // ✅ Obtener usuario sin depender de `this.task`
     this.authService.getCurrentUser().subscribe({
-        next: (userData) => {
-            this.user = userData;
-        },
-        error: (error) => {
-            console.error('Error al cargar el perfil:', error);
-            this.errorMessage = 'No se pudo cargar la información del perfil.';
-        },
+      next: (userData) => {
+        this.user = userData;
+      },
+      error: (error) => {
+        console.error('Error al cargar el perfil:', error);
+        this.errorMessage = 'No se pudo cargar la información del perfil.';
+      },
     });
 }
 
