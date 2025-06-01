@@ -7,7 +7,7 @@
         (formSubmitted)="onFormSubmit($event)"></app-form-task>
 </p-fluid>
 
-<app-popup [isVisible]="showConfirmPopup" title="Confirmar Actualización"
-    question="¿Estás seguro de que deseas actualizar esta tarea?" primaryActionText="Actualizar"
+<app-popup [isVisible]="showConfirmPopup" title="Confirmar Modificación"
+    question="¿Estás seguro de que deseas modificar esta tarea?" primaryActionText="Modificar"
     secondaryActionText="Cancelar" (primaryAction)="onConfirmSubmit()" (secondaryAction)="showConfirmPopup = false">
 </app-popup>

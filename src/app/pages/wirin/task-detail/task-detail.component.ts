@@ -95,7 +95,6 @@ export class TaskDetailComponent implements OnInit {
               fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
           };
   
-          // Esperar los valores antes de asignarlos
           this.creatorName = await this.getUserName(data.createdByUserId);
           this.requesterName = await this.getUserName(data.assignedUserId);
   

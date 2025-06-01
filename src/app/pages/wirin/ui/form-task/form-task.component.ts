@@ -12,13 +12,15 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { UserService } from '../../../../services/user.service';
 import { Order } from '../../../../types/order.interface';
 import { MessageModule } from 'primeng/message';
+import { BackButtonComponent } from '../back-button/back-button.component';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   standalone: true,
   selector: 'app-form-task',
   templateUrl: './form-task.component.html',
   imports: [ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, 
-    SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule]
+    SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule, BackButtonComponent]
 })
 export class FormTaskComponent implements OnInit {
   @Input() isEditMode: boolean = false;
@@ -53,20 +55,22 @@ export class FormTaskComponent implements OnInit {
             limitDate: formattedDate,
             assignedUserId: data.assignedUserId,
             status: data.status,
+            createdByUserId: data.createdByUserId,
         });
 
         if (data.filePath) {
             this.currentFileName = data.filePath.split('\\').pop() || data.filePath.split('/').pop() || data.filePath;
             this.existingFile = this.currentFileName;
             this.uploadedFiles = [{ name: this.currentFileName }];
-            this.formTask.patchValue({ file: this.currentFileName }); // 🔥 Asigna el archivo al formulario
+            this.formTask.patchValue({ file: this.currentFileName });
         }
     }
 }
 
   constructor(
     private fb: FormBuilder,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService,
   ) {
     this.formTask = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -74,7 +78,8 @@ export class FormTaskComponent implements OnInit {
       limitDate: ['', Validators.required],
       status: ['Pendiente'],
       assignedUserId: ['', Validators.required],
-      file: ['', Validators.required]
+      file: ['', Validators.required],
+      createdByUserId: [''],
     });
 
     this.userService.getAllStudents().subscribe({
@@ -85,7 +90,6 @@ export class FormTaskComponent implements OnInit {
         }));
       },
     });
-    
   }
 
   ngOnInit() {
@@ -94,11 +98,20 @@ export class FormTaskComponent implements OnInit {
     } else {
       this.formTask.get('status')?.disable();
     }
+
+    this.authService.getCurrentUser().subscribe({
+      next: (userData) => {
+          if (userData && userData.id) {
+              this.formTask.patchValue({ createdByUserId: userData.id });
+          }
+      },
+      error: (error) => {
+          console.error('Error al obtener el usuario:', error);
+      }
+    });
   }
 
-  goBack() {
-    window.history.back();
-  }
+  
 
   onFileSelected(event: any): void {
     if (event.files && event.files.length > 0) {
@@ -124,11 +137,12 @@ onSubmit(): void {
       formData.append('limitDate', formattedDate);
       formData.append('status', this.formTask.get('status')?.value || '');
       formData.append('assignedUserId', this.formTask.get('assignedUserId')?.value || '');
+      formData.append('createdByUserId', this.formTask.get('createdByUserId')?.value || '');
 
       if (this.selectedFile) {
           formData.append('file', this.selectedFile);
       } else if (this.existingFile) {
-          formData.append('file', this.existingFile); // 🔥 Agrega el archivo existente
+          formData.append('file', this.existingFile);
       }
 
       this.formSubmitted.emit(formData);
