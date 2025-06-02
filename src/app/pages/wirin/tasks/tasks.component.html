@@ -1,6 +1,6 @@
 <div class="card">
-
     <div class="font-semibold text-xl mb-4">Tareas</div>
+
     <p-toolbar>
         <ng-template #start>
             <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
@@ -17,35 +17,35 @@
         </ng-template>
     </p-toolbar>
 
+    <div *ngIf="tasks.length === 0" class="text-center text-gray-500 mt-6">
+        No hay tareas disponibles en este momento.
+    </div>
+
     <p-dataview [value]="tasks" [layout]="layout">
         <ng-template #list let-items>
             <div class="grid grid-cols-12 gap-4">
                 <div *ngFor="let item of items; let i = index" class="col-span-12 sm:col-span-6 lg:col-span-4 p-2">
                     <div class="p-6 border border-blue-500 shadow-lg rounded-lg flex flex-col">
                         <div>
-
                             <div class="flex flex-row justify-between items-start gap-2">
                                 <div>
                                     <p-tag [value]="item.status.toUpperCase()" [severity]="getSeverity(item)"></p-tag>
                                     <div class="text-lg font-medium mt-1">{{ item.name }}</div>
-                                    <div class="text-base font-medium mt-2">Vencimiento: {{
-                                        item.limitDate | date:'dd/MM/yyyy' }}</div>
+                                    <div class="text-base font-medium mt-2">
+                                        Vencimiento: {{ item.limitDate | date:'dd/MM/yyyy' }}
+                                    </div>
                                 </div>
-
                             </div>
-
                             <div class="flex flex-col gap-6 mt-6">
                                 <div class="flex gap-2 justify-end">
                                     <p-button icon="pi pi-pencil"
                                         styleClass="p-button-warning border-2 border-blue-500 shadow-lg transition-all hover:shadow-green-500 hover:scale-105"
                                         (onClick)="editTask(item.id)" *ngIf="isBibliotecario">
                                     </p-button>
-
                                     <p-button icon="pi pi-trash"
                                         styleClass="p-button-danger border-2 border-blue-500 shadow-lg transition-all hover:shadow-red-500 hover:scale-105"
                                         (onClick)="deleteTask(item.id, $event)" *ngIf="isBibliotecario">
                                     </p-button>
-
                                     <p-button icon="pi pi-eye"
                                         styleClass="p-button border-2 border-blue-500 shadow-lg transition-all hover:shadow-green-500 hover:scale-105"
                                         [routerLink]="['/wirin/task-detail', item.id]">
@@ -58,5 +58,4 @@
             </div>
         </ng-template>
     </p-dataview>
-
 </div>

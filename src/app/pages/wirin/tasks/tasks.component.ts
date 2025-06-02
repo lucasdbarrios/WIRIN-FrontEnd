@@ -25,9 +25,9 @@ import { InputTextModule } from 'primeng/inputtext';
     selector: 'app-tasks-component',
     standalone: true,
     imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
-      OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
+    OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
     SplitButtonModule, FluidModule, InputGroupModule, InputTextModule
-  ],
+],
     templateUrl: './tasks.component.html',
 })
 export class TasksComponent implements OnInit{
@@ -113,7 +113,7 @@ export class TasksComponent implements OnInit{
                 return 'warn';
             case 'Completada':
                 return 'Success';
-              case 'Entregada':
+            case 'Entregada':
                 return 'success';
             case 'Denegada':
                 return 'Danger';
@@ -127,19 +127,19 @@ export class TasksComponent implements OnInit{
     }
 
     editTask(id: number) {
-      this.router.navigate([`/wirin/edit-task-form/${id}`]);
+        this.router.navigate([`/wirin/edit-task-form/${id}`]);
     }
 
     deleteTask(taskId: number, event: Event): void {
-      event.stopPropagation();
-  
-      this.orderService.deleteOrder(taskId).subscribe({
-          next: () => {
-              this.loadTasks();
-          },
-          error: error => {
-              console.error('Error al eliminar tarea:', error);
-          }
-      });
-  }
+        event.stopPropagation();
+
+        this.orderService.deleteOrder(taskId).subscribe({
+            next: () => {
+                this.loadTasks();
+            },
+            error: error => {
+                console.error('Error al eliminar tarea:', error);
+            }
+        });
+    }
 }

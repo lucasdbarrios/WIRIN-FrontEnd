@@ -3,17 +3,17 @@
 
   <ng-template pTemplate="content">
     <div *ngIf="user && !isLoading" class="flex flex-col p-4 rounded-md">
-      <p class="text-gray-800"><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
-      <p class="text-gray-800"><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
-      <p class="text-gray-800"><strong>Correo Electrónico:</strong> {{ user.email }}</p>
-      <p class="text-gray-800"><strong>Roles:</strong> {{ user.roles.join(', ') }}</p>
+      <p><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
+      <p><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
+      <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+      <p><strong>Roles:</strong> {{ user.roles.join(', ') }}</p>
     </div>
   </ng-template>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-between md:flex-row md:justify-between gap-4">
       <app-back-button></app-back-button>
-      <p-button label="Modificar" type="button" class="md:w-auto mt-2 border border-blue-500 rounded-md">
+      <p-button label="Modificar" type="button" class="md:w-auto mt-2 rounded-md">
       </p-button>
     </div>
   </ng-template>

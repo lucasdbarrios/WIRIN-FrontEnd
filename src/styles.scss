@@ -4,6 +4,11 @@
 @use 'primeicons/primeicons.css';
 @use './assets/demo/demo.scss';
 
+.p-dataview-emptymessage {
+    display: none !important;
+}
+
+
 @media (min-width: 1024px) { /* Aplica solo a pantallas de PC */
     .p-card{
         max-width: 800px; /* Ajusta el ancho del card */

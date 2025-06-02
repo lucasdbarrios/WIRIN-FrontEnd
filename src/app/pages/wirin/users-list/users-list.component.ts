@@ -75,14 +75,16 @@ export class UsersListComponent {
     this.router.navigate(['/wirin/edit-user-form', user.id]);
   }
 
-  deleteUser(id: string): void {
+  deleteUser(id: string, event: Event): void {
+    event.stopPropagation();
+
     this.userService.deleteUser(id).subscribe({
-      next: () => {
-        this.loadUsers();
-      },
-      error: error => {
-        console.error('Error al eliminar el usuario:', error);
-      }
-    })
-  }
+        next: () => {
+            this.loadUsers();
+        },
+        error: error => {
+            console.error('Error al eliminar el usuario:', error);
+        }
+    });
+}
 }
