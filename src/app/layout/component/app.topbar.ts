@@ -89,6 +89,5 @@ export class AppTopbar {
 
     logout(): void {
         this.authService.logout();
-        this.router.navigate(['/login']);
       }
 }

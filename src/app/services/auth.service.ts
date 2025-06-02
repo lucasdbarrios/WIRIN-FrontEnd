@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { EnvService } from './env.service';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../types/user.interface';
+import { Router } from '@angular/router';
 
 export interface LoginRequest {
   email: string;
@@ -26,7 +27,7 @@ export class AuthService {
   private userRoleSubject = new BehaviorSubject<string[] | null>(null);
   public userRole$ = this.userRoleSubject.asObservable();
 
-  constructor(private http: HttpClient, private envService: EnvService) {
+  constructor(private http: HttpClient, private envService: EnvService, private router: Router) {
     this.apiUrl = this.envService.getApiUrl();
     this.loadUserFromStorage();
   }
@@ -101,6 +102,7 @@ export class AuthService {
   
     this.currentUserSubject.next(null);
     this.userRoleSubject.next(null);
+    this.router.navigate(['/login']);
   }
 
   getToken(): string | null {

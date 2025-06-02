@@ -8,6 +8,7 @@ import { MessageModule } from 'primeng/message';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { User } from '../../../../types/user.interface';
 import { BackButtonComponent } from '../back-button/back-button.component';
+import { PasswordModule } from 'primeng/password';
 
 @Component({
   standalone: true,
@@ -15,7 +16,7 @@ import { BackButtonComponent } from '../back-button/back-button.component';
   templateUrl: './form-user.component.html',
   imports: [
     ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, 
-    MultiSelectModule, FormsModule, InputTextModule, BackButtonComponent
+    MultiSelectModule, FormsModule, InputTextModule, BackButtonComponent, PasswordModule
   ]
 })
 export class FormUserComponent{
@@ -61,23 +62,20 @@ export class FormUserComponent{
         email: ['', [Validators.required, Validators.email]],
         phoneNumber: [''],
         roles: [[], Validators.required],
-        password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
+        password: ['', this.isEditMode ? [] : [
+          Validators.required, 
+          Validators.minLength(6), 
+          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{6,}$/)
+      ]],      
         repeatPassword: ['', this.isEditMode ? [] : [Validators.required]],
-    }, { validator: this.isEditMode ? this.matchPasswords : null });
+    }, { validator: this.isEditMode ? null : this.matchPasswords });
   }
 
-  matchPasswords(formGroup: FormGroup) {
-    const password = formGroup.get('password');
-    const repeatPassword = formGroup.get('repeatPassword');
-
-    if (password && repeatPassword) {
-      const error = password.value === repeatPassword.value ? null : { passwordMismatch: true };
-      repeatPassword.setErrors(error);
-      return error;
-    }
-  
-    return null;
-  }
+  matchPasswords(group: FormGroup) {
+    const password = group.get('password')?.value;
+    const repeatPassword = group.get('repeatPassword')?.value;
+    return password === repeatPassword ? null : { passwordMismatch: true };
+}
 
   onSubmit(): void {
     if (this.formUser.valid) {
@@ -98,7 +96,6 @@ export class FormUserComponent{
         Object.keys(this.formUser.controls).forEach(key => {
             const control = this.formUser.get(key);
             if (control?.invalid) {
-                console.log(`⚠️ Campo inválido: ${key}, valor recibido:`, control.value);
                 control.markAsTouched();
             }
         });

@@ -12,6 +12,7 @@ import { DropDown } from '../../../types/dropDown';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { AuthService } from '../../../services/auth.service';
 @Component({
   selector: 'app-users-list',
   templateUrl: './users-list.component.html',
@@ -23,6 +24,8 @@ import { InputTextModule } from 'primeng/inputtext';
 export class UsersListComponent {
   allUsers: any[] = [];
   users: any[] = [];
+  loggedUserId: string = '';
+  isLoading: boolean = true;
   dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
         { name: 'Todos', value: '' },
@@ -35,8 +38,15 @@ export class UsersListComponent {
     ];
 
   constructor(private userService: UserService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService,
+  ) {
+    this.authService.getCurrentUser().subscribe({
+      next: (user: any) => {
+          this.loggedUserId = user.id;
+      },
+  });
+  }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -44,21 +54,22 @@ export class UsersListComponent {
 
   async loadUsers(): Promise<void> {
     const selectedState = this.dropdownValue?.value || '';
-    
     const request = selectedState
         ? this.userService.getUsersByRole(selectedState)
         : this.userService.getAll();
 
-        await request.subscribe({
-          next: (data: any[]) => {
-            this.allUsers = data;
-            this.users = [...data];
-          },
-          error: error => {
-              console.error('Error al obtener los usuarios:', error);
-          }
-      });
-  }
+    await request.subscribe({
+        next: (data: any[]) => {
+            this.allUsers = data.filter(user => user.id !== this.loggedUserId);
+            this.users = [...this.allUsers];
+            this.isLoading = false;
+        },
+        error: error => {
+            console.error('Error al obtener los usuarios:', error);
+            this.isLoading = false;
+        }
+    });
+}
 
   searchUsers(event: Event): void {
     const query = (event.target as HTMLInputElement).value.toLowerCase();

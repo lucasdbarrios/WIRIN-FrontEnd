@@ -17,7 +17,12 @@
         </ng-template>
     </p-toolbar>
 
-    <div *ngIf="tasks.length === 0" class="text-center text-gray-500 mt-6">
+    <div *ngIf="isLoading" aria-live="polite" class="flex justify-center mt-6">
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500" aria-label="Cargando..."></div>
+        <span class="sr-only">Cargando tareas</span>
+    </div>
+
+    <div *ngIf="!isLoading && tasks.length === 0" class="text-center text-gray-500 mt-6">
         No hay tareas disponibles en este momento.
     </div>
 
