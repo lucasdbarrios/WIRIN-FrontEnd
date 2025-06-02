@@ -25,8 +25,11 @@ export class OrderManagmentService {
     return this.http.put(`${this.apiUrl}/changeStatus`, {id: formData.get('id'), 
       status: formData.get('status'), 
       assignedUserId: formData.get('assignedUserId')
-
     });
+  }
+
+  saveOcrChanges(orderId: number, ocrData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/saveOcrChanges/${orderId}`, ocrData);
   }
 
 }

@@ -6,15 +6,20 @@ import { OrderManagmentService } from '../../../services/orderManagment.service'
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { OrderService } from '../../../services/order.service';
-import { OcrResponse } from '../../../types/ocr.interface';
+import { OcrPage, OcrResponse } from '../../../types/ocr.interface';
 import { OcrTextViewerComponent } from '../ui/ocr-text-viewer/ocr-text-viewer.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { OrderParagraphServiceService } from '../../../services/orderParagraph.service';
+import { ProcessParagraphRequest } from '../../../types/Requests/ProcessParagraphRequest';
 
 @Component({
   selector: 'app-ocr-viewer',
   standalone: true,
-  imports: [CommonModule, FormsModule, OcrTextViewerComponent, ButtonModule],
+  imports: [CommonModule, FormsModule, OcrTextViewerComponent, ButtonModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './ocr-viewer.component.html',
 })
 export class OcrViewerComponent implements OnInit {
@@ -36,7 +41,9 @@ export class OcrViewerComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private orderService: OrderService,
-    public sanitizer: DomSanitizer
+    public sanitizer: DomSanitizer,
+    private messageService: MessageService,
+    private orderParagraphService: OrderParagraphServiceService
   ) {}
 
   ngOnInit(): void {
@@ -134,9 +141,7 @@ export class OcrViewerComponent implements OnInit {
   }
 
   saveChanges(): void {
-    if (!this.ocrData || !this.isEditing) return;
-    localStorage.setItem('ocrData', JSON.stringify(this.ocrData));
-    this.isEditing = false;
+    
   }
 
   cancelEditing(): void {
