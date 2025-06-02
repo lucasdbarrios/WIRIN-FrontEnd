@@ -42,4 +42,13 @@ export class UserService {
   deleteUser(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
+
+  getUserName(userId: string): Promise<string> {
+    return new Promise((resolve) => {
+        this.getUserById(userId).subscribe({
+            next: (user) => resolve(user.fullName),
+            error: () => resolve("Nombre de usuario no disponible")
+        });
+    });
+}
 }

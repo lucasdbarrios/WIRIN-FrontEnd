@@ -23,7 +23,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private tokenKey = 'auth_token';
-  private userRoleSubject = new BehaviorSubject<string | null>(null);
+  private userRoleSubject = new BehaviorSubject<string[] | null>(null);
   public userRole$ = this.userRoleSubject.asObservable();
 
   constructor(private http: HttpClient, private envService: EnvService) {
@@ -49,7 +49,7 @@ export class AuthService {
           roles: Array.isArray(rolesClaim) ? rolesClaim : [rolesClaim]
         };
         this.currentUserSubject.next(user);
-        this.userRoleSubject.next(user.roles.length > 0 ? user.roles.join(', ') : null);
+        this.userRoleSubject.next(user.roles.length > 0 ? user.roles : null);
       } catch (error: any) {
         console.error('Error al decodificar el token:', error);
         console.error('Stack del error:', error?.stack);
@@ -83,7 +83,7 @@ export class AuthService {
 
             this.currentUserSubject.next(user);
 
-            this.userRoleSubject.next(user.roles.length > 0 ? user.roles.join(', ') : null);
+            this.userRoleSubject.next(user.roles.length > 0 ? user.roles : null);
 
           } catch (error) {
             console.error("Error al decodificar el token en login:", error);
@@ -135,11 +135,13 @@ export class AuthService {
     return this.currentUser$;
   }
 
-  getCurrentUserRole(): string | null {
+  getCurrentUserRole(): string[] | null {
     return this.userRoleSubject.value;
   }
 
   hasRole(role: string): boolean {
-    return this.getCurrentUserRole() === role;
-  }
+    const roles = this.getCurrentUserRole();
+    return roles ? roles.includes(role) : false;
+}
+
 }
