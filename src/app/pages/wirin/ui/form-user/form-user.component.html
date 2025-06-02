@@ -1,0 +1,116 @@
+<form [formGroup]="formUser" (ngSubmit)="onSubmit()">
+    <div class="flex mt-8">
+        <div class="card flex flex-col gap-6 w-full">
+            <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
+                <h2 class="ml-2">{{isEditMode ? 'Modificar Usuario' : 'Crear Nuev Usuario'}}</h2>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="fullName">Nombre Completo</label>
+                    <input pInputText id="fullName" type="text" formControlName="fullName"
+                        placeholder="Ingresá nombre completo" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formUser.get('fullName')?.invalid && formUser.get('fullName')?.touched">El nombre
+                            es
+                            requerido</span>
+                        <span
+                            *ngIf="!(formUser.get('fullName')?.invalid && formUser.get('fullName')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="userName">Nombre de usuario</label>
+                    <input pInputText id="userName" type="text" formControlName="userName"
+                        placeholder="Ingresá usuario" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formUser.get('userName')?.invalid && formUser.get('userName')?.touched">El usuario
+                            es
+                            requerido</span>
+                        <span
+                            *ngIf="!(formUser.get('userName')?.invalid && formUser.get('userName')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="email">Email</label>
+                    <input pInputText id="email" type="text" formControlName="email" placeholder="Ingresá el email" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formUser.get('email')?.invalid && formUser.get('email')?.touched">El email es
+                            requerido</span>
+                        <span *ngIf="!(formUser.get('email')?.invalid && formUser.get('email')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="phoneNumber">Numero de celular</label>
+                    <input pInputText id="phoneNumber" type="text" formControlName="phoneNumber"
+                        placeholder="Ingresá numero de celular" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formUser.get('phoneNumber')?.invalid && formUser.get('phoneNumber')?.touched">El
+                            celular es
+                            requerido</span>
+                        <span
+                            *ngIf="!(formUser.get('phoneNumber')?.invalid && formUser.get('phoneNumber')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6" *ngIf="!isEditMode">
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="password">Contraseña</label>
+                    <input pInputText id="password" type="password" formControlName="password"
+                        placeholder="Ingresá la contraseña" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formUser.get('password')?.invalid && formUser.get('password')?.touched">La
+                            contraseña
+                            es
+                            requerida</span>
+                        <span
+                            *ngIf="!(formUser.get('password')?.invalid && formUser.get('password')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+
+                <div class="flex flex-wrap gap-2 w-full">
+                    <label for="repeatPassword">Repetir contraseña</label>
+                    <input pInputText id="repeatPassword" type="password" formControlName="repeatPassword"
+                        placeholder="Ingresá la contreña de nuevo" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span
+                            *ngIf="formUser.get('repeatPassword')?.invalid && formUser.get('repeatPassword')?.touched">
+                            Este campo es requerido
+                        </span>
+                        <span *ngIf="formUser.hasError('passwordMismatch')">
+                            Las contraseñas no coinciden
+                        </span>
+                        <span
+                            *ngIf="!(formUser.get('repeatPassword')?.invalid && formUser.get('repeatPassword')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex flex-col gap-2">
+                    <label for="roles">Roles</label>
+                    <p-multiSelect id="roles" formControlName="roles" [options]="dropdownRoles" optionLabel="name"
+                        optionValue="value" placeholder="Selecciona los roles">
+                    </p-multiSelect>
+
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formUser.get('roles')?.invalid && formUser.get('roles')?.touched">Al menos un rol
+                            es requerido</span>
+                        <span *ngIf="!(formUser.get('roles')?.invalid && formUser.get('roles')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:justify-between gap-4 w-full">
+                <app-back-button></app-back-button>
+                <p-button [label]="isEditMode ? 'Modificar' : 'Crear'" type="submit"
+                    class="w-full md:w-auto mt-2"></p-button>
+            </div>
+        </div>
+    </div>
+</form>

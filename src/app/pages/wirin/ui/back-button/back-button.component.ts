@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { Location } from "@angular/common";
 import { ButtonModule } from "primeng/button";
 
 
@@ -11,8 +11,8 @@ import { ButtonModule } from "primeng/button";
 })
 export class BackButtonComponent {
 
-    constructor(private router: Router) {}
+    constructor(private location: Location) {}
     goBack(): void {
-        this.router.navigate(['/wirin/tasks']);
+      this.location.back();
       }
 }

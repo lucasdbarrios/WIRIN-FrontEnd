@@ -3,14 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { EnvService } from './env.service';
 import { jwtDecode } from 'jwt-decode';
-
-export interface User {
-  id: string;
-  userName: string;
-  email: string;
-  fullName: string;
-  role?: string;
-}
+import { User } from '../types/user.interface';
 
 export interface LoginRequest {
   email: string;
@@ -45,16 +38,18 @@ export class AuthService {
         const decodedToken: any = jwtDecode(token);
         
         const rolesClaim = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-        
+
         const user: User = {
           id: decodedToken.sub || '',
           userName: decodedToken.userName || '',
           email: decodedToken.email || '',
           fullName: decodedToken.fullName || '',
-          role: Array.isArray(rolesClaim) ? rolesClaim[0] : rolesClaim
+          phoneNumber: decodedToken.phoneNumber || '',
+          password: '',
+          roles: Array.isArray(rolesClaim) ? rolesClaim : [rolesClaim]
         };
         this.currentUserSubject.next(user);
-        this.userRoleSubject.next(user.role || null);
+        this.userRoleSubject.next(user.roles.length > 0 ? user.roles.join(', ') : null);
       } catch (error: any) {
         console.error('Error al decodificar el token:', error);
         console.error('Stack del error:', error?.stack);
@@ -64,7 +59,6 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<{ token: string; userId: string; role?: string }> {
-
     return this.http.post<{ token: string; userId: string; role?: string }>(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
         tap(response => {
@@ -74,25 +68,29 @@ export class AuthService {
             const decodedToken: any = jwtDecode(response.token);
 
             const rolesClaim = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-            
+
+            const userRoles = Array.isArray(rolesClaim) ? rolesClaim : [rolesClaim];
+
             const user: User = {
               id: decodedToken.sub || '',
               userName: decodedToken.userName || '',
               email: decodedToken.email || '',
               fullName: decodedToken.fullName || '',
-              role: Array.isArray(rolesClaim) ? rolesClaim[0] : rolesClaim
+              phoneNumber: decodedToken.phoneNumber || '',
+              password: '',
+              roles: userRoles
             };
 
             this.currentUserSubject.next(user);
 
-            this.userRoleSubject.next(user.role || null);
+            this.userRoleSubject.next(user.roles.length > 0 ? user.roles.join(', ') : null);
 
           } catch (error) {
-            console.error("❌ Error al decodificar el token en login:", error);
+            console.error("Error al decodificar el token en login:", error);
           }
         })
       );
-  }
+}
 
   register(user: User): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/auth/register`, user);

@@ -72,7 +72,7 @@ export class UsersListComponent {
   }
 
   updateUser(user: any): void {
-    this.router.navigate(['/wirin/update-user-form', user.id]);
+    this.router.navigate(['/wirin/edit-user-form', user.id]);
   }
 
   deleteUser(id: string): void {

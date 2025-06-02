@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
+import { User } from '../types/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,12 @@ export class UserService {
   getUsersByRole(role: string): Observable<any[]> {
     const url = `${this.apiUrl}/by-role/${role}`;
     return this.http.get<any[]>(url);
+  }
+
+  updateUser(id: string, user: User): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, user, { 
+        headers: { 'Content-Type': 'application/json' } 
+    });
   }
 
   deleteUser(id: string): Observable<any> {

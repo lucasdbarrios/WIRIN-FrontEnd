@@ -6,7 +6,7 @@
       <p class="text-gray-800"><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
       <p class="text-gray-800"><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
       <p class="text-gray-800"><strong>Correo Electrónico:</strong> {{ user.email }}</p>
-      <p class="text-gray-800"><strong>Rol:</strong> {{ user.role }}</p>
+      <p class="text-gray-800"><strong>Roles:</strong> {{ user.roles.join(', ') }}</p>
     </div>
   </ng-template>
 
