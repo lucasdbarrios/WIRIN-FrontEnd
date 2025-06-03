@@ -54,10 +54,11 @@ export class TaskDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.taskId = Number(this.route.snapshot.paramMap.get('id'));
-    this.checkUserRole();
+    this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
+    this.isAlumno = this.authService.hasRole('Alumno');
     this.loadTaskDetails();
     this.getStatus();
-    this.isAlumno = this.authService.getCurrentUserRole() === 'Alumno';
+    
   }
 
   getStatus(): void {
@@ -76,11 +77,6 @@ export class TaskDetailComponent implements OnInit {
     });
   }
 
-  private checkUserRole(): void {
-    const userRole = this.authService.getCurrentUserRole();
-    this.isLibrarian = userRole === 'Admin';
-  }
-
   loadTaskDetails(): void {
     if (!this.taskId) {
       this.errorMessage = 'ID de tarea no válido';
@@ -94,9 +90,10 @@ export class TaskDetailComponent implements OnInit {
               ...data,
               fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
           };
-  
-          this.creatorName = await this.getUserName(data.createdByUserId);
-          this.requesterName = await this.getUserName(data.assignedUserId);
+
+          this.creatorName = await this.userService.getUserName(data.createdByUserId);
+          this.requesterName = await this.userService.getUserName(data.assignedUserId);
+
   
           this.isLoading = false;
       },
@@ -108,15 +105,6 @@ export class TaskDetailComponent implements OnInit {
   });
   }
 
-async getUserName(userId: string): Promise<string> {
-    try {
-        const user = await firstValueFrom(this.userService.getUserById(userId));
-        return user.fullName;
-    } catch (err) {
-        console.error(`Error al obtener el usuario con ID ${userId}:`, err);
-        return "Usuario no encontrado";
-    }
-}
 
   getStatusBadgeClass(status: string): string {
     switch (status.toLowerCase()) {

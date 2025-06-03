@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
+import { User } from '../types/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,22 @@ export class UserService {
     return this.http.get<any[]>(url);
   }
 
+  updateUser(id: string, user: User): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, user, { 
+        headers: { 'Content-Type': 'application/json' } 
+    });
+  }
+
   deleteUser(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
+
+  getUserName(userId: string): Promise<string> {
+    return new Promise((resolve) => {
+        this.getUserById(userId).subscribe({
+            next: (user) => resolve(user.fullName),
+            error: () => resolve("Nombre de usuario no disponible")
+        });
+    });
+}
 }

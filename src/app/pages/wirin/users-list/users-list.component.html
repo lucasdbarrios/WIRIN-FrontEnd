@@ -15,17 +15,27 @@
             <p-button label="Crear usuario" icon="pi pi-plus" (onClick)="newUser()"></p-button>
         </ng-template>
     </p-toolbar>
+
+    <div *ngIf="isLoading" aria-live="polite" class="flex justify-center mt-6">
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500" aria-label="Cargando..."></div>
+        <span class="sr-only">Cargando tareas</span>
+    </div>
+
+    <div *ngIf="!isLoading && users.length === 0" class="text-center text-gray-500 mt-6">
+        No hay usuarios disponibles.
+    </div>
+
     <div class="mt-4">
         <p-accordion value="0">
             <p-accordion-panel *ngFor="let user of users" value={{user.id}}
-                class="border border-blue-400 bg-white shadow-md shadow-blue-200 rounded-md hover:shadow-blue-500">
-                <p-accordion-header class=" text-lg font-semibold text-blue-700">{{user.fullName}}</p-accordion-header>
+                class="border bg-white shadow-md shadow-blue-200 rounded-md">
+                <p-accordion-header class=" text-lg font-semibold">{{user.fullName}}</p-accordion-header>
                 <p-accordion-content>
                     <p>Nombre Completo: {{ user.fullName }}</p>
                     <p>Nombre de Usuario: {{ user.userName }}</p>
                     <p>Correo Electrónico: {{ user.email }}</p>
-                    <p>Número de teléfono: {{ user.phoneNumber || 'Sin número' }}</p>
-                    <p>Rol: {{ user.roles?.join(', ') || 'Sin rol' }}</p>
+                    <p>Número de teléfono: {{ user.phoneNumber}}</p>
+                    <p>Rol: {{ user.roles?.join(', ')}}</p>
 
                     <div class="flex justify-end gap-2 mt-4">
                         <p-button label="Modificar" icon="pi pi-pencil"
@@ -35,7 +45,7 @@
 
                         <p-button label="Eliminar" icon="pi pi-trash"
                             styleClass="p-button-danger border border-blue-400 bg-white shadow-md shadow-blue-200 rounded-md p-2"
-                            (onClick)="deleteUser(user.id)">
+                            (onClick)="deleteUser(user.id, $event)">
                         </p-button>
                     </div>
                 </p-accordion-content>

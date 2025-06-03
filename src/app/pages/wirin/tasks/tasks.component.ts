@@ -25,12 +25,13 @@ import { InputTextModule } from 'primeng/inputtext';
     selector: 'app-tasks-component',
     standalone: true,
     imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
-      OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
+    OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
     SplitButtonModule, FluidModule, InputGroupModule, InputTextModule
-  ],
+],
     templateUrl: './tasks.component.html',
 })
 export class TasksComponent implements OnInit{
+    isLoading: boolean = true;
     allTasks: any[] = [];
     tasks: any[] = [];
     layout: 'list' | 'grid' = 'list';
@@ -57,7 +58,6 @@ export class TasksComponent implements OnInit{
       private orderManagmentService: OrderManagmentService,
       private router: Router 
     ) {
-        this.loadTasks();
     }
 
 
@@ -70,16 +70,18 @@ export class TasksComponent implements OnInit{
     }
 
     async loadTasks(): Promise<void> {
+        this.isLoading = true;
+    
         const selectedState = this.dropdownValue?.value || '';
         const request = selectedState
             ? this.orderManagmentService.getOrdersByState(selectedState)
             : this.orderService.getOrders();
-            
+    
         await request.subscribe({
             next: (data: any[]) => {
                 this.allTasks = data;
                 this.tasks = [...data];
-                
+    
                 if (this.isVoluntario) {
                     this.tasks = this.tasks.filter(task => 
                         task.status.toLowerCase() !== 'completada' &&
@@ -91,9 +93,12 @@ export class TasksComponent implements OnInit{
                 } else if (this.isAlumno) {
                     this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'completada');
                 }
+    
+                this.isLoading = false;
             },
             error: error => {
                 console.error('Error al obtener las tareas:', error);
+                this.isLoading = false;
             }
         });
     }
@@ -113,7 +118,7 @@ export class TasksComponent implements OnInit{
                 return 'warn';
             case 'Completada':
                 return 'Success';
-              case 'Entregada':
+            case 'Entregada':
                 return 'success';
             case 'Denegada':
                 return 'Danger';
@@ -127,19 +132,19 @@ export class TasksComponent implements OnInit{
     }
 
     editTask(id: number) {
-      this.router.navigate([`/wirin/edit-task-form/${id}`]);
+        this.router.navigate([`/wirin/edit-task-form/${id}`]);
     }
 
     deleteTask(taskId: number, event: Event): void {
-      event.stopPropagation();
-  
-      this.orderService.deleteOrder(taskId).subscribe({
-          next: () => {
-              this.loadTasks();
-          },
-          error: error => {
-              console.error('Error al eliminar tarea:', error);
-          }
-      });
-  }
+        event.stopPropagation();
+
+        this.orderService.deleteOrder(taskId).subscribe({
+            next: () => {
+                this.loadTasks();
+            },
+            error: error => {
+                console.error('Error al eliminar tarea:', error);
+            }
+        });
+    }
 }

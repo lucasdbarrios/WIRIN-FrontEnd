@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-menu',
@@ -17,15 +18,21 @@ import { AppMenuitem } from './app.menuitem';
 })
 export class AppMenu {
     model: MenuItem[] = [];
+    role: boolean = false;
+
+    constructor(private authService: AuthService) {
+        this.role = this.authService.hasRole('Bibliotecario') || this.authService.hasRole('Admin');
+    }
 
     ngOnInit() {
+        
         this.model = [
             {
                 label: 'WIRIN',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] },
-                    { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] },
+                    ...(this.role ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] }] : [])
                 ]
             },
             {

@@ -1,6 +1,9 @@
 <p-card>
     <div class="font-bold text-2xl mb-6">{{task.name}}</div>
-
+    <div *ngIf="isLoading" aria-live="polite" class="flex justify-center mt-6">
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500" aria-label="Cargando..."></div>
+        <span class="sr-only">Cargando tarea</span>
+    </div>
     <ng-template pTemplate="content">
         <div *ngIf="!isLoading && !errorMessage && task" class="grid grid-cols-2 gap-6 p-4 rounded-md">
 
@@ -9,7 +12,7 @@
             </div>
 
             <div><strong>Fecha de creación:</strong> {{ task.creationDate
-                | date:'dd MMMM yyyy - HH:mm:ss' : 'es' }}</div>
+                | date:'dd MMMM yyyy' : 'es' }}</div>
             <div><strong>Archivo a digitalizar:</strong> {{ task.fileName || 'Sin archivo' }}
             </div>
 

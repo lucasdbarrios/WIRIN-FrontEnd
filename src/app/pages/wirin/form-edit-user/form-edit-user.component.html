@@ -1,0 +1,13 @@
+<div *ngIf="!userData" class="flex justify-center items-center min-h-screen">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
+</div>
+
+<p-fluid>
+    <app-form-user *ngIf="userData" [isEditMode]="true" [userId]="userId" [userData]="userData"
+        (formSubmitted)="onFormSubmit($event)"></app-form-user>
+</p-fluid>
+
+<app-popup [isVisible]="showConfirmPopup" title="Confirmar Modificación"
+    question="¿Estás seguro de que deseas modificar esta tarea?" primaryActionText="Modificar"
+    secondaryActionText="Cancelar" (primaryAction)="onConfirmSubmit()" (secondaryAction)="showConfirmPopup = false">
+</app-popup>
