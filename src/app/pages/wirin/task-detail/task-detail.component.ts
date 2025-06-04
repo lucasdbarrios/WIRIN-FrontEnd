@@ -12,6 +12,7 @@ import { UserService } from '../../../services/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
 import { BackButtonComponent } from '../ui/back-button/back-button.component';
+import { Paragraph } from '../../../types/paragraph.Interface';
 
 @Component({
   selector: 'app-task-detail',
@@ -206,5 +207,58 @@ getSeverity(task: any): string {
       default:
           return 'info';
   }
+}
+
+checkOcrPrevius() {
+    this.orderService.getParagraphsByOrderId(this.taskId).subscribe({
+      next: (paragraphs:Paragraph[]) => {
+        if (paragraphs && paragraphs.length > 0) {
+          // Crear estructura de ocrResponse con los párrafos recuperados
+          const processedPages = [...new Set(paragraphs.map(p => p.pageNumber))];
+          this.ocrResponse = {
+            metadata: {
+              totalPages: this.task.totalPages 
+            },
+            pages: paragraphs.reduce((pages, paragraph) => {
+              let page:Paragraph = pages.find(p => p.number === paragraph.pageNumber);
+              if (!page) {
+                page = {
+                  number: paragraph.pageNumber,
+                  text: paragraph.paragraphText,
+                  hasError: paragraph.hasError,
+                  errorMessage: paragraph.errorMessage
+                };
+                pages.push(page);
+              } else {
+                page.text += '\n' + paragraph.paragraphText;
+                page.hasError = page.hasError || paragraph.hasError;
+                if (paragraph.errorMessage) {
+                  page.errorMessage = page.errorMessage ? 
+                    `${page.errorMessage}\n${paragraph.errorMessage}` : 
+                    paragraph.errorMessage;
+                }
+              }
+              return pages;
+            }, [])
+          };
+          this.uploadStatus = 'success';
+          console.log('Párrafos recuperados:', this.ocrResponse);
+
+          // Verificar si hay páginas sin procesar
+          if (this.task.totalPages && this.task.totalPages > processedPages.length) {
+            console.log('Procesando páginas faltantes...');
+            this.processOcr(this.taskId, false, '');
+          }
+        } else {
+          // Si no hay párrafos procesados, procesar todo el documento
+          this.processOcr(this.taskId, false, '');
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener párrafos:', error);
+        // En caso de error, intentar procesar todo el documento
+        this.processOcr(this.taskId, false, '');
+      }
+    });
 }
 }

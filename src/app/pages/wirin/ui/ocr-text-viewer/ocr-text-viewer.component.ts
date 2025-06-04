@@ -22,10 +22,12 @@ export class OcrTextViewerComponent {
     @Input() ocrData: OcrResponse | null = null;
     @Input() isEditing: boolean = false;
     @Input() editingText: string = '';
+    showPdfPreview: boolean = true;
     @Output() editClicked = new EventEmitter<void>();
     @Output() cancelEditing = new EventEmitter<void>();
     @Output() textChanged = new EventEmitter<string>();
     @Output() pageChange = new EventEmitter<number>();
+    @Output() pdfVisibilityChange = new EventEmitter<boolean>();
     @Input() currentPage: number = 1;
     pagesPerView: number = 5;
     totalPages: number = 0;
@@ -79,28 +81,41 @@ export class OcrTextViewerComponent {
           body.hasError = false;
           body.errorMessage = '';
           console.log('body:', body);
+          try {
+            this.orderParagraphService.processParagraphs(body).subscribe({
+              next: (response) => {
+                console.log('Respuesta del servidor:', response);
+                this.isEditing = false;
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Éxito',
+                  detail: 'Los cambios se guardaron correctamente',
+                  life: 3000
+                });
+              },
+              error: (error) => {
+                console.error('Error al guardar los cambios:', error);
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Error',
+                  detail: 'Hubo un error al guardar los cambios. Por favor, intente nuevamente.',
+                  life: 3000
+                });
+              }
+            });
+          }
 
-          this.orderParagraphService.processParagraphs(body).subscribe({
-            next: (response) => {
-              console.log('Respuesta del servidor:', response);
-              this.isEditing = false;
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: 'Los cambios se guardaron correctamente',
-                life: 3000
-              });
-            },
-            error: (error) => {
-              console.error('Error al guardar los cambios:', error);
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
-                life: 3000
-              });
-            }
-          });
+         
+          catch (error) {
+            console.error('Error al guardar los cambios:', error);
+            this.messageService.add({
+              severity:'error',
+              summary: 'Error',
+              detail: 'Ocurrió un error al guardar los cambios',
+              life: 3000
+            });
+          }
+         
         }
 
     }
@@ -131,5 +146,10 @@ export class OcrTextViewerComponent {
     goToPage(pageNumber: number): void {
         this.pageChange.emit(pageNumber);
     }
+    togglePdfPreview(): void {
+      this.showPdfPreview = !this.showPdfPreview;
+      this.pdfVisibilityChange.emit(this.showPdfPreview);
+  }
     
 }
+

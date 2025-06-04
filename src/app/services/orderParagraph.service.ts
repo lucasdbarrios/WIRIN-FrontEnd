@@ -15,6 +15,9 @@ export class OrderParagraphServiceService {
   }
 
   processParagraphs(body: ProcessParagraphRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/processParagraphs`, { ...body });
+    return this.http.post(`${this.apiUrl}/processParagraphs`, { ...body }, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text'
+    });
   }
 }

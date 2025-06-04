@@ -1,5 +1,11 @@
 <p-card class="dark:bg-gray-800 text-gray-900 dark:text-gray-200">
     <ng-template pTemplate="content">
+        <div class="flex justify-end mb-3">
+            <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" 
+                     (click)="togglePdfPreview()" 
+                     class="p-button-secondary">
+            </p-button>
+        </div>
         <p-panel header="Texto Procesado por el OCR:"
             class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[250px]">
             <ng-container *ngIf="!isEditing">

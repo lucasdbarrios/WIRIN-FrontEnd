@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
+import { Paragraph } from '../types/paragraph.Interface';
 
 @Injectable({
   providedIn: 'root'
@@ -55,5 +56,13 @@ export class OrderService {
 
   getTaskById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+
+  checkOcrPrevius(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/ocr-previus/${id}`);
+  }
+
+  getParagraphsByOrderId(orderId: number): Observable<Paragraph[]> {
+    return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`);
   }
 }
