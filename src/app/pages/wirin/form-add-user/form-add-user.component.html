@@ -1,5 +1,6 @@
 <p-fluid>
-    <app-form-user [isEditMode]="false" (formSubmitted)="onFormSubmit($event)"></app-form-user>
+    <app-form-user [isEditMode]="false" [errorMessage]="errorMessage"
+        (formSubmitted)="onFormSubmit($event)"></app-form-user>
 </p-fluid>
 
 <app-popup [isVisible]="showConfirmPopup" title="Crear Usuario"

@@ -5,6 +5,7 @@ import { AuthService } from "../../../services/auth.service";
 import { Router } from "@angular/router";
 import { PopupComponent } from "../ui/popup/popup.component";
 import { User } from '../../../types/user.interface';
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
     selector: 'app-form-add-user',
@@ -17,6 +18,7 @@ export class AddUserFormComponent {
     uploadStatus: 'initial' | 'uploading' | 'success' | 'error' = 'initial';
     showConfirmPopup: boolean = false;
     formDataToSubmit?: FormData;
+    errorMessage: any;
 
 
     constructor(
@@ -49,8 +51,15 @@ export class AddUserFormComponent {
                 this.uploadStatus = 'success';
                 this.router.navigate(['/wirin/users']);
             },
-            error: (error) => {
+            error: (error: HttpErrorResponse) => {
                 console.error('Error al registrar el usuario:', error);
+        
+                if (error.status === 400 && error.error?.message) {
+                    this.errorMessage = error.error.message;
+                } else {
+                    this.errorMessage = 'Ocurrió un error inesperado.';
+                }
+        
                 this.uploadStatus = 'error';
             }
         });

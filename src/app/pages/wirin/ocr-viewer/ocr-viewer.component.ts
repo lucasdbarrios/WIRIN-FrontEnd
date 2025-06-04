@@ -35,6 +35,7 @@ export class OcrViewerComponent implements OnInit {
   formData?: FormData;
   urlSafe: SafeResourceUrl = '';
   task: any;
+  taskId: string  = '';
 
   constructor(private router: Router, 
     private orderManagmentService: OrderManagmentService,
@@ -71,6 +72,7 @@ export class OcrViewerComponent implements OnInit {
 
     this.orderService.getTaskById(this.task).subscribe(task => {
       this.isRevision = task?.status === 'En Revisión';
+      this.taskId = task.id;
       console.log('Estado de la tarea:', task?.status);
     });
 
@@ -123,10 +125,9 @@ export class OcrViewerComponent implements OnInit {
 
   getFormData(status: string): FormData {
     this.formData = new FormData();
-    this.formData.append('id', this.task.id);
+    this.formData.append('id', this.taskId);
     this.formData.append('status', status);
-    this.formData.append('assignedUserId', this.task.assignedUserId);
-    
+
     return this.formData;
   }
 

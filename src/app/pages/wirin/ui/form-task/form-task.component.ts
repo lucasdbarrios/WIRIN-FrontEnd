@@ -53,7 +53,7 @@ export class FormTaskComponent implements OnInit {
             name: data.name,
             description: data.description,
             limitDate: formattedDate,
-            assignedUserId: data.assignedUserId,
+            alumnoId: data.alumnoId,
             status: data.status,
             createdByUserId: data.createdByUserId,
         });
@@ -77,7 +77,7 @@ export class FormTaskComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(5)]],
       limitDate: ['', Validators.required],
       status: ['Pendiente'],
-      assignedUserId: ['', Validators.required],
+      alumnoId: ['', Validators.required],
       file: ['', Validators.required],
       createdByUserId: [''],
     });
@@ -127,6 +127,7 @@ export class FormTaskComponent implements OnInit {
 }
 
 onSubmit(): void {
+
   if (this.formTask.valid) {
       const formData = new FormData();
       const rawDate = this.formTask.get('limitDate')?.value;
@@ -136,9 +137,9 @@ onSubmit(): void {
       formData.append('description', this.formTask.get('description')?.value);
       formData.append('limitDate', formattedDate);
       formData.append('status', this.formTask.get('status')?.value || '');
-      formData.append('assignedUserId', this.formTask.get('assignedUserId')?.value || '');
+      formData.append('alumnoId', this.formTask.get('alumnoId')?.value || '');
       formData.append('createdByUserId', this.formTask.get('createdByUserId')?.value || '');
-
+      
       if (this.selectedFile) {
           formData.append('file', this.selectedFile);
       } else if (this.existingFile) {

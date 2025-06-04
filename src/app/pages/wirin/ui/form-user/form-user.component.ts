@@ -22,6 +22,7 @@ import { PasswordModule } from 'primeng/password';
 export class FormUserComponent{
   @Input() isEditMode: boolean = false;
   @Input() userId: string | null = null;
+  @Input() errorMessage: string = '';
   @Output() formSubmitted = new EventEmitter<FormData>();
   
   formUser: FormGroup;

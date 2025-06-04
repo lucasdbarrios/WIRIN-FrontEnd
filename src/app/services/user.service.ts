@@ -47,7 +47,7 @@ export class UserService {
     return new Promise((resolve) => {
         this.getUserById(userId).subscribe({
             next: (user) => resolve(user.fullName),
-            error: () => resolve("Nombre de usuario no disponible")
+            error: () => resolve("Usuario no asignado")
         });
     });
 }
