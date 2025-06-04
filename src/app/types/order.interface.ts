@@ -7,5 +7,6 @@ export interface Order{
     limitDate: string
     createdByUserId: string
     filePath: string
-    assignedUserId: string
+    alumnoId: string
+    assignedUserId?: string
   }

@@ -25,6 +25,7 @@ export class TaskDetailComponent implements OnInit {
   errorMessage: string = '';
   isLibrarian: boolean = false;
   user: any;
+  userIdActive: string  = '';
   statusTask: string = '';
   taskId: number = 0;
 
@@ -41,6 +42,7 @@ export class TaskDetailComponent implements OnInit {
   formData?: FormData;
   requesterName: string = '';
   creatorName: string = '';
+  alumnoName: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -54,11 +56,18 @@ export class TaskDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.taskId = Number(this.route.snapshot.paramMap.get('id'));
+    this.authService.getCurrentUser().subscribe({
+      next: (userData) => {
+        this.user = userData;
+        this.userIdActive = userData?.id ?? '';
+      },
+    })
+    console.log(this.userIdActive);
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');
     this.loadTaskDetails();
+    console.log(this.task);
     this.getStatus();
-    
   }
 
   getStatus(): void {
@@ -90,9 +99,11 @@ export class TaskDetailComponent implements OnInit {
               ...data,
               fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
           };
-
+console.log(this.task);
+          // Obtener nombres de usuario para cada secció
           this.creatorName = await this.userService.getUserName(data.createdByUserId);
           this.requesterName = await this.userService.getUserName(data.assignedUserId);
+          this.alumnoName = await this.userService.getUserName(data.alumnoId);
 
   
           this.isLoading = false;
@@ -137,43 +148,54 @@ export class TaskDetailComponent implements OnInit {
     });
   }
 
-  processOcr(orderId: number, condition: boolean, status: string): void {
+  async processOcr(orderId: number, condition: boolean, status: string): Promise<void> {
     this.uploadStatus = 'uploading';
     this.uploadProgress = 0;
     this.ocrResponse = null;
 
-    if(condition){
-      this.formData = new FormData();
-      this.formData.append('id', this.taskId.toString());
-      this.formData.append('status', status);
-      this.formData.append('assignedUserId', this.task.assignedUserId);
-      this.orderManagmentService.changeStatus(this.formData).subscribe({
-      error: (err) => {
-        console.error('Error al cambiar el estado:', err);
-      }
-    });
+    await this.saveAssignedUserId();
+
+    if (condition) {
+        await this.changeStateTask(status);
     }
-    
-  
+
     this.fileUploadService.newProcessOcr(orderId, this.selectedOcrProcessor).subscribe({
-      next: (response) => {
-        this.uploadStatus = 'success';
-        this.uploadProgress = 100;
-        this.ocrResponse = response;
-  
-        // Guardar los datos OCR en localStorage para que estén disponibles en la nueva vista
-        localStorage.setItem('ocrData', JSON.stringify(response));
-  
-        // Redirigir al visualizador OCR
-        this.router.navigate(['/wirin/ocr-viewer/' + orderId]);
-      },
-      error: (error) => {
-        console.error('Error al procesar el archivo con OCR:', error);
-        this.errorMessage = 'Error al procesar el archivo con OCR. Por favor, intente nuevamente.';
-        this.uploadStatus = 'error';
-      }
+        next: (response) => {
+            this.uploadStatus = 'success';
+            this.uploadProgress = 100;
+            this.ocrResponse = response;
+
+            localStorage.setItem('ocrData', JSON.stringify(response));
+
+            this.router.navigate(['/wirin/ocr-viewer/' + orderId]);
+        },
+        error: (error) => {
+            console.error('Error al procesar el archivo con OCR:', error);
+            this.errorMessage = 'Error al procesar el archivo con OCR. Por favor, intente nuevamente.';
+            this.uploadStatus = 'error';
+        }
     });
-  }
+}
+
+async saveAssignedUserId(): Promise<void> {
+  this.formData = new FormData();
+  this.formData.append('id', this.taskId.toString());
+  this.formData.append('assignedUserId', this.userIdActive);
+  console.log(this.userIdActive);
+
+  await firstValueFrom(this.orderManagmentService.saveAssignedUserId(this.formData));
+}
+
+async changeStateTask(status: string): Promise<void> {
+  console.log(this.task);
+  this.formData = new FormData();
+  this.formData.append('id', this.taskId.toString());
+  this.formData.append('status', status);
+  this.formData.append('assignedUserId', this.userIdActive);
+  console.log(this.task);
+
+  await firstValueFrom(this.orderManagmentService.changeStatus(this.formData));
+}
 
   confirmarEntrega(): void {
     this.formData = new FormData();

@@ -61,15 +61,14 @@
 
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-col gap-2">
-                    <label for="assignedUserId">Seleccionar usuario</label>
-                    <p-select id="assignedUserId" formControlName="assignedUserId" [options]="dropdownItemsUsers"
-                        optionLabel="name" optionValue="value" placeholder="Selecciona el usuario"></p-select>
+                    <label for="alumnoId">Seleccionar usuario</label>
+                    <p-select id="alumnoId" formControlName="alumnoId" [options]="dropdownItemsUsers" optionLabel="name"
+                        optionValue="value" placeholder="Selecciona el usuario"></p-select>
                     <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formTask.get('alumnoId')?.invalid && formTask.get('alumnoId')?.touched">El
+                            solicitante es requerido</span>
                         <span
-                            *ngIf="formTask.get('assignedUserId')?.invalid && formTask.get('assignedUserId')?.touched">El
-                            usuario es requerido</span>
-                        <span
-                            *ngIf="!(formTask.get('assignedUserId')?.invalid && formTask.get('assignedUserId')?.touched)">&nbsp;</span>
+                            *ngIf="!(formTask.get('alumnoId')?.invalid && formTask.get('alumnoId')?.touched)">&nbsp;</span>
                     </p-message>
 
                 </div>
