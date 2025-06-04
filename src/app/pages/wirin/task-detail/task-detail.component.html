@@ -4,10 +4,10 @@
 
             <div class="font-bold text-2xl mb-6">{{task.name}}</div>
             <div class="flex justify-between md:flex-row md:justify-end gap-1">
-                <p-button icon="pi pi-pencil" label="Editar" (onClick)="editTask(task.id)">
+                <p-button icon="pi pi-pencil" label="Editar" [severity]="'warn'" (onClick)="editTask(task.id)">
                 </p-button>
                 <p-button icon="pi pi-trash" label="Eliminar" (onClick)="deleteTask(task.id, $event)"
-                    styleClass="p-button-danger">
+                    [severity]="'danger'">
                 </p-button>
             </div>
 
@@ -52,8 +52,9 @@
         <div class="flex justify-between md:flex-row md:justify-between gap-6">
             <app-back-button></app-back-button>
             <p-button icon="pi pi-play" label="Procesar" type="button" (click)="processOcr(task.id, true, 'En Proceso')"
-                *ngIf="isProcess || isEarring || isDenegated"></p-button>
-            <p-button label="Revisar" type="button" *ngIf="isRevision"></p-button>
+                *ngIf="isProcess || isEarring || isDenegated" [severity]="'info'"></p-button>
+            <p-button label="Revisar" type="button" *ngIf="isRevision"
+                (click)="processOcr(task.id, true, 'En Revisión')"></p-button>
             <p-button label="Confirmar entrega" type="button" (click)="confirmarEntrega()"
                 *ngIf="isCompleted"></p-button>
         </div>
