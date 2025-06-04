@@ -181,18 +181,14 @@ async saveAssignedUserId(): Promise<void> {
   this.formData = new FormData();
   this.formData.append('id', this.taskId.toString());
   this.formData.append('assignedUserId', this.userIdActive);
-  console.log(this.userIdActive);
 
   await firstValueFrom(this.orderManagmentService.saveAssignedUserId(this.formData));
 }
 
 async changeStateTask(status: string): Promise<void> {
-  console.log(this.task);
   this.formData = new FormData();
   this.formData.append('id', this.taskId.toString());
   this.formData.append('status', status);
-  this.formData.append('assignedUserId', this.userIdActive);
-  console.log(this.task);
 
   await firstValueFrom(this.orderManagmentService.changeStatus(this.formData));
 }
