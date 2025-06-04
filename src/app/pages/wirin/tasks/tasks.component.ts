@@ -129,22 +129,5 @@ export class TasksComponent implements OnInit{
 
     newTask() {
         this.router.navigate(['/wirin/add-task-form']);
-    }
-
-    editTask(id: number) {
-        this.router.navigate([`/wirin/edit-task-form/${id}`]);
-    }
-
-    deleteTask(taskId: number, event: Event): void {
-        event.stopPropagation();
-
-        this.orderService.deleteOrder(taskId).subscribe({
-            next: () => {
-                this.loadTasks();
-            },
-            error: error => {
-                console.error('Error al eliminar tarea:', error);
-            }
-        });
-    }
+      }
 }

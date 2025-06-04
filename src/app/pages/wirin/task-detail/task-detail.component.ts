@@ -225,4 +225,21 @@ getSeverity(task: any): string {
           return 'info';
   }
 }
+
+deleteTask(taskId: number, event: Event): void {
+  event.stopPropagation();
+
+  this.orderService.deleteOrder(taskId).subscribe({
+      next: () => {
+          this.router.navigate(['/wirin/tasks']);
+      },
+      error: error => {
+          console.error('Error al eliminar tarea:', error);
+      }
+  });
+}
+
+editTask(id: number) {
+  this.router.navigate([`/wirin/edit-task-form/${id}`]);
+}
 }

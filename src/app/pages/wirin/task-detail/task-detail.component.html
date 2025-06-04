@@ -1,7 +1,21 @@
 <p-card>
-    <div class="font-bold text-2xl mb-6">{{task.name}}</div>
+    <ng-template pTemplate="header">
+        <div class="flex justify-between p-4">
+
+            <div class="font-bold text-2xl mb-6">{{task.name}}</div>
+            <div class="flex justify-between md:flex-row md:justify-end gap-1">
+                <p-button icon="pi pi-pencil" label="Editar" (onClick)="editTask(task.id)">
+                </p-button>
+                <p-button icon="pi pi-trash" label="Eliminar" (onClick)="deleteTask(task.id, $event)"
+                    styleClass="p-button-danger">
+                </p-button>
+            </div>
+
+        </div>
+    </ng-template>
     <div *ngIf="isLoading" aria-live="polite" class="flex justify-center mt-6">
-        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500" aria-label="Cargando..."></div>
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500" aria-label="Cargando...">
+        </div>
         <span class="sr-only">Cargando tarea</span>
     </div>
     <ng-template pTemplate="content">
@@ -37,12 +51,11 @@
     <ng-template pTemplate="footer">
         <div class="flex justify-between md:flex-row md:justify-between gap-6">
             <app-back-button></app-back-button>
-            <p-button label="Procesar" type="button" class="md:w-auto border rounded-md"
-                (click)="processOcr(task.id, true, 'En Proceso')"
+            <p-button icon="pi pi-play" label="Procesar" type="button" (click)="processOcr(task.id, true, 'En Proceso')"
                 *ngIf="isProcess || isEarring || isDenegated"></p-button>
-            <p-button label="Revisar" type="button" class="md:w-auto border rounded-md" *ngIf="isRevision"></p-button>
-            <p-button label="Confirmar entrega" type="button" class="md:w-auto border rounded-md"
-                (click)="confirmarEntrega()" *ngIf="isCompleted"></p-button>
+            <p-button label="Revisar" type="button" *ngIf="isRevision"></p-button>
+            <p-button label="Confirmar entrega" type="button" (click)="confirmarEntrega()"
+                *ngIf="isCompleted"></p-button>
         </div>
     </ng-template>
 </p-card>
