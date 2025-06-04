@@ -5,6 +5,8 @@
                 <h2 class="ml-2">{{isEditMode ? 'Modificar Usuario' : 'Crear Nuev Usuario'}}</h2>
             </div>
 
+            <p-message *ngIf="errorMessage" severity="error" text="{{ errorMessage }}"></p-message>
+
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-wrap gap-2 w-full">
                     <label for="fullName">Nombre Completo</label>
@@ -39,7 +41,7 @@
                     <input pInputText id="email" type="text" formControlName="email" placeholder="Ingresá el email" />
                     <p-message severity="error" variant="simple" size="small">
                         <span *ngIf="formUser.get('email')?.invalid && formUser.get('email')?.touched">El email es
-                            incorrecto/requerido</span>
+                            requerido</span>
                         <span *ngIf="!(formUser.get('email')?.invalid && formUser.get('email')?.touched)">&nbsp;</span>
                     </p-message>
                 </div>
