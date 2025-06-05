@@ -46,17 +46,20 @@ export class FormTaskComponent implements OnInit {
 
   @Input() set taskData(data: Order) {
     if (data) {
-        let formattedDate = data.limitDate ? new Date(data.limitDate) : null;
+      let formattedDate = data.limitDate ? new Date(data.limitDate) : null;
 
-        this.formTask.patchValue({
-            id: data.id,
-            name: data.name,
-            description: data.description,
-            limitDate: formattedDate,
-            alumnoId: data.alumnoId,
-            status: data.status,
-            createdByUserId: data.createdByUserId,
-        });
+      this.formTask.patchValue({
+          name: data.name,
+          subject: data.subject,
+          description: data.description,
+          authorName: data.authorName,
+          rangePage: data.rangePage,
+          isPriority: data.isPriority,
+          status: data.status,
+          limitDate: formattedDate,
+          alumnoId: data.alumnoId,
+          createdByUserId: data.createdByUserId,
+      })
 
         if (data.filePath) {
             this.currentFileName = data.filePath.split('\\').pop() || data.filePath.split('/').pop() || data.filePath;
@@ -74,13 +77,17 @@ export class FormTaskComponent implements OnInit {
   ) {
     this.formTask = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
+      subject: ['', Validators.required],
       description: ['', [Validators.required, Validators.minLength(5)]],
-      limitDate: ['', Validators.required],
-      status: ['Pendiente'],
-      alumnoId: ['', Validators.required],
+      authorName: ['', Validators.required],
+      rangePage: ['', Validators.required],
+      isPriority: [false],
       file: ['', Validators.required],
+      status: ['Pendiente'],
+      limitDate: ['', Validators.required],
+      alumnoId: ['', Validators.required],
       createdByUserId: [''],
-    });
+  });
 
     this.userService.getAllStudents().subscribe({
       next: (response) => {
@@ -127,24 +134,27 @@ export class FormTaskComponent implements OnInit {
 }
 
 onSubmit(): void {
-
   if (this.formTask.valid) {
       const formData = new FormData();
       const rawDate = this.formTask.get('limitDate')?.value;
       const formattedDate = rawDate ? new Date(rawDate).toISOString().split('T')[0] : '';
 
       formData.append('name', this.formTask.get('name')?.value);
+      formData.append('subject', this.formTask.get('subject')?.value);
       formData.append('description', this.formTask.get('description')?.value);
-      formData.append('limitDate', formattedDate);
+      formData.append('authorName', this.formTask.get('authorName')?.value);
+      formData.append('rangePage', this.formTask.get('rangePage')?.value);
+      formData.append('isPriority', this.formTask.get('isPriority')?.value.toString());
       formData.append('status', this.formTask.get('status')?.value || '');
+      formData.append('limitDate', formattedDate);
       formData.append('alumnoId', this.formTask.get('alumnoId')?.value || '');
       formData.append('createdByUserId', this.formTask.get('createdByUserId')?.value || '');
-      
+
       if (this.selectedFile) {
-          formData.append('file', this.selectedFile);
-      } else if (this.existingFile) {
-          formData.append('file', this.existingFile);
-      }
+        formData.append('file', this.selectedFile);
+    } else if (this.existingFile) {
+        formData.append('file', this.existingFile);
+    }
 
       this.formSubmitted.emit(formData);
   } else {

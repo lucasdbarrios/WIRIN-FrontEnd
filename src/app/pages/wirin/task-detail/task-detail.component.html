@@ -1,7 +1,6 @@
 <p-card>
     <ng-template pTemplate="header">
         <div class="flex justify-between p-4">
-
             <div class="font-bold text-2xl mb-6">{{task.name}}</div>
             <div class="flex justify-between md:flex-row md:justify-end gap-1">
                 <p-button icon="pi pi-pencil" label="Editar" [severity]="'warn'" (onClick)="editTask(task.id)">
@@ -10,34 +9,31 @@
                     [severity]="'danger'">
                 </p-button>
             </div>
-
         </div>
     </ng-template>
+
     <div *ngIf="isLoading" aria-live="polite" class="flex justify-center mt-6">
         <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500" aria-label="Cargando...">
         </div>
         <span class="sr-only">Cargando tarea</span>
     </div>
+
     <ng-template pTemplate="content">
         <div *ngIf="!isLoading && !errorMessage && task" class="grid grid-cols-2 gap-6 p-4 rounded-md">
-
             <div><strong>Descripción:</strong> {{ task.description }}</div>
-            <div><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd MMMM yyyy' : 'es' }}
+            <div><strong>Materia:</strong> {{ task.subject }}</div>
+            <div><strong>Autor:</strong> {{ task.authorName }}</div>
+            <div><strong>Rango de páginas:</strong> {{ task.rangePage }}</div>
+            <div><strong>Prioridad:</strong> {{ task.isPriority ? 'Alta' : 'Normal' }}</div>
+            <div><strong>Estado:</strong>
+                <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
             </div>
-
-            <div><strong>Fecha de creación:</strong> {{ task.creationDate
-                | date:'dd MMMM yyyy' : 'es' }}</div>
-            <div><strong>Archivo a digitalizar:</strong> {{ task.fileName || 'Sin archivo' }}
-            </div>
-
+            <div><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd MMMM yyyy' : 'es' }}</div>
+            <div><strong>Fecha de creación:</strong> {{ task.creationDate | date:'dd MMMM yyyy' : 'es' }}</div>
+            <div><strong>Archivo a digitalizar:</strong> {{ task.fileName || 'Sin archivo' }}</div>
             <div><strong>Procesado por:</strong> {{ requesterName }}</div>
             <div><strong>Solicitante del material:</strong> {{ alumnoName }}</div>
             <div><strong>Tarea creada por:</strong> {{ creatorName }}</div>
-
-            <div class="flex items-center gap-2">
-                <strong>Estado:</strong>
-                <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
-            </div>
         </div>
 
         <div class="mt-6">
