@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ButtonModule } from 'primeng/button';
-import { OrderParagraphServiceService } from '../../../../services/orderParagraph.service';
+import { OrderParagraphService } from '../../../../services/orderParagraph.service';
 import { ProcessParagraphRequest } from '../../../../types/Requests/ProcessParagraphRequest';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
@@ -30,7 +30,7 @@ export class OcrTextViewerComponent {
     pagesPerView: number = 5;
     totalPages: number = 0;
 
-    constructor(private orderParagraphService: OrderParagraphServiceService, private messageService: MessageService, private route: ActivatedRoute){}
+    constructor(private orderParagraphService: OrderParagraphService, private messageService: MessageService, private route: ActivatedRoute){}
 
     ngOnInit() {
         if (this.ocrData) {
@@ -78,11 +78,9 @@ export class OcrTextViewerComponent {
           body.pageNumber = this.currentPage;
           body.hasError = false;
           body.errorMessage = '';
-          console.log('body:', body);
 
           this.orderParagraphService.processParagraphs(body).subscribe({
-            next: (response) => {
-              console.log('Respuesta del servidor:', response);
+            next: (response: any) => {
               this.isEditing = false;
               this.messageService.add({
                 severity: 'success',

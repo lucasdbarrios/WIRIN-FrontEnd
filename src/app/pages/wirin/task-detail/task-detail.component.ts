@@ -62,11 +62,9 @@ export class TaskDetailComponent implements OnInit {
         this.userIdActive = userData?.id ?? '';
       },
     })
-    console.log(this.userIdActive);
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');
     this.loadTaskDetails();
-    console.log(this.task);
     this.getStatus();
   }
 
@@ -99,7 +97,6 @@ export class TaskDetailComponent implements OnInit {
               ...data,
               fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
           };
-console.log(this.task);
           // Obtener nombres de usuario para cada secció
           this.creatorName = await this.userService.getUserName(data.createdByUserId);
           this.requesterName = await this.userService.getUserName(data.assignedUserId);
@@ -239,7 +236,13 @@ deleteTask(taskId: number, event: Event): void {
   });
 }
 
-editTask(id: number) {
-  this.router.navigate([`/wirin/edit-task-form/${id}`]);
+  editTask(id: number) {
+    this.router.navigate([`/wirin/edit-task-form/${id}`]);
+  }
+
+  navigateToReview(taskId: number, status: string): void {
+    this.router.navigate(['/wirin/ocr-viewer', taskId], { queryParams: { estado: status } });
 }
+
+
 }

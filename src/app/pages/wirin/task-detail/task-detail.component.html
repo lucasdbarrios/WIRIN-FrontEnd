@@ -54,7 +54,7 @@
             <p-button icon="pi pi-play" label="Procesar" type="button" (click)="processOcr(task.id, true, 'En Proceso')"
                 *ngIf="isProcess || isEarring || isDenegated" [severity]="'info'"></p-button>
             <p-button label="Revisar" type="button" *ngIf="isRevision"
-                (click)="processOcr(task.id, true, 'En Revisión')"></p-button>
+                (click)="navigateToReview(task.id, 'estadoRevision')"></p-button>
             <p-button label="Confirmar entrega" type="button" (click)="confirmarEntrega()"
                 *ngIf="isCompleted"></p-button>
         </div>

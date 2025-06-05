@@ -12,7 +12,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { OrderParagraphServiceService } from '../../../services/orderParagraph.service';
+import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
+import { OrderParagraphService } from '../../../services/orderParagraph.service';
 import { ProcessParagraphRequest } from '../../../types/Requests/ProcessParagraphRequest';
 
 @Component({
@@ -29,6 +30,8 @@ export class OcrViewerComponent implements OnInit {
   editingText: string = '';
   currentPage: number = 1;
   totalPages: number = 0;
+  pages: OcrPage[] = [];
+  textProcess: ProcessParagraph[] = [];
   user: any;
   errorMessage: string = '';
   isRevision = false;
@@ -36,45 +39,50 @@ export class OcrViewerComponent implements OnInit {
   urlSafe: SafeResourceUrl = '';
   task: any;
   taskId: string  = '';
+  estado: string | null = null;
 
   constructor(private router: Router, 
     private orderManagmentService: OrderManagmentService,
     private route: ActivatedRoute,
-    private authService: AuthService,
+    private authService: AuthService, 
     private orderService: OrderService,
     public sanitizer: DomSanitizer,
     private messageService: MessageService,
-    private orderParagraphService: OrderParagraphServiceService
+    private orderParagraphService: OrderParagraphService
   ) {}
 
   ngOnInit(): void {
     this.task = Number(this.route.snapshot.paramMap.get('id'));
+    this.estado = this.route.snapshot.queryParamMap.get('estado');
+
+    this.orderService.getTaskById(this.task).subscribe(task => {
+      this.isRevision = task?.status === 'En Revisión';
+      this.taskId = task.id;
+    });
 
     const storedData = localStorage.getItem('ocrData');
     if (storedData) {
       this.ocrData = JSON.parse(storedData);
       this.totalPages = this.ocrData?.metadata?.totalPages ?? 1; 
       this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop() ?? ''
-      
-      this.orderService.recoveryFile(this.task).subscribe({
-        next: (data) => {
-          const blob = new Blob([data], { type: 'application/pdf' });
-          const url = URL.createObjectURL(blob);
-          this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        },
-        error: (error) => {
-          console.error('Error al recuperar el archivo:', error);
-        }
-      })
+      this.pages = this.ocrData?.pages?? [];
 
+      this.saveDocProcesed(this.pages);
      // this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.ocrData?.metadata?.fileName?? '');
     }
+    this.orderService.recoveryFile(this.task).subscribe({
+      next: (data) => {
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      },
+      error: (error) => {
+        console.error('Error al recuperar el archivo:', error);
+      }
+    })
+    
 
-    this.orderService.getTaskById(this.task).subscribe(task => {
-      this.isRevision = task?.status === 'En Revisión';
-      this.taskId = task.id;
-      console.log('Estado de la tarea:', task?.status);
-    });
+    
 
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
@@ -85,6 +93,24 @@ export class OcrViewerComponent implements OnInit {
         this.errorMessage = 'No se pudo cargar la información del perfil.';
       },
     });
+}
+
+saveDocProcesed(pages: OcrPage[]): void {
+  for (const page of pages) {
+      const pageData: ProcessParagraph = {
+          orderId: this.task,
+          pageNumber: page.number,
+          paragraphText: page.text,
+          hasError: false,
+          errorMessage: ''
+      };
+
+      this.orderParagraphService.processParagraphs(pageData).subscribe({
+          error: (error: any) => {
+              console.error('Error al enviar los datos:', error);
+          }
+      });
+  }
 }
 
   finalizarProceso(): void {
@@ -139,10 +165,6 @@ export class OcrViewerComponent implements OnInit {
 
   startEditing(): void {
     this.isEditing = true;
-  }
-
-  saveChanges(): void {
-    
   }
 
   cancelEditing(): void {
