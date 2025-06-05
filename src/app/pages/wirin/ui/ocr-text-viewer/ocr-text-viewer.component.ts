@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ButtonModule } from 'primeng/button';
-import { OrderParagraphServiceService } from '../../../../services/orderParagraph.service';
+import { OrderParagraphService } from '../../../../services/orderParagraph.service';
 import { ProcessParagraphRequest } from '../../../../types/Requests/ProcessParagraphRequest';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
@@ -32,7 +32,7 @@ export class OcrTextViewerComponent {
     pagesPerView: number = 5;
     totalPages: number = 0;
 
-    constructor(private orderParagraphService: OrderParagraphServiceService, private messageService: MessageService, private route: ActivatedRoute){}
+    constructor(private orderParagraphService: OrderParagraphService, private messageService: MessageService, private route: ActivatedRoute){}
 
     ngOnInit() {
         if (this.ocrData) {
@@ -80,42 +80,27 @@ export class OcrTextViewerComponent {
           body.pageNumber = this.currentPage;
           body.hasError = false;
           body.errorMessage = '';
-          console.log('body:', body);
-          try {
-            this.orderParagraphService.processParagraphs(body).subscribe({
-              next: (response) => {
-                console.log('Respuesta del servidor:', response);
-                this.isEditing = false;
-                this.messageService.add({
-                  severity: 'success',
-                  summary: 'Éxito',
-                  detail: 'Los cambios se guardaron correctamente',
-                  life: 3000
-                });
-              },
-              error: (error) => {
-                console.error('Error al guardar los cambios:', error);
-                this.messageService.add({
-                  severity: 'error',
-                  summary: 'Error',
-                  detail: 'Hubo un error al guardar los cambios. Por favor, intente nuevamente.',
-                  life: 3000
-                });
-              }
-            });
-          }
 
-         
-          catch (error) {
-            console.error('Error al guardar los cambios:', error);
-            this.messageService.add({
-              severity:'error',
-              summary: 'Error',
-              detail: 'Ocurrió un error al guardar los cambios',
-              life: 3000
-            });
-          }
-         
+          this.orderParagraphService.processParagraphs(body).subscribe({
+            next: (response: any) => {
+              this.isEditing = false;
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: 'Los cambios se guardaron correctamente',
+                life: 3000
+              });
+            },
+            error: (error) => {
+              console.error('Error al guardar los cambios:', error);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
+                life: 3000
+              });
+            }
+          });
         }
 
     }

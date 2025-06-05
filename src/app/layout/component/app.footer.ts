@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
     selector: 'app-footer',
     template: `<div class="layout-footer">
         
-        <a href="#" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">WIRIN</a>
+        <img src="logo/wirin.png" alt="Logo" width="60" />
     </div>`
 })
 export class AppFooter {}

@@ -63,11 +63,9 @@ export class TaskDetailComponent implements OnInit {
         this.userIdActive = userData?.id ?? '';
       },
     })
-    console.log(this.userIdActive);
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');
     this.loadTaskDetails();
-    console.log(this.task);
     this.getStatus();
   }
 
@@ -100,7 +98,6 @@ export class TaskDetailComponent implements OnInit {
               ...data,
               fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
           };
-console.log(this.task);
           // Obtener nombres de usuario para cada secció
           this.creatorName = await this.userService.getUserName(data.createdByUserId);
           this.requesterName = await this.userService.getUserName(data.assignedUserId);
@@ -227,56 +224,26 @@ getSeverity(task: any): string {
   }
 }
 
-checkOcrPrevius() {
-    this.orderService.getParagraphsByOrderId(this.taskId).subscribe({
-      next: (paragraphs:Paragraph[]) => {
-        if (paragraphs && paragraphs.length > 0) {
-          // Crear estructura de ocrResponse con los párrafos recuperados
-          const processedPages = [...new Set(paragraphs.map(p => p.pageNumber))];
-          this.ocrResponse = {
-            metadata: {
-              totalPages: this.task.totalPages 
-            },
-            pages: paragraphs.reduce((pages, paragraph) => {
-              let page:Paragraph = pages.find(p => p.number === paragraph.pageNumber);
-              if (!page) {
-                page = {
-                  number: paragraph.pageNumber,
-                  text: paragraph.paragraphText,
-                  hasError: paragraph.hasError,
-                  errorMessage: paragraph.errorMessage
-                };
-                pages.push(page);
-              } else {
-                page.text += '\n' + paragraph.paragraphText;
-                page.hasError = page.hasError || paragraph.hasError;
-                if (paragraph.errorMessage) {
-                  page.errorMessage = page.errorMessage ? 
-                    `${page.errorMessage}\n${paragraph.errorMessage}` : 
-                    paragraph.errorMessage;
-                }
-              }
-              return pages;
-            }, [])
-          };
-          this.uploadStatus = 'success';
-          console.log('Párrafos recuperados:', this.ocrResponse);
+deleteTask(taskId: number, event: Event): void {
+  event.stopPropagation();
 
-          // Verificar si hay páginas sin procesar
-          if (this.task.totalPages && this.task.totalPages > processedPages.length) {
-            console.log('Procesando páginas faltantes...');
-            this.processOcr(this.taskId, false, '');
-          }
-        } else {
-          // Si no hay párrafos procesados, procesar todo el documento
-          this.processOcr(this.taskId, false, '');
-        }
+  this.orderService.deleteOrder(taskId).subscribe({
+      next: () => {
+          this.router.navigate(['/wirin/tasks']);
       },
-      error: (error) => {
-        console.error('Error al obtener párrafos:', error);
-        // En caso de error, intentar procesar todo el documento
-        this.processOcr(this.taskId, false, '');
+      error: error => {
+          console.error('Error al eliminar tarea:', error);
       }
-    });
+  });
 }
+
+  editTask(id: number) {
+    this.router.navigate([`/wirin/edit-task-form/${id}`]);
+  }
+
+  navigateToReview(taskId: number, status: string): void {
+    this.router.navigate(['/wirin/ocr-viewer', taskId], { queryParams: { estado: status } });
+}
+
+
 }

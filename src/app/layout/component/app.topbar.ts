@@ -17,9 +17,9 @@ import { AuthService } from '../../services/auth.service';
                 <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/">
-            <img src="logo/wirin.png" alt="Logo" width="54" height="40" />
+            <img src="logo/wirin50.png" alt="Logo" width="54" />
 
-                <span>WIRIN</span>
+            <img src="logo/wirin25.png" alt="Logo" width="60" />
             </a>
         </div>
 

@@ -7,7 +7,7 @@ import { ProcessParagraphRequest } from '../types/Requests/ProcessParagraphReque
 @Injectable({
   providedIn: 'root'
 })
-export class OrderParagraphServiceService {
+export class OrderParagraphService {
   private apiUrl:string;
 
   constructor(private http: HttpClient, private envService: EnvService) {
@@ -19,5 +19,9 @@ export class OrderParagraphServiceService {
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text'
     });
+  }
+
+  getParagraphsByOrderId(orderId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`);
   }
 }

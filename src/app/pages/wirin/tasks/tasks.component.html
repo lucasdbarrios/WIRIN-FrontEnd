@@ -41,20 +41,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex flex-col gap-6 mt-6">
-                                <div class="flex gap-2 justify-end">
-                                    <p-button icon="pi pi-pencil"
-                                        styleClass="p-button-warning border-2 border-blue-500 shadow-lg transition-all hover:shadow-green-500 hover:scale-105"
-                                        (onClick)="editTask(item.id)" *ngIf="isBibliotecario">
-                                    </p-button>
-                                    <p-button icon="pi pi-trash"
-                                        styleClass="p-button-danger border-2 border-blue-500 shadow-lg transition-all hover:shadow-red-500 hover:scale-105"
-                                        (onClick)="deleteTask(item.id, $event)" *ngIf="isBibliotecario">
-                                    </p-button>
-                                    <p-button icon="pi pi-eye"
-                                        styleClass="p-button border-2 border-blue-500 shadow-lg transition-all hover:shadow-green-500 hover:scale-105"
-                                        [routerLink]="['/wirin/task-detail', item.id]">
-                                    </p-button>
+                            <div class="flex flex-col md:items-end gap-8 mt-4">
+                                <div class="flex flex-row-reverse md:flex-row gap-2">
+                                    <p-button icon="pi pi-eye" label="Detalles" [routerLink]="['/wirin/task-detail', item.id]" styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
                                 </div>
                             </div>
                         </div>
