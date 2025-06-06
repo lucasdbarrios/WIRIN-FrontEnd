@@ -144,7 +144,7 @@ export class TaskDetailComponent implements OnInit {
 
    // await this.saveAssignedUserId();
 
-    if (condition) {
+    if (condition && this.isEarring) {
       await this.changeStateTask(status);
     }
 

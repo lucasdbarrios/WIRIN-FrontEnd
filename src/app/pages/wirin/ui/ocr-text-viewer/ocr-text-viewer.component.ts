@@ -33,7 +33,7 @@ export class OcrTextViewerComponent {
     @Output() pageChange = new EventEmitter<number>();
     @Output() pdfVisibilityChange = new EventEmitter<boolean>();
     @Input() currentPage: number = 1;
-    pagesPerView: number = 5;
+    pagesPerView: number = 3;
     totalPages: number = 0;
     visible: boolean = false;
     annotation: string = '';

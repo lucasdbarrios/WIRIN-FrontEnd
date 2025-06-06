@@ -6,11 +6,13 @@
             </p-button>
         </div>
         <p-panel header="Texto Procesado por el OCR:"
+            [style]="{ minHeight: '250px', maxHeight: '250px', overflow: 'auto' }"
             class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[250px]">
             <ng-container *ngIf="!isEditing">
-                <p-scrollPanel [style]="{ maxHeight: '250px', overflow: 'auto' }">
+                <p-scrollPanel [style]="{ maxHeight: '250px' }">
                     <pre class="whitespace-pre-wrap font-mono text-sm">{{ getCurrentPage()?.text }}</pre>
                 </p-scrollPanel>
+
             </ng-container>
 
             <ng-container *ngIf="isEditing">
@@ -34,18 +36,19 @@
         </div>
 
         <div *ngIf="ocrData" class="flex justify-center gap-2 mt-3">
-            <p-button icon="pi pi-angle-left" *ngIf="currentPage > 1" (click)="goToPage(currentPage - 1)"
+            <p-button icon="pi pi-angle-left" (click)="goToPage(currentPage - 1)"
                 class="p-button-rounded p-button-secondary"></p-button>
 
-            <p-button *ngFor="let page of ocrData.pages.slice(currentPage - 1, currentPage - 1 + pagesPerView)"
-                (click)="goToPage(page.number)"
-                [ngClass]="{'p-button-primary': currentPage === page.number, 'p-button-secondary': currentPage !== page.number}"
+            <p-button
+                *ngFor="let page of ocrData.pages.slice(currentPage - (pagesPerView / 2), currentPage + (pagesPerView / 2))"
+                (click)="goToPage(page.number)" [severity]="currentPage === page.number ? 'primary' : 'secondary'"
                 class="p-button-rounded">
                 {{ page.number }}
             </p-button>
 
-            <p-button icon="pi pi-angle-right" *ngIf="currentPage + pagesPerView <= totalPages"
-                (click)="goToPage(currentPage + 1)" class="p-button-rounded p-button-secondary"></p-button>
+
+            <p-button icon="pi pi-angle-right" (click)="goToPage(currentPage + 1)"
+                class="p-button-rounded p-button-secondary"></p-button>
         </div>
     </ng-template>
 </p-card>
