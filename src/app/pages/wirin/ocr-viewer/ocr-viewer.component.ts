@@ -14,7 +14,6 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
 import { OrderParagraphService } from '../../../services/orderParagraph.service';
-import { ProcessParagraphRequest } from '../../../types/Requests/ProcessParagraphRequest';
 import { FileUploadService } from '../../../services/file-upload.service';
 
 @Component({
@@ -35,7 +34,7 @@ export class OcrViewerComponent implements OnInit {
   textProcess: ProcessParagraph[] = [];
   user: any;
   errorMessage: string = '';
-  isRevision = false;
+  state: string = '';
   formData?: FormData;
   urlSafe: SafeResourceUrl = '';
   task: any;
@@ -57,7 +56,7 @@ export class OcrViewerComponent implements OnInit {
     this.estado = this.route.snapshot.queryParamMap.get('estado');
 
     this.orderService.getTaskById(this.task).subscribe(task => {
-      this.isRevision = task?.status === 'En Revisión';
+      this.state = task.status;
       this.taskId = task.id;
     });
 
@@ -137,8 +136,15 @@ saveDocProcesed(pages: OcrPage[]): void {
     });
   }
   
-  finalizarRevision(): void {
-    const getFormData = this.getFormData('Completada');
+  finalizarRevision(state: string): void {
+    var getFormData = null;
+    console.log(state)
+    if(state == 'En Revisión'){
+      getFormData = this.getFormData('Aprobada');
+    }else{
+      getFormData = this.getFormData('Completada');
+    }
+    
     this.orderManagmentService.changeStatus(getFormData).subscribe({
       next: () => {
         this.router.navigate(['/wirin/tasks']);
@@ -169,9 +175,5 @@ saveDocProcesed(pages: OcrPage[]): void {
 
   cancelEditing(): void {
     this.isEditing = false;
-  }
-
-  isToRevision(): boolean {
-    return this.task?.status === 'En Revisión';
   }
 }

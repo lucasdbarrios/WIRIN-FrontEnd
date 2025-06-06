@@ -113,19 +113,21 @@ export class TasksComponent implements OnInit{
     getSeverity(task: any): string {
         switch (task.status) {
             case 'En Proceso':
-                return 'Help';
+                return 'help';
             case 'En Revisión':
                 return 'warn';
             case 'Completada':
-                return 'Success';
+                return 'success';
+            case 'Validada':
+                return 'success';
             case 'Entregada':
                 return 'success';
             case 'Denegada':
-                return 'Danger';
+                return 'danger';
             default:
                 return 'info';
         }
-    }
+      }
 
     newTask() {
         this.router.navigate(['/wirin/add-task-form']);

@@ -40,6 +40,7 @@ export class TaskDetailComponent implements OnInit {
   isDenegated = false;
   isEarring = false;
   isProcess = false;
+  isApproved = false;
   formData?: FormData;
   requesterName: string = '';
   creatorName: string = '';
@@ -76,6 +77,7 @@ export class TaskDetailComponent implements OnInit {
         this.isEarring = this.statusTask === 'Pendiente';
         this.isProcess = this.statusTask === 'En Proceso';
         this.isRevision = this.statusTask === 'En Revisión';
+        this.isApproved = this.statusTask === 'Aprobada';
         this.isDenegated = this.statusTask === 'Denegada';
         this.isCompleted = this.statusTask === 'Completada';
       },
@@ -98,9 +100,10 @@ export class TaskDetailComponent implements OnInit {
               ...data,
               fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
           };
-          // Obtener nombres de usuario para cada secció
+          
           this.creatorName = await this.userService.getUserName(data.createdByUserId);
-          this.requesterName = await this.userService.getUserName(data.assignedUserId);
+          this.requesterName = data.assignedUserId ? await this.userService.getUserName(data.assignedUserId)
+          : "Usuario no asignado";
           this.alumnoName = await this.userService.getUserName(data.alumnoId);
 
   
@@ -112,18 +115,6 @@ export class TaskDetailComponent implements OnInit {
           this.isLoading = false;
       }
   });
-  }
-
-
-  getStatusBadgeClass(status: string): string {
-    switch (status.toLowerCase()) {
-      case 'pendiente': return 'status-pendiente task-status-badge';
-      case 'en proceso': return 'status-en-proceso task-status-badge';
-      case 'en revisión': return 'status-en-revision task-status-badge';
-      case 'denegada': return 'status-denegado task-status-badge';
-      case 'completada': return 'status-completado task-status-badge';
-      default: return 'status-pendiente task-status-badge';
-    }
   }
 
   downloadFile(taskId: number, fileName: string | null): void {
@@ -153,9 +144,9 @@ export class TaskDetailComponent implements OnInit {
 
    // await this.saveAssignedUserId();
 
-    // if (condition) {
-    //     await this.changeStateTask(status);
-    // }
+    if (condition) {
+      await this.changeStateTask(status);
+    }
 
     this.fileUploadService.newProcessOcr(orderId, this.selectedOcrProcessor).subscribe({
         next: (response) => {
@@ -211,15 +202,17 @@ async changeStateTask(status: string): Promise<void> {
 getSeverity(task: any): string {
   switch (task.status) {
       case 'En Proceso':
-          return 'Help';
+          return 'help';
       case 'En Revisión':
           return 'warn';
       case 'Completada':
-          return 'Success';
-        case 'Entregada':
+          return 'success';
+      case 'Validada':
+          return 'success';
+      case 'Entregada':
           return 'success';
       case 'Denegada':
-          return 'Danger';
+          return 'danger';
       default:
           return 'info';
   }
@@ -241,10 +234,5 @@ deleteTask(taskId: number, event: Event): void {
   editTask(id: number) {
     this.router.navigate([`/wirin/edit-task-form/${id}`]);
   }
-
-  navigateToReview(taskId: number, status: string): void {
-    this.router.navigate(['/wirin/ocr-viewer', taskId], { queryParams: { estado: status } });
-}
-
 
 }

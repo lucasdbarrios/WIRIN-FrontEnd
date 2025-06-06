@@ -1,9 +1,8 @@
 <p-card class="dark:bg-gray-800 text-gray-900 dark:text-gray-200">
     <ng-template pTemplate="content">
         <div class="flex justify-end mb-3">
-            <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" 
-                     (click)="togglePdfPreview()" 
-                     class="p-button-secondary">
+            <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" (click)="togglePdfPreview()"
+                class="p-button-secondary">
             </p-button>
         </div>
         <p-panel header="Texto Procesado por el OCR:"
@@ -30,7 +29,7 @@
         <div class="flex justify-end mt-3">
             <p-button label="Editar texto" class="p-button-primary" *ngIf="!isEditing"
                 (click)="onStartEditing()"></p-button>
-                <p-button label="Hacer anotacion" class="p-button-primary" *ngIf="!isEditing"
+            <p-button label="Hacer anotacion" class="p-button-primary" *ngIf="!isEditing"
                 (click)="onStartAnnotation()"></p-button>
         </div>
 
@@ -52,14 +51,15 @@
 </p-card>
 
 
-    <p-dialog header="Hacer una anotacion en Pagina {{ this.currentPage }}" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-        <div class="flex items-center gap-4 mb-8">
-            <label for="email" class="font-semibold w-24">Anotacion</label>
-            <textarea [(ngModel)]="annotation"  rows="5" cols="30" pTextarea [autoResize]="true"></textarea>
-            
-        </div>
-        <div class="flex justify-end gap-2">
-            <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
-            <p-button label="Guardar" (click)="onSaveAnnotation" />
-        </div>
-    </p-dialog>
+<p-dialog header="Hacer una anotacion en Pagina {{ this.currentPage }}" [modal]="true" [(visible)]="visible"
+    [style]="{ width: '25rem' }">
+    <div class="flex items-center gap-4 mb-8">
+        <label for="email" class="font-semibold w-24">Anotacion</label>
+        <textarea [(ngModel)]="annotation" rows="5" cols="30" pTextarea [autoResize]="true"></textarea>
+
+    </div>
+    <div class="flex justify-end gap-2">
+        <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+        <p-button label="Guardar" (click)="onSaveAnnotation()" />
+    </div>
+</p-dialog>

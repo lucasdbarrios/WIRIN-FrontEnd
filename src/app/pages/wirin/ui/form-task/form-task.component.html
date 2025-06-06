@@ -64,7 +64,7 @@
                 <div class="flex flex-col gap-2 w-full">
                     <label for="isPriority">Prioridad</label>
                     <p-select id="isPriority" formControlName="isPriority"
-                        [options]="[{ name: 'Sí', value: true }, { name: 'No', value: false }]" optionLabel="name"
+                        [options]="[{ name: 'Alta', value: true }, { name: 'Normal', value: false }]" optionLabel="name"
                         optionValue="value" placeholder="Selecciona prioridad"></p-select>
                     <p-message severity="error" variant="simple" size="small">
                         <span *ngIf="formTask.get('isPriority')?.invalid && formTask.get('isPriority')?.touched">La
@@ -73,16 +73,26 @@
                 </div>
             </div>
 
-
-            <div class="flex flex-col gap-2 w-1/2">
-                <label for="alumnoId">Seleccionar usuario</label>
-                <p-select id="alumnoId" formControlName="alumnoId" [options]="dropdownItemsUsers" optionLabel="name"
-                    optionValue="value" placeholder="Selecciona el usuario"></p-select>
-                <p-message severity="error" variant="simple" size="small">
-                    <span *ngIf="formTask.get('alumnoId')?.invalid && formTask.get('alumnoId')?.touched">El usuario
-                        es
-                        requerido</span>
-                </p-message>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex flex-col gap-2 w-full">
+                    <label for="status">Estado</label>
+                    <p-select id="status" formControlName="status" [options]="dropdownItems" optionLabel="name"
+                        optionValue="value" placeholder="Selecciona el estado"></p-select>
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formTask.get('status')?.invalid && formTask.get('status')?.touched">El estado es
+                            requerido</span>
+                    </p-message>
+                </div>
+                <div class="flex flex-col gap-2 w-full">
+                    <label for="alumnoId">Seleccionar usuario</label>
+                    <p-select id="alumnoId" formControlName="alumnoId" [options]="dropdownItemsUsers" optionLabel="name"
+                        optionValue="value" placeholder="Selecciona el usuario"></p-select>
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formTask.get('alumnoId')?.invalid && formTask.get('alumnoId')?.touched">El usuario
+                            es
+                            requerido</span>
+                    </p-message>
+                </div>
             </div>
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-col gap-2">

@@ -3,17 +3,17 @@
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
 
-    <div *ngIf="!isToRevision()" class="flex gap-4">
-      <p-button label="Finalizar proceso" icon="pi pi-plus" styleClass="p-button-primary" (click)="finalizarProceso()">
+    <div *ngIf="state != 'En Revisión' && state != 'Aprobada'" class="flex gap-4">
+      <p-button label="Finalizar proceso" icon="pi pi-check" styleClass="p-button-primary" (click)="finalizarProceso()">
       </p-button>
     </div>
 
-    <div class="flex gap-4" *ngIf="isToRevision()">
-      <p-button label="Denegar resultado" icon="pi pi-times" styleClass="p-button-warning" (click)="denegarResultado()">
+    <div class="flex gap-4" *ngIf="state == 'En Revisión' || state == 'Aprobada'">
+      <p-button label="Denegar resultado" icon="pi pi-times" [severity]="'warn'" (click)="denegarResultado()">
       </p-button>
 
       <p-button label="Finalizar revisión" icon="pi pi-check" styleClass="p-button-success"
-        (click)="finalizarRevision()">
+        (click)="finalizarRevision(state)">
       </p-button>
     </div>
   </div>
