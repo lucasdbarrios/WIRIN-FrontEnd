@@ -32,7 +32,8 @@ export class AppMenu {
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] },
-                    ...(this.role ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] }] : [])
+                     ...(this.role ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] },
+                        { label: 'Entregas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/deliveries'] }] : [])
                 ]
             },
             {
