@@ -15,6 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
 import { OrderParagraphService } from '../../../services/orderParagraph.service';
 import { ProcessParagraphRequest } from '../../../types/Requests/ProcessParagraphRequest';
+import { FileUploadService } from '../../../services/file-upload.service';
 
 @Component({
   selector: 'app-ocr-viewer',
@@ -47,7 +48,7 @@ export class OcrViewerComponent implements OnInit {
     private authService: AuthService, 
     private orderService: OrderService,
     public sanitizer: DomSanitizer,
-    private messageService: MessageService,
+    private fileUploadService: FileUploadService,
     private orderParagraphService: OrderParagraphService
   ) {}
 
@@ -60,16 +61,18 @@ export class OcrViewerComponent implements OnInit {
       this.taskId = task.id;
     });
 
-    const storedData = localStorage.getItem('ocrData');
-    if (storedData) {
-      this.ocrData = JSON.parse(storedData);
-      this.totalPages = this.ocrData?.metadata?.totalPages ?? 1; 
-      this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop() ?? ''
-      this.pages = this.ocrData?.pages?? [];
+   
+     this.fileUploadService.newProcessOcr(this.task, "Local").subscribe({
+      next: (response) => {
+        this.ocrData = response;
+        this.totalPages = this.ocrData?.metadata?.totalPages?? 1;
+        this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop()?? ''
+        this.pages = this.ocrData?.pages?? [];
+        localStorage.setItem('ocrData', JSON.stringify(this.ocrData));
+      }
+     })
+    
 
-     // this.saveDocProcesed(this.pages);
-     // this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.ocrData?.metadata?.fileName?? '');
-    }
     this.orderService.recoveryFile(this.task).subscribe({
       next: (data) => {
         const blob = new Blob([data], { type: 'application/pdf' });

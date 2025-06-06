@@ -11,11 +11,15 @@ import { ProcessParagraphRequest } from '../../../../types/Requests/ProcessParag
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
+import { Dialog } from 'primeng/dialog';
+import { TextareaModule } from 'primeng/textarea';
+import { ApiService } from '../../../../services/api.service';
+import { MessageRequest } from '../../../../types/Requests/MessageRequest';
 
 @Component({
     selector: 'app-ocr-text-viewer',
     standalone: true,
-    imports: [CommonModule, FormsModule, CardModule, PanelModule, ScrollPanelModule, ButtonModule, ToastModule],
+    imports: [TextareaModule,Dialog,CommonModule, FormsModule, CardModule, PanelModule, ScrollPanelModule, ButtonModule, ToastModule],
     templateUrl: './ocr-text-viewer.component.html',
 })
 export class OcrTextViewerComponent {
@@ -31,14 +35,25 @@ export class OcrTextViewerComponent {
     @Input() currentPage: number = 1;
     pagesPerView: number = 5;
     totalPages: number = 0;
+    visible: boolean = false;
+    annotation: string = '';
 
-    constructor(private orderParagraphService: OrderParagraphService, private messageService: MessageService, private route: ActivatedRoute){}
+    constructor(
+      private orderParagraphService: OrderParagraphService, 
+      private messageService: MessageService, 
+      private route: ActivatedRoute,
+      private apiService: ApiService
+    ){}
 
     ngOnInit() {
         if (this.ocrData) {
         this.totalPages = this.ocrData.metadata.totalPages;
         }
     }
+
+    showDialog() {
+      this.visible = true;
+  }
 
     getCurrentPage(): OcrPage | undefined {
         if (!this.ocrData) return undefined;
@@ -49,8 +64,26 @@ export class OcrTextViewerComponent {
         const currentPage = this.getCurrentPage();
         if (currentPage) {
             this.editingText = currentPage.text;
-            this.editClicked.emit();
+            this.isEditing = true;
         }
+    }
+
+    onStartAnnotation(): void {
+        const currentPage = this.getCurrentPage();
+        if (currentPage) {
+            this.showDialog();
+        }
+    }
+
+    onSaveAnnotation(): void {
+        /* const message: MessageRequest = {
+            orderId: Number(this.route.snapshot.paramMap.get('id')),
+            message: this.annotation,
+            pageNumber: this.currentPage,
+            userId: 1,
+            userName: 'Usuario'
+        }
+        this.apiService.post('api/message/sendMessage', ) */
     }
 
     onSaveChanges(): void {
