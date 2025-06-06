@@ -129,6 +129,7 @@ export class OcrTextViewerComponent {
     }
 
     goToPage(pageNumber: number): void {
+      console.log('Changing to page:', pageNumber);
         this.pageChange.emit(pageNumber);
     }
     togglePdfPreview(): void {

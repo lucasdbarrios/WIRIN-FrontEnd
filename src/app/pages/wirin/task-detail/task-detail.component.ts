@@ -151,18 +151,19 @@ export class TaskDetailComponent implements OnInit {
     this.uploadProgress = 0;
     this.ocrResponse = null;
 
-    await this.saveAssignedUserId();
+   // await this.saveAssignedUserId();
 
-    if (condition) {
-        await this.changeStateTask(status);
-    }
+    // if (condition) {
+    //     await this.changeStateTask(status);
+    // }
 
     this.fileUploadService.newProcessOcr(orderId, this.selectedOcrProcessor).subscribe({
         next: (response) => {
             this.uploadStatus = 'success';
             this.uploadProgress = 100;
             this.ocrResponse = response;
-
+            
+            localStorage.removeItem('ocrData');
             localStorage.setItem('ocrData', JSON.stringify(response));
 
             this.router.navigate(['/wirin/ocr-viewer/' + orderId]);

@@ -67,7 +67,7 @@ export class OcrViewerComponent implements OnInit {
       this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop() ?? ''
       this.pages = this.ocrData?.pages?? [];
 
-      this.saveDocProcesed(this.pages);
+     // this.saveDocProcesed(this.pages);
      // this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.ocrData?.metadata?.fileName?? '');
     }
     this.orderService.recoveryFile(this.task).subscribe({
@@ -80,9 +80,6 @@ export class OcrViewerComponent implements OnInit {
         console.error('Error al recuperar el archivo:', error);
       }
     })
-    
-
-    
 
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
