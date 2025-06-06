@@ -12,7 +12,6 @@ import { UserService } from '../../../services/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
 import { BackButtonComponent } from '../ui/back-button/back-button.component';
-import { Paragraph } from '../../../types/paragraph.Interface';
 
 @Component({
   selector: 'app-task-detail',
@@ -102,7 +101,7 @@ export class TaskDetailComponent implements OnInit {
           };
           
           this.creatorName = await this.userService.getUserName(data.createdByUserId);
-          this.requesterName = data.assignedUserId ? await this.userService.getUserName(data.assignedUserId)
+          this.requesterName = data.voluntarioId ? await this.userService.getUserName(data.voluntarioId)
           : "Usuario no asignado";
           this.alumnoName = await this.userService.getUserName(data.alumnoId);
 
@@ -142,7 +141,7 @@ export class TaskDetailComponent implements OnInit {
     this.uploadProgress = 0;
     this.ocrResponse = null;
 
-   // await this.saveAssignedUserId();
+    await this.saveAssignedUserId();
 
     if (condition && this.isEarring) {
       await this.changeStateTask(status);
@@ -170,7 +169,7 @@ export class TaskDetailComponent implements OnInit {
 async saveAssignedUserId(): Promise<void> {
   this.formData = new FormData();
   this.formData.append('id', this.taskId.toString());
-  this.formData.append('assignedUserId', this.userIdActive);
+  this.formData.append('voluntarioId', this.userIdActive);
 
   await firstValueFrom(this.orderManagmentService.saveAssignedUserId(this.formData));
 }

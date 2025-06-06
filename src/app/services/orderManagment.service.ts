@@ -30,7 +30,7 @@ export class OrderManagmentService {
 
   saveAssignedUserId(formData: FormData): Observable<any> {
     return this.http.put(`${this.apiUrl}/saveAssignedUserId`, {id: formData.get('id'),
-      assignedUserId: formData.get('assignedUserId')
+      voluntarioId: formData.get('voluntarioId')
     });
   }
 
