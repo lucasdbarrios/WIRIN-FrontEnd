@@ -81,17 +81,17 @@ export class TasksComponent implements OnInit{
             next: (data: any[]) => {
                 this.allTasks = data;
                 this.tasks = [...data];
-    
+
                 if (this.isVoluntario) {
                     this.tasks = this.tasks.filter(task => 
-                        task.status.toLowerCase() !== 'completada' &&
-                        task.status.toLowerCase() !== 'en revisión' &&
-                        task.status.toLowerCase() !== 'en proceso'
+                        task.status.toLowerCase() == 'denegada' ||
+                        task.status.toLowerCase() == 'en proceso' ||
+                        task.status.toLowerCase() == 'pendiente'
                     );
                 } else if (this.isRevisor) {
                     this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'en revisión');
                 } else if (this.isAlumno) {
-                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'completada');
+                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'entregada');
                 }
     
                 this.isLoading = false;
