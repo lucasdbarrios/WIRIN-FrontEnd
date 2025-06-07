@@ -57,7 +57,9 @@ export class OcrTextViewerComponent {
 
     getCurrentPage(): OcrPage | undefined {
         if (!this.ocrData) return undefined;
-        return this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
+        var ocr = this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
+        console.log("Texto obtenido:", ocr?.text)
+        return ocr;
     }
 
     onStartEditing(): void {

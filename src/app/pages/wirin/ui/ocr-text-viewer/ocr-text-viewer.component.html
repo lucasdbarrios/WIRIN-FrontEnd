@@ -8,9 +8,9 @@
         <p-panel header="Texto Procesado por el OCR:" [style]="{ minHeight: '400px', maxHeight: '400px' }"
             class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[400px]">
             <ng-container *ngIf="!isEditing">
-                <p-scrollPanel [style]="{ maxHeight: '250px' }">
-                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ getCurrentPage()?.text }}</pre>
-                </p-scrollPanel>
+                <div class="whitespace-pre-wrap font-mono text-sm overflow-auto" [style]="{ maxHeight: '250px' }">
+                    {{ getCurrentPage()?.text }}
+                </div>
 
             </ng-container>
 
