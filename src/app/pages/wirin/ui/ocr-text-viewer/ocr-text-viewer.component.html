@@ -5,9 +5,8 @@
                 class="p-button-secondary">
             </p-button>
         </div>
-        <p-panel header="Texto Procesado por el OCR:"
-            [style]="{ minHeight: '250px', maxHeight: '250px', overflow: 'auto' }"
-            class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[250px]">
+        <p-panel header="Texto Procesado por el OCR:" [style]="{ minHeight: '400px', maxHeight: '400px' }"
+            class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[400px]">
             <ng-container *ngIf="!isEditing">
                 <p-scrollPanel [style]="{ maxHeight: '250px' }">
                     <pre class="whitespace-pre-wrap font-mono text-sm">{{ getCurrentPage()?.text }}</pre>
