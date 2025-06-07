@@ -29,6 +29,9 @@ export class DeliveriesComponent implements OnInit {
     showDialog: boolean = false;
     selectedStudent: any = null;
     students: any[] = [];
+    formdata?: FormData;
+    
+
 
     constructor(
         private orderService: OrderService,
@@ -77,14 +80,17 @@ export class DeliveriesComponent implements OnInit {
         return task.status.toLowerCase() === 'completada' ? 'success' : 'info';
     }
 
-    realizarEntrega(): void {
+    performDelivery(): void {
         if (!this.selectedStudent || this.selectedTasks.length === 0) {
             alert('Debe seleccionar al menos un alumno y una o más tareas.');
             return;
         }
-
+        this.formdata = new FormData();
+    this.formdata.append('id', toString());
+    this.formdata.append('status', 'Entregada');
+   
         const deliveryPromises = this.selectedTasks.map(task => 
-            this.orderManagmentService.updateOrderStatus(task.id, 'Entregada')
+            this.orderManagmentService.changeStatus(task.id, )
         );
 
         Promise.all(deliveryPromises).then(() => {

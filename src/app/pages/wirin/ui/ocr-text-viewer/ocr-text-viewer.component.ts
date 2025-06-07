@@ -59,13 +59,20 @@ export class OcrTextViewerComponent {
                 background-color: #1F2937; 
                 color: #E5E7EB; 
             }
+            p:after {
+                content: '¶';
+                color: #999;
+                margin-left: 5px;
+            }
         `,
         skin: document.body.classList.contains('app-dark') ? 'oxide-dark' : 'oxide',
         content_css: document.body.classList.contains('app-dark') ? 'dark' : 'default',
         promotion: false,
         browser_spellcheck: true,
         language: 'es',
-        language_url: '/tinymce/langs/es.js'
+        language_url: '/tinymce/langs/es.js',
+        visualblocks_default_state: true,
+        visualchars_default_state: true
     };
 
     constructor(
