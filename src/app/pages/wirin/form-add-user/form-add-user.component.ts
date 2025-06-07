@@ -6,12 +6,14 @@ import { Router } from "@angular/router";
 import { PopupComponent } from "../ui/popup/popup.component";
 import { User } from '../../../types/user.interface';
 import { HttpErrorResponse } from "@angular/common/http";
+import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html',
     standalone: true,
-    imports: [FluidModule, FormUserComponent, PopupComponent]
+    imports: [FluidModule, FormUserComponent, PopupComponent],
+    providers: [MessageService]
 })
 export class AddUserFormComponent {
     uploadProgress: number = 0;
@@ -20,10 +22,10 @@ export class AddUserFormComponent {
     formDataToSubmit?: FormData;
     errorMessage: any;
 
-
     constructor(
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private messageService: MessageService
     ) {}
 
     onFormSubmit(formData: FormData): void {
@@ -49,6 +51,12 @@ export class AddUserFormComponent {
         this.authService.register(newUser).subscribe({
             next: () => {
                 this.uploadStatus = 'success';
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Usuario registrado',
+                    detail: 'El usuario ha sido registrado correctamente.',
+                    life: 3000
+                });
                 this.router.navigate(['/wirin/users']);
             },
             error: (error: HttpErrorResponse) => {
@@ -61,6 +69,12 @@ export class AddUserFormComponent {
                 }
         
                 this.uploadStatus = 'error';
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: this.errorMessage,
+                    life: 3000
+                });
             }
         });
     }

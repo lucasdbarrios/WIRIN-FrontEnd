@@ -142,7 +142,7 @@ actualizarEstado(event: boolean): void {
   
   finalizarRevision(state: string): void {
     var getFormData = null;
-    console.log(state)
+
     if(state == 'En Revisión'){
       getFormData = this.getFormData('Aprobada');
     }else{

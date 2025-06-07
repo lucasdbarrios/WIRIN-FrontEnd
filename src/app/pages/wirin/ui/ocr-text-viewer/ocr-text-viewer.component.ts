@@ -138,6 +138,27 @@ export class OcrTextViewerComponent {
           pageNumber: this.currentPage,
           annotatorId: this.activeUserId,
       }
+
+      // this.orderParagraphService.processParagraphs(body).subscribe({
+      //   next: (response: any) => {
+      //     this.isEditing = false;
+      //     this.messageService.add({
+      //       severity: 'success',
+      //       summary: 'Éxito',
+      //       detail: 'Los cambios se guardaron correctamente',
+      //       life: 3000
+      //     });
+      //   },
+      //   error: (error) => {
+      //     console.error('Error al guardar los cambios:', error);
+      //     this.messageService.add({
+      //       severity: 'error',
+      //       summary: 'Error',
+      //       detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
+      //       life: 3000
+      //     });
+      //   }
+      // });
       
       this.annotations.push(annotation);
       this.closeDialog();
