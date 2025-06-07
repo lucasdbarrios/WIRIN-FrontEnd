@@ -77,24 +77,30 @@ export class DeliveriesComponent implements OnInit {
         return task.status.toLowerCase() === 'completada' ? 'success' : 'info';
     }
 
-    realizarEntrega(): void {
+    performDelivery(): void {
         if (!this.selectedStudent || this.selectedTasks.length === 0) {
             alert('Debe seleccionar al menos un alumno y una o más tareas.');
             return;
         }
-
-        const deliveryPromises = this.selectedTasks.map(task => 
-            this.orderManagmentService.updateOrderStatus(task.id, 'Entregada')
-        );
-
-        Promise.all(deliveryPromises).then(() => {
-            this.showDialog = false;
-            this.selectedTasks = [];
-            this.selectedStudent = null;
-            this.loadTasks();
-        }).catch(error => {
-            console.error('Error al realizar la entrega:', error);
-            alert('Ocurrió un error al realizar la entrega. Por favor, intente nuevamente.');
+    
+        const deliveryPromises = this.selectedTasks.map(task => {
+            const formData = new FormData();
+            formData.append('id', task.id.toString());
+            formData.append('status', 'Entregada');
+            formData.append('assignedUserId', this.selectedStudent.id.toString());
+    
+            return this.orderManagmentService.changeStatus(formData).toPromise();
         });
+    
+        Promise.all(deliveryPromises)
+            .then(() => {
+                alert('Entrega realizada con éxito.');
+                // Aquí podrías limpiar la selección o refrescar la vista
+            })
+            .catch(error => {
+                console.error('Error al realizar la entrega:', error);
+                alert('Ocurrió un error al realizar la entrega.');
+            });
     }
+    
 }

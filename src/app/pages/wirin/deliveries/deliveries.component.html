@@ -40,7 +40,7 @@
 
             <div class="flex justify-end gap-2 mt-4">
                 <p-button label="Cancelar" icon="pi pi-times" (onClick)="showDialog = false"></p-button>
-                <p-button label="Confirmar entrega" icon="pi pi-check" (onClick)="realizarEntrega()" 
+                <p-button label="Confirmar entrega" icon="pi pi-check" (onClick)="performDelivery()" 
                     [disabled]="!selectedStudent"></p-button>
             </div>
         </div>
