@@ -15,12 +15,16 @@ import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { ApiService } from '../../../../services/api.service';
 import { MessageRequest } from '../../../../types/Requests/MessageRequest';
+import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 @Component({
     selector: 'app-ocr-text-viewer',
     standalone: true,
-    imports: [TextareaModule,Dialog,CommonModule, FormsModule, CardModule, PanelModule, ScrollPanelModule, ButtonModule, ToastModule],
+    imports: [TextareaModule, Dialog, CommonModule, FormsModule, CardModule, PanelModule, ScrollPanelModule, ButtonModule, ToastModule, EditorModule],
     templateUrl: './ocr-text-viewer.component.html',
+    providers: [
+        { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
+    ]
 })
 export class OcrTextViewerComponent {
     @Input() ocrData: OcrResponse | null = null;
@@ -37,6 +41,32 @@ export class OcrTextViewerComponent {
     totalPages: number = 0;
     visible: boolean = false;
     annotation: string = '';
+    tinyMceConfig = {
+        base_url: '/tinymce',
+        suffix: '.min',
+        plugins: 'lists link image table code help wordcount visualblocks visualchars charmap',
+        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help | visualblocks | visualchars | charmap',
+        height: 350,
+        menubar: false,
+        content_style: `
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; 
+                font-size: 14px; 
+                padding: 0.5rem;
+                color: #374151;
+            }
+            body.dark-mode { 
+                background-color: #1F2937; 
+                color: #E5E7EB; 
+            }
+        `,
+        skin: document.body.classList.contains('app-dark') ? 'oxide-dark' : 'oxide',
+        content_css: document.body.classList.contains('app-dark') ? 'dark' : 'default',
+        promotion: false,
+        browser_spellcheck: true,
+        language: 'es',
+        language_url: '/tinymce/langs/es.js'
+    };
 
     constructor(
       private orderParagraphService: OrderParagraphService, 

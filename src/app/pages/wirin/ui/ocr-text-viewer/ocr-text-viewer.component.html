@@ -6,19 +6,21 @@
             </p-button>
         </div>
         <p-panel header="Texto Procesado por el OCR:"
-            [style]="{ minHeight: '250px', maxHeight: '250px', overflow: 'auto' }"
+            [style]="{ minHeight: '350px', maxHeight: isEditing ? '500px' : '250px', overflow: 'auto' }"
             class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[250px]">
             <ng-container *ngIf="!isEditing">
-                <p-scrollPanel [style]="{ maxHeight: '250px' }">
+                <p-scrollPanel [style]="{ maxHeight: '240px' }">
                     <pre class="whitespace-pre-wrap font-mono text-sm">{{ getCurrentPage()?.text }}</pre>
                 </p-scrollPanel>
 
             </ng-container>
 
             <ng-container *ngIf="isEditing">
-                <textarea [(ngModel)]="editingText" class="w-full min-h-[250px] border border-gray-400 dark:border-gray-600 rounded-md p-2 mt-2 
-                        whitespace-pre-wrap overflow-auto dark:bg-gray-800 text-gray-900 dark:text-gray-200">
-                    </textarea>
+                <editor
+                    [(ngModel)]="editingText"
+                    [init]="tinyMceConfig"
+                    class="w-full min-h-[250px] mt-2">
+                </editor>
                 <div class="flex justify-end gap-4 mt-3">
                     <p-button label="Guardar cambios" class="p-button-success" (click)="onSaveChanges()"></p-button>
                     <p-button label="Cancelar" class="p-button-secondary" (click)="isEditing = false"></p-button>
