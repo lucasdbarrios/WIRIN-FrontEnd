@@ -1,15 +1,16 @@
-import { Component } from '@angular/core';
-import { StatsWidget } from '../components/statswidget';
+import { Component, OnInit } from '@angular/core';
 import { RecentSalesWidget } from '../components/recentsaleswidget';
-import { ApiService } from '../../../services/api.service';
+import { Order } from '../../../types/order.interface';
+import { OrderService } from '../../../services/order.service';
+import { WirinStatsWidget } from './components/statsWidgetWirin/statswidget';
 
 
 @Component({
     selector: 'app-dashboard-wirin',
-    imports: [StatsWidget, RecentSalesWidget ],
+    imports: [WirinStatsWidget, RecentSalesWidget ],
     template: `
         <div class="grid grid-cols-12 gap-8">
-            <app-stats-widget class="contents" />
+            <app-stats-widget-wirin class="contents" [tasks]="tasks" />
             <div class="col-span-12 xl:col-span-6">
                 <app-recent-sales-widget />
                
@@ -21,11 +22,23 @@ import { ApiService } from '../../../services/api.service';
         </div>
     `
 })
-export class DashboardWirin {
-    tasks: any[] = [];
-    constructor(private apiService: ApiService) {
-        this.apiService.get('/order').subscribe((data: any) => {
-            this.tasks = data;
-        });
-     }
+export class DashboardWirin implements OnInit{
+    tasks: Order[] = [];
+    taskPend: number = 0;
+    completedTasks: number = 0;
+    constructor(private orderService: OrderService){}
+    ngOnInit(): void {
+        this.taskPend = this.tasks.filter(t => t.status != "Pendiente").length;
+        this.completedTasks = this.tasks.filter(t => t.status === "Completada").length;
+        this.orderService.getOrders().subscribe({
+            next: (orders) => {
+                this.tasks = orders;
+            },
+            error: (error) => {
+                console.error('Error fetching tasks:', error);
+            }
+        });  
+    }
+
 }
+
