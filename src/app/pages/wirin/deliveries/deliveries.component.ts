@@ -86,21 +86,11 @@ export class DeliveriesComponent implements OnInit {
             return;
         }
         this.formdata = new FormData();
-    this.formdata.append('id', toString());
-    this.formdata.append('status', 'Entregada');
-   
-        const deliveryPromises = this.selectedTasks.map(task => 
-            this.orderManagmentService.changeStatus(task.id, )
-        );
+        this.formdata.append('id', toString());
+        this.formdata.append('status', 'Entregada');
+        console.log(this.selectedTasks);
+      
 
-        Promise.all(deliveryPromises).then(() => {
-            this.showDialog = false;
-            this.selectedTasks = [];
-            this.selectedStudent = null;
-            this.loadTasks();
-        }).catch(error => {
-            console.error('Error al realizar la entrega:', error);
-            alert('Ocurrió un error al realizar la entrega. Por favor, intente nuevamente.');
-        });
+        
     }
 }
