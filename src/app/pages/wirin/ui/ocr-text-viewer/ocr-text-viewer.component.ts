@@ -13,10 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
-import { ApiService } from '../../../../services/api.service';
-import { MessageRequest } from '../../../../types/Requests/MessageRequest';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
-import { AnnotationRequest } from '../../../../types/Requests/AnnotationRequest';
 import { AuthService } from '../../../../services/auth.service';
 
 @Component({
@@ -43,9 +40,9 @@ export class OcrTextViewerComponent {
     pagesPerView: number = 3;
     totalPages: number = 0;
     visible: boolean = false;
+    mostrarAnnotation: boolean = false;
     annotation: string = '';
     activeUserId: string = '';
-    annotations: AnnotationRequest[] = [];
 
     tinyMceConfig = {
         base_url: '/tinymce',
@@ -92,6 +89,7 @@ export class OcrTextViewerComponent {
         if (this.ocrData) {
         this.totalPages = this.ocrData.metadata.totalPages;
         }
+        
         this.authService.getCurrentUser().subscribe({
             next: (userData) => {
                 this.activeUserId = userData?.id || '';
@@ -102,17 +100,18 @@ export class OcrTextViewerComponent {
         });
     }
 
-    showDialog() {
-      this.visible = true;
-  }
+    showAnnotation(){
+        this.mostrarAnnotation = !this.mostrarAnnotation;
+    }
 
-  closeDialog() {
-    this.visible = false;
-}
+    showDialog() {
+      this.visible = !this.visible;
+  }
 
     getCurrentPage(): OcrPage | undefined {
         if (!this.ocrData) return undefined;
         var ocr = this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
+        console.log(ocr)
         return ocr;
     }
 
@@ -132,37 +131,38 @@ export class OcrTextViewerComponent {
     }
 
     onSaveAnnotation(): void {
-      const annotation: AnnotationRequest = {
-          orderId: Number(this.route.snapshot.paramMap.get('id')),
-          annotation: this.annotation,
-          pageNumber: this.currentPage,
-          annotatorId: this.activeUserId,
-      }
+        if (!this.ocrData) return;
+        const orderId = Number(this.route.snapshot.paramMap.get('id'));
+        const body: ProcessParagraphRequest = {
+                orderId: orderId,
+                pageNumber: this.currentPage,
+                hasError: true,
+                errorMessage: this.annotation
+            };
 
-      // this.orderParagraphService.processParagraphs(body).subscribe({
-      //   next: (response: any) => {
-      //     this.isEditing = false;
-      //     this.messageService.add({
-      //       severity: 'success',
-      //       summary: 'Éxito',
-      //       detail: 'Los cambios se guardaron correctamente',
-      //       life: 3000
-      //     });
-      //   },
-      //   error: (error) => {
-      //     console.error('Error al guardar los cambios:', error);
-      //     this.messageService.add({
-      //       severity: 'error',
-      //       summary: 'Error',
-      //       detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
-      //       life: 3000
-      //     });
-      //   }
-      // });
-      
-      this.annotations.push(annotation);
-      this.closeDialog();
-  }
+    this.orderParagraphService.saveErrorMessageParagraph(body).subscribe({
+        next: (response: any) => {
+        this.isEditing = false;
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Los cambios se guardaron correctamente',
+            life: 3000
+        });
+        },
+        error: (error) => {
+        console.error('Error al guardar los cambios:', error);
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
+            life: 3000
+        });
+        }
+    });
+    
+    this.showDialog();
+}
 
     onSaveChanges(): void {
         if (!this.ocrData || !this.isEditing) return;

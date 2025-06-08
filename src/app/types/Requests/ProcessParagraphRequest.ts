@@ -1,6 +1,6 @@
 export type ProcessParagraphRequest = {
     orderId: number,
-    paragraphText: string,
+    paragraphText?: string,
     pageNumber: number,
     hasError: boolean,
     errorMessage: string

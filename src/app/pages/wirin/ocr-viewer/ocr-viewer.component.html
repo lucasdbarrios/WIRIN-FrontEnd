@@ -4,16 +4,15 @@
     <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
 
     <div *ngIf="state != 'En Revisión' && state != 'Aprobada'" class="flex gap-4">
-      <p-button label="Finalizar proceso" icon="pi pi-check" styleClass="p-button-primary" (click)="finalizarProceso()">
+      <p-button label="Finalizar proceso" styleClass="p-button-primary" (click)="finalizarProceso()">
       </p-button>
     </div>
 
     <div class="flex gap-4" *ngIf="state == 'En Revisión' || state == 'Aprobada'">
-      <p-button label="Denegar resultado" icon="pi pi-times" [severity]="'warn'" (click)="denegarResultado()">
+      <p-button label="Denegar resultado" [severity]="'warn'" (click)="denegarResultado()">
       </p-button>
 
-      <p-button label="Finalizar revisión" icon="pi pi-check" styleClass="p-button-success"
-        (click)="finalizarRevision(state)">
+      <p-button label="Finalizar revisión" styleClass="p-button-success" (click)="finalizarRevision(state)">
       </p-button>
     </div>
   </div>

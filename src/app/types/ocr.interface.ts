@@ -4,6 +4,7 @@ export interface OcrPage {
     confidence: number;
     characters: number;
     words: number;
+    errorMessage?: string;
   }
   
   export interface OcrResponse {

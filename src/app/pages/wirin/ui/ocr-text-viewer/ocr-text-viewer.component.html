@@ -1,6 +1,9 @@
 <p-card class="dark:bg-gray-800 text-gray-900 dark:text-gray-200">
     <ng-template pTemplate="content">
-        <div class="flex justify-end mb-3">
+        <div class="flex justify-between mb-3">
+            <p-button [label]="showPdfPreview ? 'Ocultar Anotacion' : 'Mostrar Anotacion'" (click)="showAnnotation()"
+                class="p-button-secondary">
+            </p-button>
             <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" (click)="togglePdfPreview()"
                 class="p-button-secondary">
             </p-button>
@@ -11,25 +14,27 @@
                 <div class="whitespace-pre-wrap font-mono text-sm overflow-auto" [style]="{ maxHeight: '250px' }">
                     {{ getCurrentPage()?.text }}
                 </div>
-
             </ng-container>
 
             <ng-container *ngIf="isEditing">
-                <editor
-                    [(ngModel)]="editingText"
-                    [init]="tinyMceConfig"
-                    class="w-full min-h-[250px] mt-2">
+                <editor [(ngModel)]="editingText" [init]="tinyMceConfig" class="w-full min-h-[250px] mt-2">
                 </editor>
                 <div class="flex justify-end gap-4 mt-3">
                     <p-button label="Guardar cambios" class="p-button-success" (click)="onSaveChanges()"></p-button>
                     <p-button label="Cancelar" class="p-button-secondary" (click)="isEditing = false"></p-button>
                 </div>
             </ng-container>
+
+
+
+
         </p-panel>
     </ng-template>
 
+
     <ng-template pTemplate="footer">
-        <div class="flex justify-end mt-3">
+
+        <div class="flex justify-end mt-3 gap-2">
             <p-button label="Editar texto" class="p-button-primary" *ngIf="!isEditing"
                 (click)="onStartEditing()"></p-button>
             <p-button label="Hacer anotacion" class="p-button-primary" *ngIf="!isEditing"
@@ -54,12 +59,20 @@
     </ng-template>
 </p-card>
 
+<p-dialog header="Anotaciones de pagina {{ this.currentPage }} " [modal]="true" [(visible)]="mostrarAnnotation">
+
+    <div class="flex flex-col gap-4 mb-8 text-start">
+        <h6>
+            {{ getCurrentPage()?.errorMessage }}
+        </h6>
+    </div>
+</p-dialog>
 
 <p-dialog header="Hacer una anotacion en Pagina {{ this.currentPage }}" [modal]="true" [(visible)]="visible"
     [style]="{ width: '25rem' }">
-    <div class="flex items-center gap-4 mb-8">
-        <label for="email" class="font-semibold w-24">Anotacion</label>
-        <textarea [(ngModel)]="annotation" rows="5" cols="30" pTextarea [autoResize]="true"></textarea>
+    <div class="flex flex-col gap-4 mb-8 text-start">
+        <textarea placeholder="Ingrese anotacion" [(ngModel)]="annotation" rows="5" cols="30" pTextarea
+            [autoResize]="true"></textarea>
 
     </div>
     <div class="flex justify-end gap-2">
