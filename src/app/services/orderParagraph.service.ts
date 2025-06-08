@@ -24,4 +24,11 @@ export class OrderParagraphService {
   getParagraphsByOrderId(orderId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`);
   }
+
+  saveErrorMessageParagraph(body: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/hasError`, { ...body }, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'text'
+    });
+  }
 }

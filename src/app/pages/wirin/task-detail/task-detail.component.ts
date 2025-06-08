@@ -142,7 +142,7 @@ export class TaskDetailComponent implements OnInit {
     this.ocrResponse = null;
 
     await this.saveAssignedUserId();
-console.log(condition);
+
     if (condition && (this.isEarring || this.isDenegated)) {
       await this.changeStateTask(status);
     }
