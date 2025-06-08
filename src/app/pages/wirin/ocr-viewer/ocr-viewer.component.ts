@@ -25,7 +25,8 @@ import { FileUploadService } from '../../../services/file-upload.service';
 })
 export class OcrViewerComponent implements OnInit {
   @Input() ocrData: OcrResponse | null = null;
-  fileName: string = '';
+  showPdfPreview: boolean = false;
+  fileName: any;
   isEditing: boolean = false;
   editingText: string = '';
   currentPage: number = 1;
@@ -60,8 +61,7 @@ export class OcrViewerComponent implements OnInit {
       this.taskId = task.id;
     });
 
-   
-     this.fileUploadService.newProcessOcr(this.task, "Local").subscribe({
+    this.fileUploadService.newProcessOcr(this.task, "Local").subscribe({
       next: (response) => {
         this.ocrData = response;
         this.totalPages = this.ocrData?.metadata?.totalPages?? 1;
@@ -112,6 +112,10 @@ saveDocProcesed(pages: OcrPage[]): void {
   }
 }
 
+actualizarEstado(event: boolean): void {
+  this.showPdfPreview = event;
+}
+
   finalizarProceso(): void {
     const getFormData = this.getFormData('En Revisión');
     this.orderManagmentService.changeStatus(getFormData).subscribe({
@@ -138,7 +142,7 @@ saveDocProcesed(pages: OcrPage[]): void {
   
   finalizarRevision(state: string): void {
     var getFormData = null;
-    console.log(state)
+
     if(state == 'En Revisión'){
       getFormData = this.getFormData('Aprobada');
     }else{

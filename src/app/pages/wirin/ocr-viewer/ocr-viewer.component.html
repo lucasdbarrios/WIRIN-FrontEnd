@@ -1,5 +1,5 @@
 <div class="container max-w-6xl mx-auto mb-4 dark:text-gray-200 flex flex-col">
-  <p-toast></p-toast>
+
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
 
@@ -23,12 +23,14 @@
   </div>
 
   <div class="flex gap-6 lg:flex-row sm:flex-col min-h-[70vh]">
-    <app-ocr-text-viewer class="w-full lg:w-1/2 h-[70vh]" [ocrData]="ocrData" [currentPage]="currentPage"
+    <app-ocr-text-viewer class="h-[70vh] transition-all duration-300" [ocrData]="ocrData" [currentPage]="currentPage"
       [isEditing]="isEditing" [editingText]="editingText" (editClicked)="startEditing()"
-      (cancelEditing)="cancelEditing()" (pageChange)="goToPage($event)">
+      (cancelEditing)="cancelEditing()" (pageChange)="goToPage($event)"
+      (showPdfPreviewChange)="actualizarEstado($event)" [style.width]="showPdfPreview ? '50%' : '100%'">
     </app-ocr-text-viewer>
 
-    <iframe [src]="urlSafe" type="application/pdf"
-      class="w-full lg:w-1/2 h-[70vh] border rounded-lg shadow-lg"></iframe>
+    <iframe *ngIf="showPdfPreview" [src]="urlSafe" type="application/pdf"
+      class="h-[70vh] border rounded-lg shadow-lg transition-all duration-300 w-1/2">
+    </iframe>
   </div>
 </div>

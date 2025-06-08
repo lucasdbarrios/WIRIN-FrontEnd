@@ -16,6 +16,8 @@ import { TextareaModule } from 'primeng/textarea';
 import { ApiService } from '../../../../services/api.service';
 import { MessageRequest } from '../../../../types/Requests/MessageRequest';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+import { AnnotationRequest } from '../../../../types/Requests/AnnotationRequest';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
     selector: 'app-ocr-text-viewer',
@@ -30,7 +32,8 @@ export class OcrTextViewerComponent {
     @Input() ocrData: OcrResponse | null = null;
     @Input() isEditing: boolean = false;
     @Input() editingText: string = '';
-    showPdfPreview: boolean = true;
+    @Input() showPdfPreview: boolean = false;
+    @Output() showPdfPreviewChange = new EventEmitter<boolean>();
     @Output() editClicked = new EventEmitter<void>();
     @Output() cancelEditing = new EventEmitter<void>();
     @Output() textChanged = new EventEmitter<string>();
@@ -41,6 +44,9 @@ export class OcrTextViewerComponent {
     totalPages: number = 0;
     visible: boolean = false;
     annotation: string = '';
+    activeUserId: string = '';
+    annotations: AnnotationRequest[] = [];
+
     tinyMceConfig = {
         base_url: '/tinymce',
         suffix: '.min',
@@ -79,23 +85,34 @@ export class OcrTextViewerComponent {
       private orderParagraphService: OrderParagraphService, 
       private messageService: MessageService, 
       private route: ActivatedRoute,
-      private apiService: ApiService
+      private authService: AuthService
     ){}
 
     ngOnInit() {
         if (this.ocrData) {
         this.totalPages = this.ocrData.metadata.totalPages;
         }
+        this.authService.getCurrentUser().subscribe({
+            next: (userData) => {
+                this.activeUserId = userData?.id || '';
+            },
+            error: (error) => {
+                console.error('Error al cargar el id:', error);
+            },
+        });
     }
 
     showDialog() {
       this.visible = true;
   }
 
+  closeDialog() {
+    this.visible = false;
+}
+
     getCurrentPage(): OcrPage | undefined {
         if (!this.ocrData) return undefined;
         var ocr = this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
-        console.log("Texto obtenido:", ocr?.text)
         return ocr;
     }
 
@@ -115,15 +132,37 @@ export class OcrTextViewerComponent {
     }
 
     onSaveAnnotation(): void {
-        /* const message: MessageRequest = {
-            orderId: Number(this.route.snapshot.paramMap.get('id')),
-            message: this.annotation,
-            pageNumber: this.currentPage,
-            userId: 1,
-            userName: 'Usuario'
-        }
-        this.apiService.post('api/message/sendMessage', ) */
-    }
+      const annotation: AnnotationRequest = {
+          orderId: Number(this.route.snapshot.paramMap.get('id')),
+          annotation: this.annotation,
+          pageNumber: this.currentPage,
+          annotatorId: this.activeUserId,
+      }
+
+      // this.orderParagraphService.processParagraphs(body).subscribe({
+      //   next: (response: any) => {
+      //     this.isEditing = false;
+      //     this.messageService.add({
+      //       severity: 'success',
+      //       summary: 'Éxito',
+      //       detail: 'Los cambios se guardaron correctamente',
+      //       life: 3000
+      //     });
+      //   },
+      //   error: (error) => {
+      //     console.error('Error al guardar los cambios:', error);
+      //     this.messageService.add({
+      //       severity: 'error',
+      //       summary: 'Error',
+      //       detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
+      //       life: 3000
+      //     });
+      //   }
+      // });
+      
+      this.annotations.push(annotation);
+      this.closeDialog();
+  }
 
     onSaveChanges(): void {
         if (!this.ocrData || !this.isEditing) return;
@@ -201,13 +240,12 @@ export class OcrTextViewerComponent {
     }
 
     goToPage(pageNumber: number): void {
-      console.log('Changing to page:', pageNumber);
         this.pageChange.emit(pageNumber);
     }
     togglePdfPreview(): void {
       this.showPdfPreview = !this.showPdfPreview;
-      this.pdfVisibilityChange.emit(this.showPdfPreview);
-  }
+      this.showPdfPreviewChange.emit(this.showPdfPreview);
+    }
     
 }
 

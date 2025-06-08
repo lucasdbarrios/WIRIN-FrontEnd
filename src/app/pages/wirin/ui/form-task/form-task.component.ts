@@ -34,6 +34,15 @@ export class FormTaskComponent implements OnInit {
   uploadStatus: string = '';
   uploadProgress: number = 0;
   existingFile: string = '';
+  dropdownItemsSubjects: DropDown[] = [
+    { name: 'Matemáticas', value: 'Matemáticas' },
+    { name: 'Historia', value: 'Historia' },
+    { name: 'Ciencias', value: 'Ciencias' },
+    { name: 'Lengua', value: 'Lengua' },
+    { name: 'Geografía', value: 'Geografía' },
+    { name: 'Arte', value: 'Arte' },
+    { name: 'Educación Física', value: 'Educación Física' }
+];
   dropdownItems: DropDown[] = [
       { name: 'Pendiente', value: 'Pendiente' },
       { name: 'En Proceso', value: 'En Proceso' },

@@ -6,12 +6,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { FluidModule } from 'primeng/fluid';
 import { User } from '../../../types/user.interface';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-form-edit-user',
   standalone: true,
   templateUrl: './form-edit-user.component.html',
-  imports: [FormUserComponent, CommonModule, PopupComponent, FluidModule]
+  imports: [FormUserComponent, CommonModule, PopupComponent, FluidModule],
+  providers: [MessageService]
 })
 export class EditUserComponent implements OnInit {
   userId: string = '';
@@ -24,7 +26,8 @@ export class EditUserComponent implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -56,35 +59,41 @@ export class EditUserComponent implements OnInit {
   }
 
   onConfirmSubmit(): void {
-    if (!this.userId || !this.formDataToSubmit) {
-        return;
-    }
+    if (!this.userId || !this.formDataToSubmit) return;
 
     this.uploadStatus = 'uploading';
     this.uploadProgress = 0;
 
     const updatedUser: User = {
-        id: this.userId,
-        fullName: this.formDataToSubmit.get('fullName') as string,
-        userName: this.formDataToSubmit.get('userName') as string,
-        email: this.formDataToSubmit.get('email') as string,
-        phoneNumber: this.formDataToSubmit.get('phoneNumber') as string || '',
-        roles: JSON.parse(this.formDataToSubmit.get('roles') as string || '[]'),
-        password: this.formDataToSubmit.get('password') as string || ''
+      id: this.userId,
+      fullName: this.formDataToSubmit.get('fullName') as string,
+      userName: this.formDataToSubmit.get('userName') as string,
+      email: this.formDataToSubmit.get('email') as string,
+      phoneNumber: this.formDataToSubmit.get('phoneNumber') as string || '',
+      roles: JSON.parse(this.formDataToSubmit.get('roles') as string || '[]'),
+      password: this.formDataToSubmit.get('password') as string || ''
     };
 
     this.userService.updateUser(this.userId, updatedUser).subscribe({
-      next: (response) => {
-          if (typeof response === 'string' || !response) {
-              this.uploadStatus = 'success';
-          } else {
-              this.uploadStatus = 'success';
-          }
-          this.router.navigate(['/wirin/users']);
+      next: () => {
+        this.uploadStatus = 'success';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Usuario actualizado',
+          detail: 'El usuario se actualizó correctamente.',
+          life: 3000
+        });
+        this.router.navigate(['/wirin/users']);
       },
       error: () => {
-          this.uploadStatus = 'error';
+        this.uploadStatus = 'error';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Hubo un problema al actualizar el usuario. Intenta nuevamente.',
+          life: 3000
+        });
       }
-  });
-}
+    });
+  }
 }

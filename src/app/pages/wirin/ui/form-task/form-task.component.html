@@ -2,37 +2,45 @@
     <div class="flex mt-8">
         <div class="card flex flex-col gap-6 w-full">
             <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
-                <h2 class="ml-2">{{isEditMode ? 'Modificar Tarea' : 'Crear Nueva Tarea'}}</h2>
+                <h2 class="ml-2">{{ isEditMode ? 'Modificar Tarea' : 'Crear Nueva Tarea' }}</h2>
             </div>
-
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-wrap gap-2 w-full">
                     <label for="name">Título</label>
                     <input pInputText id="name" type="text" formControlName="name" placeholder="Ingresá un título" />
                     <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('name')?.invalid && formTask.get('name')?.touched">El título es
-                            requerido</span>
+                        <span *ngIf="formTask.get('name')?.hasError('required') && formTask.get('name')?.touched">
+                            El título es requerido
+                        </span>
+                        <span *ngIf="!(formTask.get('name')?.invalid && formTask.get('name')?.touched)">&nbsp;</span>
                     </p-message>
                 </div>
-
-                <div class="flex flex-wrap gap-2 w-full">
+                <div class="flex flex-col gap-2 w-full">
                     <label for="subject">Materia</label>
-                    <input pInputText id="subject" type="text" formControlName="subject"
-                        placeholder="Ingresá la materia" />
+                    <p-select id="subject" formControlName="subject" [options]="dropdownItemsSubjects"
+                        optionLabel="name" optionValue="value" placeholder="Selecciona una materia">
+                    </p-select>
                     <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('subject')?.invalid && formTask.get('subject')?.touched">La materia es
-                            requerida</span>
+                        <span *ngIf="formTask.get('subject')?.hasError('required') && formTask.get('subject')?.touched">
+                            La materia es requerida
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('subject')?.invalid && formTask.get('subject')?.touched)">&nbsp;</span>
                     </p-message>
                 </div>
             </div>
 
-            <div class="flex flex-wrap">
+            <div class="flex flex-wrap gap-2 w-full">
                 <label for="description">Descripción</label>
                 <textarea pTextarea id="description" formControlName="description"
                     placeholder="Agrega una breve descripción" rows="4"></textarea>
                 <p-message severity="error" variant="simple" size="small">
-                    <span *ngIf="formTask.get('description')?.invalid && formTask.get('description')?.touched">La
-                        descripción es requerida</span>
+                    <span
+                        *ngIf="formTask.get('description')?.hasError('required') && formTask.get('description')?.touched">
+                        La descripción es requerida
+                    </span>
+                    <span
+                        *ngIf="!(formTask.get('description')?.invalid && formTask.get('description')?.touched)">&nbsp;</span>
                 </p-message>
             </div>
 
@@ -41,12 +49,28 @@
                     <label for="authorName">Autor</label>
                     <input pInputText id="authorName" type="text" formControlName="authorName"
                         placeholder="Ingresá el autor" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span
+                            *ngIf="formTask.get('authorName')?.hasError('required') && formTask.get('authorName')?.touched">
+                            El autor es requerido
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('authorName')?.invalid && formTask.get('authorName')?.touched)">&nbsp;</span>
+                    </p-message>
                 </div>
 
                 <div class="flex flex-wrap gap-2 w-full">
                     <label for="rangePage">Rango de Páginas</label>
                     <input pInputText id="rangePage" type="text" formControlName="rangePage"
                         placeholder="Ejemplo: 2-7" />
+                    <p-message severity="error" variant="simple" size="small">
+                        <span
+                            *ngIf="formTask.get('rangePage')?.hasError('required') && formTask.get('rangePage')?.touched">
+                            El rango de páginas es requerido
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('rangePage')?.invalid && formTask.get('rangePage')?.touched)">&nbsp;</span>
+                    </p-message>
                 </div>
             </div>
 
@@ -56,44 +80,47 @@
                     <p-datepicker placeholder="Ingresa fecha" [showIcon]="true" [showButtonBar]="true"
                         formControlName="limitDate"></p-datepicker>
                     <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('limitDate')?.invalid && formTask.get('limitDate')?.touched">La fecha
-                            es requerida</span>
-                    </p-message>
-                </div>
-
-                <div class="flex flex-col gap-2 w-full">
-                    <label for="isPriority">Prioridad</label>
-                    <p-select id="isPriority" formControlName="isPriority"
-                        [options]="[{ name: 'Alta', value: true }, { name: 'Normal', value: false }]" optionLabel="name"
-                        optionValue="value" placeholder="Selecciona prioridad"></p-select>
-                    <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('isPriority')?.invalid && formTask.get('isPriority')?.touched">La
-                            prioridad es requerida</span>
-                    </p-message>
-                </div>
-            </div>
-
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex flex-col gap-2 w-full">
-                    <label for="status">Estado</label>
-                    <p-select id="status" formControlName="status" [options]="dropdownItems" optionLabel="name"
-                        optionValue="value" placeholder="Selecciona el estado"></p-select>
-                    <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('status')?.invalid && formTask.get('status')?.touched">El estado es
-                            requerido</span>
+                        <span
+                            *ngIf="formTask.get('limitDate')?.hasError('required') && formTask.get('limitDate')?.touched">
+                            La fecha es requerida
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('limitDate')?.invalid && formTask.get('limitDate')?.touched)">&nbsp;</span>
                     </p-message>
                 </div>
                 <div class="flex flex-col gap-2 w-full">
                     <label for="alumnoId">Seleccionar usuario</label>
                     <p-select id="alumnoId" formControlName="alumnoId" [options]="dropdownItemsUsers" optionLabel="name"
-                        optionValue="value" placeholder="Selecciona el usuario"></p-select>
+                        optionValue="value" placeholder="Selecciona el usuario">
+                    </p-select>
                     <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('alumnoId')?.invalid && formTask.get('alumnoId')?.touched">El usuario
-                            es
-                            requerido</span>
+                        <span
+                            *ngIf="formTask.get('alumnoId')?.hasError('required') && formTask.get('alumnoId')?.touched">
+                            El usuario es requerido
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('alumnoId')?.invalid && formTask.get('alumnoId')?.touched)">&nbsp;</span>
                     </p-message>
                 </div>
             </div>
+
+
+
+            <div class="flex flex-col md:flex-row gap-6" *ngIf="isEditMode">
+                <div class="flex flex-col gap-2 w-1/2">
+                    <label for="status">Estado</label>
+                    <p-select id="status" formControlName="status" [options]="dropdownItems" optionLabel="name"
+                        optionValue="value" placeholder="Selecciona el estado"></p-select>
+                    <p-message severity="error" variant="simple" size="small">
+                        <span *ngIf="formTask.get('status')?.hasError('required') && formTask.get('status')?.touched">
+                            El estado es requerido
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('status')?.invalid && formTask.get('status')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+            </div>
+
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-col gap-2">
                     <p-fileupload (onSelect)="onFileSelected($event)" accept="application/pdf" maxFileSize="1000000"
@@ -105,14 +132,13 @@
                         </ng-template>
                     </p-fileupload>
                     <p-message severity="error" variant="simple" size="small">
-                        <span *ngIf="formTask.get('file')?.invalid && formTask.get('file')?.touched">El archivo es
-                            requerido</span>
+                        <span *ngIf="formTask.get('file')?.hasError('required') && formTask.get('file')?.touched">
+                            El archivo es requerido
+                        </span>
                         <span *ngIf="!(formTask.get('file')?.invalid && formTask.get('file')?.touched)">&nbsp;</span>
                     </p-message>
-
                 </div>
             </div>
-
 
             <div class="flex flex-col md:flex-row md:justify-between gap-4 w-full">
                 <app-back-button></app-back-button>
