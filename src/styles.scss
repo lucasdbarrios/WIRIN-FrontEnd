@@ -8,10 +8,6 @@
     display: none !important;
 }
 
-
-@media (min-width: 1024px) { /* Aplica solo a pantallas de PC */
-    .p-card{
-        max-width: 800px; /* Ajusta el ancho del card */
-        margin: 0 auto; /* Lo centra en la pantalla */
-    }
+.layout-main{
+    padding: 0;
 }

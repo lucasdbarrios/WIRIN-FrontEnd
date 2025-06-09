@@ -14,12 +14,13 @@ import { Order } from '../../../../types/order.interface';
 import { MessageModule } from 'primeng/message';
 import { BackButtonComponent } from '../back-button/back-button.component';
 import { AuthService } from '../../../../services/auth.service';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   standalone: true,
   selector: 'app-form-task',
   templateUrl: './form-task.component.html',
-  imports: [ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, 
+  imports: [ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, CheckboxModule,
     SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule, BackButtonComponent]
 })
 export class FormTaskComponent implements OnInit {
