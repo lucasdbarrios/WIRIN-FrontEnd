@@ -1,10 +1,12 @@
+import { Annotation } from "./annotation.interface";
+
 export interface OcrPage {
     number: number;
     text: string;
     confidence: number;
     characters: number;
     words: number;
-    errorMessage?: string;
+    annotations?: Annotation[];
   }
   
   export interface OcrResponse {
