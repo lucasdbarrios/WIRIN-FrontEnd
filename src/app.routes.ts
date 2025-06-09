@@ -22,6 +22,7 @@ export const appRoutes: Routes = [
     {
         path: '',
         component: AppLayout,
+        canActivate: [AuthGuard],
         children: [
             { path: '', component: DashboardWirin },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
@@ -33,7 +34,8 @@ export const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
     {
         path: 'wirin',
-        component: AppLayout, 
+        component: AppLayout,
+        canActivate: [AuthGuard],
         children: [
             { path: '', component: DashboardWirin, canActivate: [AuthGuard] },
             { path: 'tasks', component: TasksComponent, canActivate: [AuthGuard] },

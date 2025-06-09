@@ -11,39 +11,25 @@ import { AuthService } from '../../services/auth.service';
     selector: 'app-topbar',
     standalone: true,
     imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
-    template: ` <div class="layout-topbar">
-        <div class="layout-topbar-logo-container">
-            <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-                <i class="pi pi-bars"></i>
-            </button>
-           
-        </div>
-        <a class="layout-topbar-logo mx-auto" routerLink="/">
-            <img src="logo/wirin50.png" alt="Logo" width="54" />
+    template: ` <div class="layout-topbar" style="display: flex; align-items: center; justify-content: center; position: relative; padding: 0 5rem;">
+    <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem;">
+        <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+            <i class="pi pi-bars"></i>
+        </button>
+    </div>
 
-            <img src="logo/wirin25.png" alt="Logo" width="60" />
-            </a>
+    <a class="layout-topbar-logo" routerLink="/" style="display: flex; flex-direction: column; align-items: center;">
+    <img [src]="layoutService.isDarkTheme() ? 'logo/wirin-white.png' : 'logo/wirin.png'" alt="Logo" width="54" />
+        
+    </a>
 
-        <div class="layout-topbar-actions">
+    <div class="layout-topbar-actions" style="position: absolute; right: 1rem; display: flex; gap: 1rem;">
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
                 <app-configurator />
-                <!-- <div class="relative">
-                    <button
-                        class="layout-topbar-action layout-topbar-action-highlight"
-                        pStyleClass="@next"
-                        enterFromClass="hidden"
-                        enterActiveClass="animate-scalein"
-                        leaveToClass="hidden"
-                        leaveActiveClass="animate-fadeout"
-                        [hideOnOutsideClick]="true"
-                    >
-                        <i class="pi pi-palette"></i>
-                    </button>
-                    <app-configurator />
-                </div> -->
+            
             </div>
 
             <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
