@@ -15,6 +15,8 @@ import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { AuthService } from '../../../../services/auth.service';
+import { Annotation } from '../../../../types/annotation.interface';
+import { ParagraphAnnotationService } from '../../../../services/paragraphAnnotation.service';
 
 @Component({
     selector: 'app-ocr-text-viewer',
@@ -43,6 +45,7 @@ export class OcrTextViewerComponent {
     mostrarAnnotation: boolean = false;
     annotation: string = '';
     activeUserId: string = '';
+    isVoluntario: boolean = false;
 
     tinyMceConfig = {
         base_url: '/tinymce',
@@ -82,7 +85,8 @@ export class OcrTextViewerComponent {
       private orderParagraphService: OrderParagraphService, 
       private messageService: MessageService, 
       private route: ActivatedRoute,
-      private authService: AuthService
+      private authService: AuthService,
+      private paragraphAnnotationService: ParagraphAnnotationService
     ){}
 
     ngOnInit() {
@@ -98,6 +102,7 @@ export class OcrTextViewerComponent {
                 console.error('Error al cargar el id:', error);
             },
         });
+        this.isVoluntario = this.authService.hasRole('Voluntario');
     }
 
     showAnnotation(){
@@ -111,7 +116,6 @@ export class OcrTextViewerComponent {
     getCurrentPage(): OcrPage | undefined {
         if (!this.ocrData) return undefined;
         var ocr = this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
-        console.log(ocr)
         return ocr;
     }
 
@@ -133,16 +137,16 @@ export class OcrTextViewerComponent {
     onSaveAnnotation(): void {
         if (!this.ocrData) return;
         const orderId = Number(this.route.snapshot.paramMap.get('id'));
-        const body: ProcessParagraphRequest = {
+        const body: Annotation = {
                 orderId: orderId,
-                pageNumber: this.currentPage,
-                hasError: true,
-                errorMessage: this.annotation
+                paragraphId: this.currentPage,
+                userId: this.activeUserId,
+                annotationText: this.annotation
             };
 
-    this.orderParagraphService.saveErrorMessageParagraph(body).subscribe({
+    this.paragraphAnnotationService.saveErrorMessageParagraph(body).subscribe({
         next: (response: any) => {
-        this.isEditing = false;
+            this.showDialog();
         this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
@@ -161,7 +165,7 @@ export class OcrTextViewerComponent {
         }
     });
     
-    this.showDialog();
+    
 }
 
     onSaveChanges(): void {
