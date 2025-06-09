@@ -16,19 +16,21 @@ import { AuthService } from '../../services/auth.service';
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
                 <i class="pi pi-bars"></i>
             </button>
-            <a class="layout-topbar-logo" routerLink="/">
+           
+        </div>
+        <a class="layout-topbar-logo mx-auto" routerLink="/">
             <img src="logo/wirin50.png" alt="Logo" width="54" />
 
             <img src="logo/wirin25.png" alt="Logo" width="60" />
             </a>
-        </div>
 
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
-                <div class="relative">
+                <app-configurator />
+                <!-- <div class="relative">
                     <button
                         class="layout-topbar-action layout-topbar-action-highlight"
                         pStyleClass="@next"
@@ -41,7 +43,7 @@ import { AuthService } from '../../services/auth.service';
                         <i class="pi pi-palette"></i>
                     </button>
                     <app-configurator />
-                </div>
+                </div> -->
             </div>
 
             <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
