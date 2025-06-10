@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
 import { Paragraph } from '../types/paragraph.Interface';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +41,6 @@ export class OrderService {
 
   downloadFile(id: number): Observable<Blob> {
     const downloadUrl = `${this.apiUrl}/download/${id}`;
-    console.log(downloadUrl);
     return this.http.get(downloadUrl, {
       ...this.getHeaders(),
       responseType: 'blob'

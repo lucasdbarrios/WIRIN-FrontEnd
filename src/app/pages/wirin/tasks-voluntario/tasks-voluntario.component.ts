@@ -90,8 +90,10 @@ export class TasksVoluntarioComponent implements OnInit{
                 this.tasks = [...data];
 
             if (this.isVoluntario) {
+
                 this.tasks = this.tasks.filter(task => 
-                    task.VoluntarioId === this.user?.id
+                    task.voluntarioId === this.user?.id &&
+                    (task.status === 'Pendiente' || task.status === 'En Proceso')
                 );
             }
                 this.isLoading = false;

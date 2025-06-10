@@ -7,19 +7,28 @@ import { Annotation } from '../types/annotation.interface';
 @Injectable({
     providedIn: 'root'
 })
-
 export class ParagraphAnnotationService {
-    private apiUrl:string;
+    private apiUrl: string;
 
     constructor(private http: HttpClient, private envService: EnvService) {
-        this.apiUrl = this.envService.getApiUrl()+"/ParagraphAnnotation";
+        this.apiUrl = this.envService.getApiUrl() + "/ParagraphAnnotation";
+    }
+
+    private getHeaders() {
+        const token = localStorage.getItem('auth_token');
+        return {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
     }
 
     saveErrorMessageParagraph(annotation: Annotation): Observable<any> {
         console.log(annotation);
         return this.http.post(`${this.apiUrl}/SaveParagraphAnnotationAsync`, { paragraphAnnotation: annotation }, {
-        headers: { 'Content-Type': 'application/json' },
-        responseType: 'text'
+            ...this.getHeaders(),
+            headers: { 'Content-Type': 'application/json' },
+            responseType: 'text'
         });
     }
 }

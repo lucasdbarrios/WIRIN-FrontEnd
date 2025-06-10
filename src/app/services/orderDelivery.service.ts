@@ -14,6 +14,15 @@ export class OrderDeliveryService {
     this.apiUrl = this.envService.getApiUrl() + "/OrderDelivery";
   }
 
+  private getHeaders() {
+    const token = localStorage.getItem('auth_token');
+    return {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+  }
+
   /**
    * Procesa la entrega de tareas a un estudiante
    * @param orderSequence Secuencia de órdenes a entregar
@@ -25,6 +34,7 @@ export class OrderDeliveryService {
       orderSequence,
       studentId
     }, {
+      ...this.getHeaders(),
       headers: { 'Content-Type': 'application/json' }
     });
   }

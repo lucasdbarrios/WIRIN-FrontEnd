@@ -13,16 +13,23 @@ export class FileUploadService {
     this.apiUrl = this.envService.getApiUrl();
   }
 
+  private getHeaders() {
+    const token = localStorage.getItem('auth_token');
+    return {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+  }
+
   uploadFile(file: File): Observable<HttpEvent<any>> {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
-    const headers = new HttpHeaders();
-
-    return this.http.post<any>(`${this.apiUrl}/upload`, formData, {
-      headers: headers,
-      reportProgress: true,
-      observe: 'events'
+    return this.http.post<any>(`${this.apiUrl}/upload`, formData, { 
+      ...this.getHeaders(), 
+      reportProgress: true, 
+      observe: 'events' 
     });
   }
 
@@ -30,17 +37,11 @@ export class FileUploadService {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
-    const headers = new HttpHeaders();
-
-    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}`, formData, {
-      headers: headers
-    });
+    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}`, formData, this.getHeaders());
   }
 
   newProcessOcr(id: number, processor: string = 'Local'): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}?id=${id}`, processor, { headers });
+    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}?id=${id}`, processor, this.getHeaders());
   }
 
   isValidFileType(file: File): boolean {
