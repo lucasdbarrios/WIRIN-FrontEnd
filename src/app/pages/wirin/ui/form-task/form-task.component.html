@@ -1,6 +1,6 @@
 <form [formGroup]="formTask" (ngSubmit)="onSubmit()">
-    <div class="flex mt-8">
-        <div class="card flex flex-col gap-6 w-full">
+    <div class="flex justify-center items-center">
+        <div class="card flex flex-col gap-6 w-full 2xl:w-1/2">
             <div class="flex items-center justify-center text-blue-500 text-xl font-semibold mb-4">
                 <h2 class="ml-2">{{ isEditMode ? 'Modificar Tarea' : 'Crear Nueva Tarea' }}</h2>
             </div>
@@ -122,7 +122,8 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex flex-col gap-2">
+
+                <div class="flex flex-col gap-2 w-1/2">
                     <p-fileupload (onSelect)="onFileSelected($event)" accept="application/pdf" maxFileSize="1000000"
                         mode="advanced" [customUpload]="true">
                         <ng-template pTemplate="content">
@@ -136,6 +137,20 @@
                             El archivo es requerido
                         </span>
                         <span *ngIf="!(formTask.get('file')?.invalid && formTask.get('file')?.touched)">&nbsp;</span>
+                    </p-message>
+                </div>
+
+                <div class="flex flex-row gap-2 w-1/2">
+                    <label for="isPriority">Alta prioridad</label>
+                    <p-checkbox id="isPriority" formControlName="isPriority" binary="true"
+                        inputId="isPriority"></p-checkbox>
+                    <p-message severity="error" variant="simple" size="small">
+                        <span
+                            *ngIf="formTask.get('isPriority')?.hasError('required') && formTask.get('isPriority')?.touched">
+                            Debes marcar si la tarea es prioritaria
+                        </span>
+                        <span
+                            *ngIf="!(formTask.get('isPriority')?.invalid && formTask.get('isPriority')?.touched)">&nbsp;</span>
                     </p-message>
                 </div>
             </div>

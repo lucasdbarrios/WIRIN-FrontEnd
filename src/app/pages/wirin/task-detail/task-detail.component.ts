@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { OrderService } from '../../../services/order.service';
 import { AuthService } from '../../../services/auth.service';
 import { saveAs } from 'file-saver';
@@ -11,12 +11,12 @@ import { ButtonModule } from 'primeng/button';
 import { UserService } from '../../../services/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
-import { BackButtonComponent } from '../ui/back-button/back-button.component';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, TagModule, BackButtonComponent],
+  imports: [CommonModule, CardModule, ButtonModule, TagModule],
   templateUrl: './task-detail.component.html',
 })
 export class TaskDetailComponent implements OnInit {
@@ -27,7 +27,7 @@ export class TaskDetailComponent implements OnInit {
   user: any;
   userIdActive: string  = '';
   statusTask: string = '';
-  taskId: number = 0;
+  @Input() taskId: number = 0;
 
   uploadProgress: number = 0;
   uploadStatus: 'idle' | 'uploading' | 'success' | 'error' = 'idle';
@@ -46,22 +46,26 @@ export class TaskDetailComponent implements OnInit {
   alumnoName: string = '';
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private orderService: OrderService,
     private authService: AuthService,
     private fileUploadService: FileUploadService,
     private orderManagmentService: OrderManagmentService,
-    private userService: UserService
+    private userService: UserService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    this.taskId = Number(this.route.snapshot.paramMap.get('id'));
+    console.log(this.taskId);
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
         this.userIdActive = userData?.id ?? '';
       },
+      error: (err) => {
+        this.toastService.showError('Error al obtener el usuario');
+        console.error('Error al obtener el usuario:', err);
+      }
     })
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');
@@ -81,6 +85,7 @@ export class TaskDetailComponent implements OnInit {
         this.isCompleted = this.statusTask === 'Completada';
       },
       error: (err) => {
+        this.toastService.showError('Error al obtener la tarea');
         console.error('Error al obtener la tarea:', err);
       }
     });
@@ -130,8 +135,8 @@ export class TaskDetailComponent implements OnInit {
     this.orderService.downloadFile(taskId).subscribe({
       next: (blob) => saveAs(blob, fileName),
       error: (error) => {
+        this.toastService.showError('Error al descargar el archivo');
         console.error('Error al descargar el archivo:', error);
-        alert('No se pudo descargar el archivo.');
       }
     });
   }
@@ -159,8 +164,8 @@ export class TaskDetailComponent implements OnInit {
             this.router.navigate(['/wirin/ocr-viewer/' + orderId]);
         },
         error: (error) => {
+            this.toastService.showError('Error al procesar el archivo con OCR');
             console.error('Error al procesar el archivo con OCR:', error);
-            this.errorMessage = 'Error al procesar el archivo con OCR. Por favor, intente nuevamente.';
             this.uploadStatus = 'error';
         }
     });
@@ -193,6 +198,7 @@ async changeStateTask(status: string): Promise<void> {
           this.router.navigate(['/wirin/tasks']);
         },
         error: (err) => {
+            this.toastService.showError('Error al cambiar el estado');
             console.error('Error al cambiar el estado:', err);
         }
     });
@@ -222,9 +228,11 @@ deleteTask(taskId: number, event: Event): void {
 
   this.orderService.deleteOrder(taskId).subscribe({
       next: () => {
+          this.toastService.showSuccess('Tarea eliminada con éxito');
           this.router.navigate(['/wirin/tasks']);
       },
       error: error => {
+          this.toastService.showError('Error al eliminar tarea');
           console.error('Error al eliminar tarea:', error);
       }
   });

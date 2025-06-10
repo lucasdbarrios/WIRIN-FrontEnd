@@ -19,7 +19,7 @@
     </div>
 
     <ng-template pTemplate="content">
-        <div *ngIf="!isLoading && !errorMessage && task" class="grid grid-cols-2 gap-6 p-4 rounded-md">
+        <div *ngIf="!isLoading && task" class="grid grid-cols-2 gap-6 p-4 rounded-md">
             <div><strong>Descripción:</strong> {{ task.description }}</div>
             <div><strong>Materia:</strong> {{ task.subject }}</div>
             <div><strong>Autor:</strong> {{ task.authorName }}</div>
@@ -45,8 +45,7 @@
     </ng-template>
 
     <ng-template pTemplate="footer">
-        <div class="flex justify-between md:flex-row md:justify-between gap-6">
-            <app-back-button></app-back-button>
+        <div class="flex justify-end md:flex-row md:justify-end gap-6">
             <p-button icon="pi pi-play" label="Procesar" type="button" (click)="processOcr(task.id, true, 'En Proceso')"
                 *ngIf="isProcess || isEarring" [severity]="'info'"></p-button>
             <p-button label="Revisar" type="button" *ngIf="isRevision || isApproved"

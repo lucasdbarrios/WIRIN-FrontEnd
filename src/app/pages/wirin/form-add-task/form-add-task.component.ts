@@ -5,6 +5,7 @@ import { HttpEventType, HttpResponse } from "@angular/common/http";
 import { OrderService } from "../../../services/order.service";
 import { Router } from "@angular/router";
 import { PopupComponent } from "../ui/popup/popup.component";
+import { ToastService } from "../../../services/toast.service";
 
 @Component({
     selector: 'app-form-add-task',
@@ -20,7 +21,8 @@ export class AddTaskFormComponent{
 
     constructor(
         private orderService: OrderService,
-        private router: Router
+        private router: Router,
+        private toastService : ToastService
     ) {}
 
     onFormSubmit(formData: FormData): void {
@@ -41,14 +43,18 @@ export class AddTaskFormComponent{
                 this.uploadProgress = Math.round(100 * event.loaded / event.total);
             }
             } else if (event instanceof HttpResponse) {
-            this.uploadStatus = 'success';
-            this.router.navigate(['/wirin/tasks']);
+                this.uploadStatus = 'success';
+                this.toastService.showSuccess('Tarea creada con éxito');
+                this.router.navigate(['/wirin/tasks']);
             }
+
         },
         error: (error: any) => {
             console.error('Error al crear la tarea:', error);
             this.uploadStatus = 'error';
+            this.toastService.showError('Error al crear la tarea');
         }
+
         });
     }
 }

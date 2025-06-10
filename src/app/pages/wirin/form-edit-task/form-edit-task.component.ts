@@ -7,12 +7,15 @@ import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { FluidModule } from 'primeng/fluid';
 import { Order } from '../../../types/order.interface';
+import { MessageService } from 'primeng/api';
+import { Location } from '@angular/common';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-form-edit-task',
   standalone: true,
   templateUrl: './form-edit-task.component.html',
-  imports: [FormTaskComponent, CommonModule, PopupComponent, FluidModule]
+  imports: [FormTaskComponent, CommonModule, PopupComponent, FluidModule],
 })
 export class EditTaskComponent implements OnInit {
   taskId: string | null = null;
@@ -25,7 +28,10 @@ export class EditTaskComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private messageService: MessageService,
+    private location: Location,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +51,7 @@ export class EditTaskComponent implements OnInit {
         this.taskData = task;
       },
       error: (error) => {
+        this.toastService.showError('Hubo un problema al cargar la tarea');
         console.error('Error al cargar la tarea:', error);
         this.router.navigate(['/wirin/tasks']);
       }
@@ -63,20 +70,22 @@ export class EditTaskComponent implements OnInit {
     this.uploadProgress = 0;
 
     this.orderService.updateOrder(Number(this.taskId), this.formDataToSubmit).subscribe({
-      next: (event: any) => {
-        if (event.type === HttpEventType.UploadProgress) {
-          if (event.total) {
-            this.uploadProgress = Math.round(100 * event.loaded / event.total);
-          }
-        } else if (event instanceof HttpResponse) {
-          this.uploadStatus = 'success';
-          this.router.navigate(['/wirin/tasks']);
+        next: (event: any) => {
+            if (event.type === HttpEventType.UploadProgress) {
+                if (event.total) {
+                    this.uploadProgress = Math.round(100 * event.loaded / event.total);
+                }
+            } else if (event instanceof HttpResponse) {
+                this.uploadStatus = 'success';
+                this.toastService.showSuccess('La tarea se actualizó correctamente');
+                this.location.back();
+            }
+        },
+        error: (error) => {
+            this.toastService.showError('Hubo un problema al actualizar la tarea');
+            console.error('Error al actualizar la tarea:', error);
+            this.uploadStatus = 'error';
         }
-      },
-      error: (error) => {
-        console.error('Error al actualizar la tarea:', error);
-        this.uploadStatus = 'error';
-      }
     });
-  }
+}
 }

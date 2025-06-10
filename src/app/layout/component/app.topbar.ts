@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
     selector: 'app-topbar',
     standalone: true,
     imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
-    template: ` <div class="layout-topbar" style="display: flex; align-items: center; justify-content: center; position: relative; padding: 0 5rem;">
+    template: ` <div class="layout-topbar" style="display: flex; align-items: center; justify-content: center;">
     <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem;">
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
             <i class="pi pi-bars"></i>
