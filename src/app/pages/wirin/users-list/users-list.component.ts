@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
+
 @Component({
   selector: 'app-users-list',
   templateUrl: './users-list.component.html',
@@ -40,11 +42,16 @@ export class UsersListComponent {
   constructor(private userService: UserService,
     private router: Router,
     private authService: AuthService,
+    private toastService: ToastService,
   ) {
     this.authService.getCurrentUser().subscribe({
       next: (user: any) => {
           this.loggedUserId = user.id;
       },
+      error: error => {
+          this.toastService.showError('Error al obtener el usuario');
+          console.error('Error al obtener el usuario:', error);
+      }
   });
   }
 
@@ -65,6 +72,7 @@ export class UsersListComponent {
             this.isLoading = false;
         },
         error: error => {
+            this.toastService.showError('Error al obtener los usuarios');
             console.error('Error al obtener los usuarios:', error);
             this.isLoading = false;
         }
@@ -91,9 +99,11 @@ export class UsersListComponent {
 
     this.userService.deleteUser(id).subscribe({
         next: () => {
+            this.toastService.showSuccess('Usuario eliminado');
             this.loadUsers();
         },
         error: error => {
+            this.toastService.showError('Error al eliminar el usuario');
             console.error('Error al eliminar el usuario:', error);
         }
     });

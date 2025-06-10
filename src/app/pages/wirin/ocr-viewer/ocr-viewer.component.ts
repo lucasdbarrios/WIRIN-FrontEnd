@@ -15,6 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
 import { OrderParagraphService } from '../../../services/orderParagraph.service';
 import { FileUploadService } from '../../../services/file-upload.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-ocr-viewer',
@@ -49,7 +50,8 @@ export class OcrViewerComponent implements OnInit {
     private orderService: OrderService,
     public sanitizer: DomSanitizer,
     private fileUploadService: FileUploadService,
-    private orderParagraphService: OrderParagraphService
+    private orderParagraphService: OrderParagraphService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -79,6 +81,7 @@ export class OcrViewerComponent implements OnInit {
         this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
       },
       error: (error) => {
+        this.toastService.showError('Error al recuperar el archivo.');
         console.error('Error al recuperar el archivo:', error);
       }
     })
@@ -106,7 +109,8 @@ saveDocProcesed(pages: OcrPage[]): void {
 
       this.orderParagraphService.processParagraphs(pageData).subscribe({
           error: (error: any) => {
-              console.error('Error al enviar los datos:', error);
+            this.toastService.showError('Error al enviar los datos.');
+            console.error('Error al enviar los datos:', error);
           }
       });
   }
@@ -123,6 +127,7 @@ actualizarEstado(event: boolean): void {
         this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
+        this.toastService.showError('Error al cambiar el estado.');
         console.error('Error al cambiar el estado:', err);
       }
     });
@@ -135,6 +140,7 @@ actualizarEstado(event: boolean): void {
         this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
+        this.toastService.showError('Error al cambiar el estado.');
         console.error('Error al cambiar el estado:', err);
       }
     });
@@ -154,6 +160,7 @@ actualizarEstado(event: boolean): void {
         this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
+        this.toastService.showError('Error al cambiar el estado.');
         console.error('Error al cambiar el estado:', err);
       }
     });

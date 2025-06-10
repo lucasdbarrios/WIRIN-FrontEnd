@@ -19,7 +19,7 @@
     </div>
 
     <ng-template pTemplate="content">
-        <div *ngIf="!isLoading && !errorMessage && task" class="grid grid-cols-2 gap-6 p-4 rounded-md">
+        <div *ngIf="!isLoading && task" class="grid grid-cols-2 gap-6 p-4 rounded-md">
             <div><strong>Descripción:</strong> {{ task.description }}</div>
             <div><strong>Materia:</strong> {{ task.subject }}</div>
             <div><strong>Autor:</strong> {{ task.authorName }}</div>

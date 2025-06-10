@@ -20,6 +20,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { FluidModule } from 'primeng/fluid';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
     selector: 'app-tasks-component',
@@ -56,7 +57,8 @@ export class TasksComponent implements OnInit{
     constructor(private orderService: OrderService, 
       private authService: AuthService, 
       private orderManagmentService: OrderManagmentService,
-      private router: Router 
+      private router: Router,
+      private toastService: ToastService
     ) {
     }
 
@@ -97,6 +99,7 @@ export class TasksComponent implements OnInit{
                 this.isLoading = false;
             },
             error: error => {
+                this.toastService.showError('Error al obtener las tareas');
                 console.error('Error al obtener las tareas:', error);
                 this.isLoading = false;
             }

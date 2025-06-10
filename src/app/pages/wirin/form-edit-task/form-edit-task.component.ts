@@ -9,6 +9,7 @@ import { FluidModule } from 'primeng/fluid';
 import { Order } from '../../../types/order.interface';
 import { MessageService } from 'primeng/api';
 import { Location } from '@angular/common';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-form-edit-task',
@@ -29,7 +30,8 @@ export class EditTaskComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private location: Location
+    private location: Location,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -43,16 +45,13 @@ export class EditTaskComponent implements OnInit {
     });
   }
 
-  show() {
-    this.messageService.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
-}
-
   private loadTaskData(taskId: number): void {
     this.orderService.getTaskById(taskId).subscribe({
       next: (task) => {
         this.taskData = task;
       },
       error: (error) => {
+        this.toastService.showError('Hubo un problema al cargar la tarea');
         console.error('Error al cargar la tarea:', error);
         this.router.navigate(['/wirin/tasks']);
       }
@@ -78,23 +77,12 @@ export class EditTaskComponent implements OnInit {
                 }
             } else if (event instanceof HttpResponse) {
                 this.uploadStatus = 'success';
-                this.messageService.add({ 
-                    severity: 'success', 
-                    summary: 'Éxito', 
-                    detail: 'La tarea se actualizó correctamente', 
-                    life: 3000 
-                });
+                this.toastService.showSuccess('La tarea se actualizó correctamente');
                 this.location.back();
-          
             }
         },
         error: (error) => {
-            this.messageService.add({ 
-                severity: 'error', 
-                summary: 'Error', 
-                detail: 'Hubo un problema al actualizar la tarea', 
-                life: 3000 
-            });
+            this.toastService.showError('Hubo un problema al actualizar la tarea');
             console.error('Error al actualizar la tarea:', error);
             this.uploadStatus = 'error';
         }

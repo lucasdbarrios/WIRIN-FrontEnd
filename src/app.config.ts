@@ -6,6 +6,7 @@ import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import { TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -13,6 +14,7 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withFetch()),
         provideAnimationsAsync(),
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
+        MessageService,
         { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
     ]
 };

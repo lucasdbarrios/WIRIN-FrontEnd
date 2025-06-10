@@ -7,6 +7,7 @@ import { PopupComponent } from "../ui/popup/popup.component";
 import { User } from '../../../types/user.interface';
 import { HttpErrorResponse } from "@angular/common/http";
 import { MessageService } from "primeng/api";
+import { ToastService } from "../../../services/toast.service";
 
 @Component({
     selector: 'app-form-add-user',
@@ -25,7 +26,8 @@ export class AddUserFormComponent {
     constructor(
         private authService: AuthService,
         private router: Router,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private toastService: ToastService
     ) {}
 
     onFormSubmit(formData: FormData): void {
@@ -51,12 +53,7 @@ export class AddUserFormComponent {
         this.authService.register(newUser).subscribe({
             next: () => {
                 this.uploadStatus = 'success';
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Usuario registrado',
-                    detail: 'El usuario ha sido registrado correctamente.',
-                    life: 3000
-                });
+                this.toastService.showSuccess('El usuario ha sido registrado correctamente');
                 this.router.navigate(['/wirin/users']);
             },
             error: (error: HttpErrorResponse) => {
@@ -69,12 +66,7 @@ export class AddUserFormComponent {
                 }
         
                 this.uploadStatus = 'error';
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: this.errorMessage,
-                    life: 3000
-                });
+                this.toastService.showError(this.errorMessage);
             }
         });
     }

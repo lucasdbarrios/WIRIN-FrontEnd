@@ -12,6 +12,7 @@ import { UserService } from '../../../services/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
 import { BackButtonComponent } from '../ui/back-button/back-button.component';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -52,7 +53,8 @@ export class TaskDetailComponent implements OnInit {
     private authService: AuthService,
     private fileUploadService: FileUploadService,
     private orderManagmentService: OrderManagmentService,
-    private userService: UserService
+    private userService: UserService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +83,7 @@ export class TaskDetailComponent implements OnInit {
         this.isCompleted = this.statusTask === 'Completada';
       },
       error: (err) => {
+        this.toastService.showError('Error al obtener la tarea');
         console.error('Error al obtener la tarea:', err);
       }
     });
@@ -130,8 +133,8 @@ export class TaskDetailComponent implements OnInit {
     this.orderService.downloadFile(taskId).subscribe({
       next: (blob) => saveAs(blob, fileName),
       error: (error) => {
+        this.toastService.showError('Error al descargar el archivo');
         console.error('Error al descargar el archivo:', error);
-        alert('No se pudo descargar el archivo.');
       }
     });
   }
@@ -159,8 +162,8 @@ export class TaskDetailComponent implements OnInit {
             this.router.navigate(['/wirin/ocr-viewer/' + orderId]);
         },
         error: (error) => {
+            this.toastService.showError('Error al procesar el archivo con OCR');
             console.error('Error al procesar el archivo con OCR:', error);
-            this.errorMessage = 'Error al procesar el archivo con OCR. Por favor, intente nuevamente.';
             this.uploadStatus = 'error';
         }
     });
@@ -193,6 +196,7 @@ async changeStateTask(status: string): Promise<void> {
           this.router.navigate(['/wirin/tasks']);
         },
         error: (err) => {
+            this.toastService.showError('Error al cambiar el estado');
             console.error('Error al cambiar el estado:', err);
         }
     });
@@ -222,9 +226,11 @@ deleteTask(taskId: number, event: Event): void {
 
   this.orderService.deleteOrder(taskId).subscribe({
       next: () => {
+          this.toastService.showSuccess('Tarea eliminada con éxito');
           this.router.navigate(['/wirin/tasks']);
       },
       error: error => {
+          this.toastService.showError('Error al eliminar tarea');
           console.error('Error al eliminar tarea:', error);
       }
   });

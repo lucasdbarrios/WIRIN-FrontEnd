@@ -7,6 +7,7 @@ import { PopupComponent } from '../ui/popup/popup.component';
 import { FluidModule } from 'primeng/fluid';
 import { User } from '../../../types/user.interface';
 import { MessageService } from 'primeng/api';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-form-edit-user',
@@ -27,7 +28,8 @@ export class EditUserComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +49,7 @@ export class EditUserComponent implements OnInit {
         this.userData = user;
       },
       error: (error) => {
+        this.toastService.showError('Error al cargar el usuario');
         console.error('Error al cargar el usuario:', error);
         this.router.navigate(['/wirin/users']);
       }
@@ -77,22 +80,13 @@ export class EditUserComponent implements OnInit {
     this.userService.updateUser(this.userId, updatedUser).subscribe({
       next: () => {
         this.uploadStatus = 'success';
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Usuario actualizado',
-          detail: 'El usuario se actualizó correctamente.',
-          life: 3000
-        });
+        this.toastService.showSuccess('Usuario actualizado correctamente');
         this.router.navigate(['/wirin/users']);
       },
-      error: () => {
+      error: (error) => {
         this.uploadStatus = 'error';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Hubo un problema al actualizar el usuario. Intenta nuevamente.',
-          life: 3000
-        });
+        this.toastService.showError('Hubo un problema al actualizar el usuario. Intenta nuevamente');
+        console.error('Error al actualizar el usuario:', error);
       }
     });
   }

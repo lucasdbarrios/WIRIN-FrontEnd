@@ -17,6 +17,7 @@ import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { AuthService } from '../../../../services/auth.service';
 import { Annotation } from '../../../../types/annotation.interface';
 import { ParagraphAnnotationService } from '../../../../services/paragraphAnnotation.service';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
     selector: 'app-ocr-text-viewer',
@@ -82,11 +83,12 @@ export class OcrTextViewerComponent {
     };
 
     constructor(
-      private orderParagraphService: OrderParagraphService, 
-      private messageService: MessageService, 
-      private route: ActivatedRoute,
-      private authService: AuthService,
-      private paragraphAnnotationService: ParagraphAnnotationService
+        private orderParagraphService: OrderParagraphService, 
+        private messageService: MessageService, 
+        private route: ActivatedRoute,
+        private authService: AuthService,
+        private paragraphAnnotationService: ParagraphAnnotationService,
+        private toastService: ToastService
     ){}
 
     ngOnInit() {
@@ -99,6 +101,7 @@ export class OcrTextViewerComponent {
                 this.activeUserId = userData?.id || '';
             },
             error: (error) => {
+                this.toastService.showError('Error al cargar el usuario.');
                 console.error('Error al cargar el id:', error);
             },
         });
@@ -145,23 +148,13 @@ export class OcrTextViewerComponent {
             };
 
     this.paragraphAnnotationService.saveErrorMessageParagraph(body).subscribe({
-        next: (response: any) => {
+        next: () => {
             this.showDialog();
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Los cambios se guardaron correctamente',
-            life: 3000
-        });
+            this.toastService.showSuccess('La anotación se guardó correctamente');
         },
         error: (error) => {
-        console.error('Error al guardar los cambios:', error);
-        this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
-            life: 3000
-        });
+            console.error('Error al guardar los cambios:', error);
+            this.toastService.showError('No se pudo guardar la anotación.');
         }
     });
     
@@ -189,33 +182,23 @@ export class OcrTextViewerComponent {
             pageNumber: this.currentPage,
             hasError: false,
             errorMessage: ''
-          };
+            };
         
-          body.paragraphText = this.editingText;
-          body.pageNumber = this.currentPage;
-          body.hasError = false;
-          body.errorMessage = '';
+            body.paragraphText = this.editingText;
+            body.pageNumber = this.currentPage;
+            body.hasError = false;
+            body.errorMessage = '';
 
-          this.orderParagraphService.processParagraphs(body).subscribe({
-            next: (response: any) => {
-              this.isEditing = false;
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: 'Los cambios se guardaron correctamente',
-                life: 3000
-              });
-            },
-            error: (error) => {
-              console.error('Error al guardar los cambios:', error);
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'No se pudieron guardar los cambios. Por favor, intente nuevamente.',
-                life: 3000
-              });
-            }
-          });
+            this.orderParagraphService.processParagraphs(body).subscribe({
+                next: () => {
+                    this.toastService.showSuccess('Los cambios se guardaron correctamente');
+                    this.isEditing = false;
+                },
+                error: (error) => {
+                    console.error('Error al guardar los cambios:', error);
+                    this.toastService.showError('No se pudieron guardar los cambios.');
+                }
+            });
         }
 
     }
@@ -247,8 +230,8 @@ export class OcrTextViewerComponent {
         this.pageChange.emit(pageNumber);
     }
     togglePdfPreview(): void {
-      this.showPdfPreview = !this.showPdfPreview;
-      this.showPdfPreviewChange.emit(this.showPdfPreview);
+        this.showPdfPreview = !this.showPdfPreview;
+        this.showPdfPreviewChange.emit(this.showPdfPreview);
     }
     
 }

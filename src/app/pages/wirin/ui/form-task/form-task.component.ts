@@ -15,6 +15,7 @@ import { MessageModule } from 'primeng/message';
 import { BackButtonComponent } from '../back-button/back-button.component';
 import { AuthService } from '../../../../services/auth.service';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
   standalone: true,
@@ -85,6 +86,7 @@ export class FormTaskComponent implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     private authService: AuthService,
+    private toastService: ToastService
   ) {
     this.formTask = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -107,6 +109,10 @@ export class FormTaskComponent implements OnInit {
           value: user.id
         }));
       },
+      error: (error) => {
+        this.toastService.showError('Error al obtener los usuarios');
+        console.error('Error al obtener los usuarios:', error);
+      }
     });
   }
 
@@ -124,6 +130,7 @@ export class FormTaskComponent implements OnInit {
           }
       },
       error: (error) => {
+          this.toastService.showError('Error al obtener el usuario');
           console.error('Error al obtener el usuario:', error);
       }
     });

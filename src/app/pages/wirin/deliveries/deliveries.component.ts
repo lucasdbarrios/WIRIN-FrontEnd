@@ -17,6 +17,7 @@ import { RouterModule } from '@angular/router';
 import { OrderSequence } from '../../../types/orderSequence.type';
 import { OrderListModule } from 'primeng/orderlist';
 import { CardModule } from 'primeng/card';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
     selector: 'app-deliveries-component',
@@ -42,12 +43,11 @@ export class DeliveriesComponent implements OnInit {
 
 
     constructor(
-        private orderService: OrderService,
         private orderManagmentService: OrderManagmentService,
         private orderDeliveryService: OrderDeliveryService,
-        private authService: AuthService,
         private userService: UserService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private toastService: ToastService
     ) {}
 
     ngOnInit(): void {
@@ -65,6 +65,7 @@ export class DeliveriesComponent implements OnInit {
                 this.isLoading = false;
             },
             error: error => {
+                this.toastService.showError('Error al cargar las tareas');
                 console.error('Error al obtener las tareas:', error);
                 this.isLoading = false;
             }
@@ -77,6 +78,7 @@ export class DeliveriesComponent implements OnInit {
                 this.students = students;
             },
             error: (error) => {
+                this.toastService.showError('Error al cargar los alumnos');
                 console.error('Error al cargar los alumnos:', error);
             }
         });
@@ -109,11 +111,7 @@ export class DeliveriesComponent implements OnInit {
 
     performDelivery(): void {
         if (!this.selectedStudent || this.selectedTasks.length === 0) {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Debe seleccionar al menos un alumno y una o más tareas.'
-            });
+            this.toastService.showError('Debe seleccionar al menos un alumno y una o más tareas.');
             return;
         }
         
@@ -122,25 +120,17 @@ export class DeliveriesComponent implements OnInit {
         this.orderDeliveryService.processDelivery(body)
             .subscribe({
                 next: (response) => {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Éxito',
-                        detail: 'La entrega se ha realizado correctamente'
-                    });
+                    this.toastService.showSuccess('La entrega se ha realizado correctamente');
                     this.showDialog = false;
                     this.selectedStudent = null;
                     this.selectedTasks = [];
                     this.orderSequence = [];
-                    this.loadTasks(); // Recargar las tareas
+                    this.loadTasks();
                     this.isLoading = false;
                 },
                 error: (error) => {
                     console.error('Error al realizar la entrega:', error);
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Ha ocurrido un error al realizar la entrega'
-                    });
+                    this.toastService.showError('Ha ocurrido un error al realizar la entrega');
                     this.isLoading = false;
                 }
             });
