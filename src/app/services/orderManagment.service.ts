@@ -37,10 +37,17 @@ export class OrderManagmentService {
     }, this.getHeaders());
   }
 
-  saveAssignedUserId(formData: FormData): Observable<any> {
-    return this.http.put(`${this.apiUrl}/saveAssignedUserId`, { 
+  saveVoluntarioId(formData: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/saveVoluntarioId`, { 
       id: formData.get('id'), 
-      voluntarioId: formData.get('voluntarioId') 
+      userId: formData.get('userId') 
+    }, this.getHeaders());
+  }
+
+  saveRevisorId(formData: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/saveRevisorId`, { 
+      id: formData.get('id'), 
+      userId: formData.get('userId') 
     }, this.getHeaders());
   }
 

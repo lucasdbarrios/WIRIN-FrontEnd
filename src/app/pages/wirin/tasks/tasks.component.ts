@@ -98,15 +98,19 @@ export class TasksComponent implements OnInit{
                 this.tasks = [...data];
 
                 if (this.isVoluntario) {
-                    this.tasks = this.tasks.filter(task => 
-                        task.status.toLowerCase() == 'pendiente'
-                    );
+                    this.tasks = this.tasks
+                        .filter(task => task.status.toLowerCase() === 'pendiente')
+                        .sort((a, b) => a.prioridad - b.prioridad);
                 } else if (this.isRevisor) {
-                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'en revisión');
+                    this.tasks = this.tasks
+                        .filter(task => task.status.toLowerCase() === 'en revisión')
+                        .sort((a, b) => a.prioridad - b.prioridad);
                 } else if (this.isAlumno) {
-                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'entregada');
+                    this.tasks = this.tasks
+                        .filter(task => task.status.toLowerCase() === 'entregada')
+                        .sort((a, b) => a.prioridad - b.prioridad);
                 }
-    
+                
                 this.isLoading = false;
             },
             error: error => {

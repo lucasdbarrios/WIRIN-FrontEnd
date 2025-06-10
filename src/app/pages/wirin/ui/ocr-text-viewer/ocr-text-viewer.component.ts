@@ -43,7 +43,7 @@ export class OcrTextViewerComponent {
     pagesPerView: number = 3;
     totalPages: number = 0;
     visible: boolean = false;
-    mostrarAnnotation: boolean = false;
+    showAnnotation: boolean = false;
     annotation: string = '';
     activeUserId: string = '';
     isVoluntario: boolean = false;
@@ -108,8 +108,8 @@ export class OcrTextViewerComponent {
         this.isVoluntario = this.authService.hasRole('Voluntario');
     }
 
-    showAnnotation(){
-        this.mostrarAnnotation = !this.mostrarAnnotation;
+    onShowAnnotation(){
+        this.showAnnotation = !this.showAnnotation;
     }
 
     showDialog() {

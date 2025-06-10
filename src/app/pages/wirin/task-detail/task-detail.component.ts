@@ -156,7 +156,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
     this.uploadProgress = 0;
     this.ocrResponse = null;
 
-    await this.saveAssignedUserId();
+    await this.saveUserId();
 
     if (condition && (this.isEarring || this.isDenegated)) {
       await this.changeStateTask(status);
@@ -186,12 +186,17 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
     });
 }
 
-async saveAssignedUserId(): Promise<void> {
+async saveUserId(): Promise<void> {
   this.formData = new FormData();
   this.formData.append('id', this.taskId.toString());
-  this.formData.append('voluntarioId', this.userIdActive);
+  this.formData.append('userId', this.userIdActive);
 
-  await firstValueFrom(this.orderManagmentService.saveAssignedUserId(this.formData));
+  if(this.isRevision){
+    await firstValueFrom(this.orderManagmentService.saveRevisorId(this.formData));
+  }else{
+    await firstValueFrom(this.orderManagmentService.saveVoluntarioId(this.formData));
+  }
+  
 }
 
 async changeStateTask(status: string): Promise<void> {

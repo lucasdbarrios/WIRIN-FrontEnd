@@ -37,6 +37,9 @@
                                     <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
                                     <div class="text-lg font-medium mt-1">{{ task.name }}</div>
                                     <div class="text-base font-medium mt-2">
+                                        Prioridad: {{ task.priority}}
+                                    </div>
+                                    <div class="text-base font-medium mt-2">
                                         Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}
                                     </div>
                                 </div>

@@ -8,11 +8,19 @@
       </p-button>
     </div>
 
-    <div class="flex gap-4" *ngIf="state == 'En Revisión' || state == 'Aprobada'">
+    <div class="flex gap-4" *ngIf="state == 'En Revisión'">
       <p-button label="Denegar resultado" [severity]="'warn'" (click)="denegarResultado()">
       </p-button>
 
       <p-button label="Finalizar revisión" styleClass="p-button-success" (click)="finalizarRevision(state)">
+      </p-button>
+    </div>
+
+    <div class="flex gap-4" *ngIf="state == 'Aprobada'">
+      <p-button label="Denegar resultado" [severity]="'warn'" (click)="denegarResultado()">
+      </p-button>
+
+      <p-button label="Finalizar validación" styleClass="p-button-success" (click)="finalizarRevision(state)">
       </p-button>
     </div>
   </div>

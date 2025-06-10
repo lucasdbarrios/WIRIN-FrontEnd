@@ -47,47 +47,23 @@
 
     <ng-template pTemplate="footer">
         <div class="flex justify-end md:flex-row md:justify-end gap-6">
-            <p-button
-                icon="pi pi-play"
-                [label]="isProcessing ? 'Procesando...': 'Procesar'"
-                type="button"
-                (click)="processOcr(task.id, true, 'En Proceso')"
-                *ngIf="isProcess || isEarring"
-                [severity]="'info'"
-                [disabled]="isProcessing"
-            >
+            <p-button icon="pi pi-play" [label]="isProcessing ? 'Procesando...': 'Procesar'" type="button"
+                (click)="processOcr(task.id, true, 'En Proceso')" *ngIf="isProcess || isEarring" [severity]="'info'"
+                [disabled]="isProcessing">
             </p-button>
-    
-            <p-button
-                [label]="isProcessing ? 'Procesando...': 'Revisar'"
-                type="button"
-                *ngIf="isRevision"
-                (click)="processOcr(task.id, false, '')"
-                [severity]="'info'"
-                [disabled]="isProcessing"
-            >
+
+            <p-button [label]="isProcessing ? 'Cargando...': 'Revisar'" type="button" *ngIf="isRevision"
+                (click)="processOcr(task.id, false, '')" [severity]="'info'" [disabled]="isProcessing">
             </p-button>
-    
-            <p-button
-                [label]="isProcessing ? 'Procesando...': 'Validar revisión'"
-                type="button"
-                *ngIf="isApproved"
-                (click)="processOcr(task.id, false, '')"
-                [severity]="'info'"
-                [disabled]="isProcessing"
-            >
+
+            <p-button [label]="isProcessing ? 'Cargando...': 'Validar revisión'" type="button" *ngIf="isApproved"
+                (click)="processOcr(task.id, false, '')" [severity]="'info'" [disabled]="isProcessing">
             </p-button>
-    
-            <p-button
-                [label]="isProcessing ? 'Procesando...': 'Ver anotaciones'"
-                type="button"
-                (click)="processOcr(task.id, true, 'En Proceso')"
-                *ngIf="isDenegated"
-                [severity]="'info'"
-                [disabled]="isProcessing"
-            >
+
+            <p-button [label]="isProcessing ? 'Procesando...': 'Ver anotaciones'" type="button"
+                (click)="processOcr(task.id, true, 'En Proceso')" *ngIf="isDenegated" [severity]="'info'"
+                [disabled]="isProcessing">
             </p-button>
         </div>
     </ng-template>
 </p-card>
-

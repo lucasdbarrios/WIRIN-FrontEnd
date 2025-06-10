@@ -124,7 +124,7 @@ actualizarEstado(event: boolean): void {
     const getFormData = this.getFormData('En Revisión');
     this.orderManagmentService.changeStatus(getFormData).subscribe({
       next: () => {
-        this.router.navigate(['/wirin/tasks-voluntario']);
+        this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
         this.toastService.showError('Error al cambiar el estado.');

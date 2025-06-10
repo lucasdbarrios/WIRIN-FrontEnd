@@ -1,8 +1,8 @@
 <p-card class="dark:bg-gray-800 text-gray-900 dark:text-gray-200">
     <ng-template pTemplate="content">
         <div class="flex justify-between mb-3">
-            <p-button [label]="showPdfPreview ? 'Ocultar Anotación' : 'Mostrar anotaciones'" (click)="showAnnotation()"
-                class="p-button-secondary">
+            <p-button [label]="showAnnotation ? 'Ocultar Anotación' : 'Mostrar anotaciones'"
+                (click)="onShowAnnotation()" class="p-button-secondary">
             </p-button>
             <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" (click)="togglePdfPreview()"
                 class="p-button-secondary">
@@ -59,8 +59,13 @@
     </ng-template>
 </p-card>
 
-<p-dialog header="Anotaciones de página {{ this.currentPage }} " [modal]="true" [(visible)]="mostrarAnnotation">
+<p-dialog header="Anotaciones de página {{ this.currentPage }} " [modal]="true" [(visible)]="showAnnotation">
     <div class="flex flex-col gap-4 mb-8 text-start" style="max-height: 300px; max-width: 500px; overflow: auto;">
+
+        <div *ngIf="!getCurrentPage()?.annotations?.length">
+            <p>No hay anotaciones para esta página.</p>
+        </div>
+
         <div *ngFor="let annotation of getCurrentPage()?.annotations" style="max-width: 450px; word-wrap: break-word;">
             <p>📅 {{ annotation.creationDate | date:'dd/MM/yyyy' }}</p>
             <h6>{{ annotation.annotationText }}</h6>
