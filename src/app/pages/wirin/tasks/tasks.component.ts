@@ -105,10 +105,6 @@ export class TasksComponent implements OnInit{
                     this.tasks = this.tasks
                         .filter(task => task.status.toLowerCase() === 'en revisión')
                         .sort((a, b) => a.prioridad - b.prioridad);
-                } else if (this.isAlumno) {
-                    this.tasks = this.tasks
-                        .filter(task => task.status.toLowerCase() === 'entregada')
-                        .sort((a, b) => a.prioridad - b.prioridad);
                 }
                 
                 this.isLoading = false;
@@ -124,30 +120,18 @@ export class TasksComponent implements OnInit{
     async loadTasksDelivered(): Promise<void> {
         this.isLoading = true;
 
-       /*  await this.orderService.getOrdersDelivered(this.user.id).subscribe({
+        await this.orderService.getOrdersDelivered().subscribe({
             next: (data: any[]) => {
                 this.allTasks = data;
                 this.tasks = [...data];
-
-                if (this.isVoluntario) {
-                    this.tasks = this.tasks.filter(task => 
-                        task.status.toLowerCase() == 'denegada' ||
-                        task.status.toLowerCase() == 'en proceso' ||
-                        task.status.toLowerCase() == 'pendiente'
-                    );
-                } else if (this.isRevisor) {
-                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'en revisión');
-                } else if (this.isAlumno) {
-                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'entregada');
-                }
-    
+                console.log(data);
                 this.isLoading = false;
             },
             error: error => {
                 console.error('Error al obtener las tareas:', error);
                 this.isLoading = false;
             }
-        }); */
+        });
     }
 
     searchTasks(event: Event): void {

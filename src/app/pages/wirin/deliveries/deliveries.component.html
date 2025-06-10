@@ -26,7 +26,8 @@
                                         Vencimiento: {{ item.limitDate | date:'dd/MM/yyyy' }}
                                     </div>
                                     <div class="mt-2">
-                                        <input type="checkbox" [(ngModel)]="item.selected" (change)="onTaskSelectionChange()" /> Seleccionar
+                                        <input type="checkbox" [(ngModel)]="item.selected"
+                                            (change)="onTaskSelectionChange()" /> Seleccionar
                                     </div>
                                 </div>
                             </div>
@@ -39,7 +40,8 @@
         <!-- Lista de tareas seleccionadas para reordenar -->
         <div class="col-span-12 lg:col-span-4">
             <p-card header="Tareas seleccionadas" *ngIf="selectedTasks.length > 0" styleClass="mb-4">
-                <p-orderList [value]="selectedTasks" [listStyle]="{'max-height':'30rem'}" [dragdrop]="true" (onReorder)="onReorder()">
+                <p-orderList [value]="selectedTasks" [listStyle]="{'max-height':'30rem'}" [dragdrop]="true"
+                    (onReorder)="onReorder()">
                     <ng-template let-task pTemplate="item">
                         <div class="flex flex-col p-3 border-bottom-1 surface-border">
                             <span class="font-bold mb-2">{{ task.name }}</span>
@@ -55,18 +57,20 @@
     </div>
 
     <div class="mt-4 flex justify-end">
-        <p-button label="Realizar entrega" icon="pi pi-send" (onClick)="showDialog = true" 
+        <p-button label="Realizar entrega" icon="pi pi-send" (onClick)="showDialog = true"
             [disabled]="selectedTasks.length === 0"></p-button>
     </div>
 
-    <p-dialog header="Realizar entrega" [(visible)]="showDialog" [modal]="true" [closable]="false" [dismissableMask]="true">
+    <p-dialog header="Realizar entrega" [(visible)]="showDialog" [modal]="true" [closable]="false"
+        [dismissableMask]="true">
         <div class="flex flex-col gap-4">
             <label>Seleccione alumno:</label>
-            <p-dropdown [options]="students" [(ngModel)]="selectedStudent" optionLabel="fullname" placeholder="Seleccione un alumno"></p-dropdown>
+            <p-dropdown [options]="students" [(ngModel)]="selectedStudent" optionLabel="fullName"
+                placeholder="Seleccione un alumno" appendTo="body"></p-dropdown>
 
             <div class="flex justify-end gap-2 mt-4">
                 <p-button label="Cancelar" icon="pi pi-times" (onClick)="showDialog = false"></p-button>
-                <p-button label="Confirmar entrega" icon="pi pi-check" (onClick)="performDelivery()" 
+                <p-button label="Confirmar entrega" icon="pi pi-check" (onClick)="performDelivery()"
                     [disabled]="!selectedStudent"></p-button>
             </div>
         </div>

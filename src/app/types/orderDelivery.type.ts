@@ -1,3 +1,5 @@
+import { User } from "./user.interface";
+
 export type OrderDelivery = {
     studentId: string;
     userId: string;
@@ -5,4 +7,5 @@ export type OrderDelivery = {
     status: string;
     id: number;
     orderQuantity?: number;
+    user?: User;
 }

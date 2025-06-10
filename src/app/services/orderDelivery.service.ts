@@ -11,7 +11,7 @@ export class OrderDeliveryService {
   private apiUrl: string;
 
   constructor(private http: HttpClient, private envService: EnvService) {
-    this.apiUrl = this.envService.getApiUrl() + "/OrderDelivery";
+    this.apiUrl = this.envService.getApiUrl() + "/OrderManagment";
   }
 
   private getHeaders() {
@@ -30,12 +30,14 @@ export class OrderDeliveryService {
    * @returns Observable con la respuesta del servidor
    */
   processDelivery(orderSequence: OrderSequence[], studentId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/processDelivery`, {
-      orderSequence,
-      studentId
+    return this.http.post(`${this.apiUrl}/performDelivery`, {
+        SelectedOrders: orderSequence,
+        StudentId: studentId
     }, {
-      ...this.getHeaders(),
-      headers: { 'Content-Type': 'application/json' }
+        headers: { 
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Content-Type': 'application/json'
+        }
     });
-  }
+}
 }
