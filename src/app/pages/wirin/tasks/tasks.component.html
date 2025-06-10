@@ -56,5 +56,5 @@
 </div>
 
 <p-dialog header="Detalles de la tarea" [modal]="true" [(visible)]="isTaskDetailOpen">
-    <app-task-detail *ngIf="taskId" [taskId]="taskId"></app-task-detail>
+    <app-task-detail *ngIf="taskId" [taskId]="taskId" (taskDeleted)="handleTaskDeletion(taskId)"></app-task-detail>
 </p-dialog>

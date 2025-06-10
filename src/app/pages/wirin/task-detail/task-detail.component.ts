@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../services/order.service';
@@ -28,7 +28,7 @@ export class TaskDetailComponent implements OnInit {
   userIdActive: string  = '';
   statusTask: string = '';
   @Input() taskId: number = 0;
-
+  @Output() taskDeleted = new EventEmitter<boolean>();
   uploadProgress: number = 0;
   uploadStatus: 'idle' | 'uploading' | 'success' | 'error' = 'idle';
   ocrResponse: any = null;
@@ -229,7 +229,7 @@ deleteTask(taskId: number, event: Event): void {
   this.orderService.deleteOrder(taskId).subscribe({
       next: () => {
           this.toastService.showSuccess('Tarea eliminada con éxito');
-          this.router.navigate(['/wirin/tasks']);
+          this.taskDeleted.emit(true);
       },
       error: error => {
           this.toastService.showError('Error al eliminar tarea');
