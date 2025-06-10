@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
 import { Paragraph } from '../types/paragraph.Interface';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,10 @@ export class OrderService {
 
   getOrders(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
+  }
+
+  getOrdersDelivered(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl + '/delivered');
   }
 
   createOrder(formData: FormData): Observable<any> {

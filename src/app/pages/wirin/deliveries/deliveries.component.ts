@@ -118,8 +118,7 @@ export class DeliveriesComponent implements OnInit {
         }
         
         this.isLoading = true;
-        const body = {selectedOrders: this.orderSequence, studentId: this.selectedStudent.id};
-        this.orderDeliveryService.processDelivery(body)
+        this.orderDeliveryService.processDelivery(this.orderSequence, this.selectedStudent.id)
             .subscribe({
                 next: (response) => {
                     this.messageService.add({

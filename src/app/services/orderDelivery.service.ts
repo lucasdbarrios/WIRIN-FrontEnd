@@ -11,7 +11,7 @@ export class OrderDeliveryService {
   private apiUrl: string;
 
   constructor(private http: HttpClient, private envService: EnvService) {
-    this.apiUrl = this.envService.getApiUrl() + "/Ordermanagment";
+    this.apiUrl = this.envService.getApiUrl() + "/OrderDelivery";
   }
 
   /**
@@ -20,9 +20,10 @@ export class OrderDeliveryService {
    * @param studentId ID del estudiante seleccionado
    * @returns Observable con la respuesta del servidor
    */
-  processDelivery(body: {selectedOrders: OrderSequence[], studentId: string}): Observable<any> {
-    return this.http.post(`${this.apiUrl}/performDelivery`, {
-     ...body
+  processDelivery(orderSequence: OrderSequence[], studentId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/processDelivery`, {
+      orderSequence,
+      studentId
     }, {
       headers: { 'Content-Type': 'application/json' }
     });

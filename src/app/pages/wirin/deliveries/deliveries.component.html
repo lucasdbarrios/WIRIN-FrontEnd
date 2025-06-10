@@ -62,7 +62,7 @@
     <p-dialog header="Realizar entrega" [(visible)]="showDialog" [modal]="true" [closable]="false" [dismissableMask]="true">
         <div class="flex flex-col gap-4">
             <label>Seleccione alumno:</label>
-            <p-dropdown [options]="students" [(ngModel)]="selectedStudent" optionLabel="fullName" placeholder="Seleccione un alumno"></p-dropdown>
+            <p-dropdown [options]="students" [(ngModel)]="selectedStudent" optionLabel="name" placeholder="Seleccione un alumno"></p-dropdown>
 
             <div class="flex justify-end gap-2 mt-4">
                 <p-button label="Cancelar" icon="pi pi-times" (onClick)="showDialog = false"></p-button>

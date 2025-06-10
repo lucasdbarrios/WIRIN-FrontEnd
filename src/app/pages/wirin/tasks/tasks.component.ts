@@ -20,6 +20,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { FluidModule } from 'primeng/fluid';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
+import { User } from '../../../types/user.interface';
 
 @Component({
     selector: 'app-tasks-component',
@@ -32,6 +33,7 @@ import { InputTextModule } from 'primeng/inputtext';
 })
 export class TasksComponent implements OnInit{
     isLoading: boolean = true;
+    user: User | null = null;
     allTasks: any[] = [];
     tasks: any[] = [];
     layout: 'list' | 'grid' = 'list';
@@ -62,11 +64,18 @@ export class TasksComponent implements OnInit{
 
 
     ngOnInit(): void {
-        this.loadTasks();
         this.isRevisor = this.authService.hasRole('Voluntario Administrativo');
         this.isVoluntario = this.authService.hasRole('Voluntario');
         this.isBibliotecario = this.authService.hasRole('Bibliotecario') || this.authService.hasRole('Admin');
         this.isAlumno = this.authService.hasRole('Alumno');
+        this.user = this.authService.getUserSync();
+        const validLoadTasks = this.isRevisor || this.isVoluntario || this.isBibliotecario;
+        
+        if(validLoadTasks){
+            this.loadTasks();
+        }else{
+            this.loadTasksDelivered();
+        }
     }
 
     async loadTasks(): Promise<void> {
@@ -101,6 +110,35 @@ export class TasksComponent implements OnInit{
                 this.isLoading = false;
             }
         });
+    }
+
+    async loadTasksDelivered(): Promise<void> {
+        this.isLoading = true;
+
+       /*  await this.orderService.getOrdersDelivered(this.user.id).subscribe({
+            next: (data: any[]) => {
+                this.allTasks = data;
+                this.tasks = [...data];
+
+                if (this.isVoluntario) {
+                    this.tasks = this.tasks.filter(task => 
+                        task.status.toLowerCase() == 'denegada' ||
+                        task.status.toLowerCase() == 'en proceso' ||
+                        task.status.toLowerCase() == 'pendiente'
+                    );
+                } else if (this.isRevisor) {
+                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'en revisión');
+                } else if (this.isAlumno) {
+                    this.tasks = this.tasks.filter(task => task.status.toLowerCase() === 'entregada');
+                }
+    
+                this.isLoading = false;
+            },
+            error: error => {
+                console.error('Error al obtener las tareas:', error);
+                this.isLoading = false;
+            }
+        }); */
     }
 
     searchTasks(event: Event): void {
