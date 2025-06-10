@@ -44,6 +44,7 @@ export class TaskDetailComponent implements OnInit {
   requesterName: string = '';
   creatorName: string = '';
   alumnoName: string = '';
+  isProcessing: boolean = false;
 
   constructor(
     private router: Router,
@@ -142,6 +143,7 @@ export class TaskDetailComponent implements OnInit {
   }
 
   async processOcr(orderId: number, condition: boolean, status: string): Promise<void> {
+    this.isProcessing = true;
     this.uploadStatus = 'uploading';
     this.uploadProgress = 0;
     this.ocrResponse = null;
@@ -154,6 +156,8 @@ export class TaskDetailComponent implements OnInit {
 
     this.fileUploadService.newProcessOcr(orderId, this.selectedOcrProcessor).subscribe({
         next: (response) => {
+          
+            this.isProcessing = false;
             this.uploadStatus = 'success';
             this.uploadProgress = 100;
             this.ocrResponse = response;
@@ -162,11 +166,14 @@ export class TaskDetailComponent implements OnInit {
             localStorage.setItem('ocrData', JSON.stringify(response));
 
             this.router.navigate(['/wirin/ocr-viewer/' + orderId]);
+          
         },
         error: (error) => {
+            
             this.toastService.showError('Error al procesar el archivo con OCR');
             console.error('Error al procesar el archivo con OCR:', error);
             this.uploadStatus = 'error';
+            this.isProcessing = false;
         }
     });
 }
