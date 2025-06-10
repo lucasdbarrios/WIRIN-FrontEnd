@@ -1,7 +1,7 @@
 <p-card class="dark:bg-gray-800 text-gray-900 dark:text-gray-200">
     <ng-template pTemplate="content">
         <div class="flex justify-between mb-3">
-            <p-button [label]="showPdfPreview ? 'Ocultar Anotacion' : 'Mostrar Anotaciones'" (click)="showAnnotation()"
+            <p-button [label]="showPdfPreview ? 'Ocultar Anotación' : 'Mostrar anotaciones'" (click)="showAnnotation()"
                 class="p-button-secondary">
             </p-button>
             <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" (click)="togglePdfPreview()"
@@ -37,7 +37,7 @@
         <div class="flex justify-end mt-3 gap-2">
             <p-button label="Editar texto" class="p-button-primary" *ngIf="!isEditing"
                 (click)="onStartEditing()"></p-button>
-            <p-button label="Hacer anotacion" class="p-button-primary" *ngIf="!isEditing && !isVoluntario"
+            <p-button label="Hacer anotación" class="p-button-primary" *ngIf="!isEditing && !isVoluntario"
                 (click)="onStartAnnotation()"></p-button>
         </div>
 
@@ -69,10 +69,10 @@
     </div>
 </p-dialog>
 
-<p-dialog header="Hacer una anotacion en Pagina {{ this.currentPage }}" [modal]="true" [(visible)]="visible"
+<p-dialog header="Hacer una anotacion en la página {{ this.currentPage }}" [modal]="true" [(visible)]="visible"
     [style]="{ width: '25rem' }">
     <div class="flex flex-col gap-4 mb-8 text-start">
-        <textarea placeholder="Ingrese anotacion" [(ngModel)]="annotation" rows="5" cols="30" pTextarea
+        <textarea placeholder="Ingrese anotación" [(ngModel)]="annotation" rows="5" cols="30" pTextarea
             [autoResize]="true"></textarea>
 
     </div>

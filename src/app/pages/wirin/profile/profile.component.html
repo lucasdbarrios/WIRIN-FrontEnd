@@ -1,11 +1,11 @@
-<p-card class="border-round-lg shadow-2 p-6 border-primary w-full max-w-lg">
-  <div class="font-semibold text-4xl mb-6">Mi perfil</div>
+<p-card>
+  <div class="font-semibold text-xl mb-4">Mi perfil</div>
 
   <ng-template pTemplate="content">
     <div *ngIf="user && !isLoading" class="flex flex-col p-4 rounded-md">
-      <p><strong>Nombre Completo:</strong> {{ user.fullName }}</p>
-      <p><strong>Nombre de Usuario:</strong> {{ user.userName }}</p>
-      <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+      <p><strong>Nombre completo:</strong> {{ user.fullName }}</p>
+      <p><strong>Nombre de usuario:</strong> {{ user.userName }}</p>
+      <p><strong>Correo electrónico:</strong> {{ user.email }}</p>
       <p><strong>Numero de celular:</strong> {{ user.phoneNumber }}</p>
       <p><strong>Roles:</strong> {{ user.roles.join(', ') }}</p>
     </div>

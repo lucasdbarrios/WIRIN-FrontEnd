@@ -157,7 +157,7 @@ export class OcrTextViewerComponent {
             this.toastService.showError('No se pudo guardar la anotación.');
         }
     });
-    
+    this.annotation = '';
     
 }
 
