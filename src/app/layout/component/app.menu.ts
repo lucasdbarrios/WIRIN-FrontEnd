@@ -18,10 +18,12 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AppMenu {
     model: MenuItem[] = [];
-    role: boolean = false;
+    isBibliotecario: boolean = false;
+    isVoluntario: boolean = false;   
 
     constructor(private authService: AuthService) {
-        this.role = this.authService.hasRole('Bibliotecario') || this.authService.hasRole('Admin');
+        this.isBibliotecario = this.authService.hasRole('Bibliotecario') || this.authService.hasRole('Admin');
+        this.isVoluntario = this.authService.hasRole('Voluntario');
     }
 
     ngOnInit() {
@@ -32,9 +34,11 @@ export class AppMenu {
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] },
-                    ...(this.role ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] },
-                        { label: 'Entregas', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/deliveries'] }] : [])
+                    ...(this.isBibliotecario ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] }] : []),
+                    ...(this.isVoluntario ? [{ label: 'Mis tareas', icon: 'pi pi-fw pi-clipboard', routerLink: ['/wirin/tasks-voluntario'] }] : []),
+                    { label: 'Entregas', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/deliveries'] } // 🔥 Siempre visible
                 ]
+                
             },
             // {
             //     label: 'UI Components',

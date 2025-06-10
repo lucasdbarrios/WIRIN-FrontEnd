@@ -99,8 +99,6 @@ export class TasksComponent implements OnInit{
 
                 if (this.isVoluntario) {
                     this.tasks = this.tasks.filter(task => 
-                        task.status.toLowerCase() == 'denegada' ||
-                        task.status.toLowerCase() == 'en proceso' ||
                         task.status.toLowerCase() == 'pendiente'
                     );
                 } else if (this.isRevisor) {
@@ -172,7 +170,7 @@ export class TasksComponent implements OnInit{
             default:
                 return 'info';
         }
-      }
+    }
 
     newTask() {
         this.router.navigate(['/wirin/add-task-form']);
@@ -180,7 +178,7 @@ export class TasksComponent implements OnInit{
 
     onShowTaskDetail(taskId: number) {
         this.taskId = taskId;
-        this.isTaskDetailOpen = !this.isTaskDetailOpen;
+        setTimeout(() => this.isTaskDetailOpen = true, 0);
     }
 
     handleTaskDeletion(taskId: number): void {

@@ -17,6 +17,7 @@ import { ProfileComponent } from './app/pages/wirin/profile/profile.component';
 import { AddUserFormComponent } from './app/pages/wirin/form-add-user/form-add-user.component';
 import { EditUserComponent } from './app/pages/wirin/form-edit-user/form-edit-user.component';
 import { DeliveriesComponent } from './app/pages/wirin/deliveries/deliveries.component';
+import { TasksVoluntarioComponent } from './app/pages/wirin/tasks-voluntario/tasks-voluntario.component';
 
 export const appRoutes: Routes = [
     {
@@ -39,6 +40,7 @@ export const appRoutes: Routes = [
         children: [
             { path: '', component: DashboardWirin, canActivate: [AuthGuard] },
             { path: 'tasks', component: TasksComponent, canActivate: [AuthGuard] },
+            { path: 'tasks-voluntario', component: TasksVoluntarioComponent, canActivate: [AuthGuard] },
             { path: 'deliveries', component: DeliveriesComponent, canActivate: [AuthGuard] },
             { path: 'add-task-form', component: AddTaskFormComponent, canActivate: [AuthGuard] },
             { path: 'edit-task-form/:id', component: EditTaskComponent, canActivate: [AuthGuard] },

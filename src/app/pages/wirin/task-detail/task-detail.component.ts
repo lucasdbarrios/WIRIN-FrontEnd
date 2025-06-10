@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../services/order.service';
@@ -19,7 +19,7 @@ import { ToastService } from '../../../services/toast.service';
   imports: [CommonModule, CardModule, ButtonModule, TagModule],
   templateUrl: './task-detail.component.html',
 })
-export class TaskDetailComponent implements OnInit {
+export class TaskDetailComponent implements OnInit, OnChanges  {
   task: any = {};
   isLoading: boolean = true;
   errorMessage: string = '';
@@ -56,7 +56,6 @@ export class TaskDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.taskId);
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
@@ -72,6 +71,15 @@ export class TaskDetailComponent implements OnInit {
     this.loadTaskDetails();
     this.getStatus();
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['taskId'] && changes['taskId'].currentValue !== changes['taskId'].previousValue) {
+      this.task = {};
+      this.isLoading = true;
+        this.loadTaskDetails();
+    }
+}
+
 
   getStatus(): void {
     this.orderService.getTaskById(this.taskId).subscribe({
