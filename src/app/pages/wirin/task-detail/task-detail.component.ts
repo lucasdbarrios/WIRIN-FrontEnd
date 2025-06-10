@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { OrderService } from '../../../services/order.service';
 import { AuthService } from '../../../services/auth.service';
 import { saveAs } from 'file-saver';
@@ -11,13 +11,12 @@ import { ButtonModule } from 'primeng/button';
 import { UserService } from '../../../services/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
-import { BackButtonComponent } from '../ui/back-button/back-button.component';
 import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, TagModule, BackButtonComponent],
+  imports: [CommonModule, CardModule, ButtonModule, TagModule],
   templateUrl: './task-detail.component.html',
 })
 export class TaskDetailComponent implements OnInit {
@@ -28,7 +27,7 @@ export class TaskDetailComponent implements OnInit {
   user: any;
   userIdActive: string  = '';
   statusTask: string = '';
-  taskId: number = 0;
+  @Input() taskId: number = 0;
 
   uploadProgress: number = 0;
   uploadStatus: 'idle' | 'uploading' | 'success' | 'error' = 'idle';
@@ -47,7 +46,6 @@ export class TaskDetailComponent implements OnInit {
   alumnoName: string = '';
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private orderService: OrderService,
     private authService: AuthService,
@@ -58,12 +56,16 @@ export class TaskDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.taskId = Number(this.route.snapshot.paramMap.get('id'));
+    console.log(this.taskId);
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
         this.userIdActive = userData?.id ?? '';
       },
+      error: (err) => {
+        this.toastService.showError('Error al obtener el usuario');
+        console.error('Error al obtener el usuario:', err);
+      }
     })
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');

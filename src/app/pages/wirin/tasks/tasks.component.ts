@@ -21,18 +21,21 @@ import { FluidModule } from 'primeng/fluid';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastService } from '../../../services/toast.service';
+import { DialogModule } from 'primeng/dialog';
+import { TaskDetailComponent } from '../task-detail/task-detail.component';
 
 @Component({
     selector: 'app-tasks-component',
     standalone: true,
     imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
     OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
-    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule
+    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent
 ],
     templateUrl: './tasks.component.html',
 })
 export class TasksComponent implements OnInit{
     isLoading: boolean = true;
+    isTaskDetailOpen: boolean = false;
     allTasks: any[] = [];
     tasks: any[] = [];
     layout: 'list' | 'grid' = 'list';
@@ -42,6 +45,7 @@ export class TasksComponent implements OnInit{
     isVoluntario: boolean = false;
     isBibliotecario: boolean = false;
     isAlumno: boolean = false;
+    taskId: number = 0;
     dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
         { name: 'Todos', value: '' },
@@ -134,5 +138,10 @@ export class TasksComponent implements OnInit{
 
     newTask() {
         this.router.navigate(['/wirin/add-task-form']);
-      }
+    }
+
+    onShowTaskDetail(taskId: number) {
+        this.taskId = taskId;
+        this.isTaskDetailOpen = !this.isTaskDetailOpen;
+    }
 }
