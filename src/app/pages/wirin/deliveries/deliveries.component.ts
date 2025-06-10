@@ -40,8 +40,6 @@ export class DeliveriesComponent implements OnInit {
     formdata?: FormData;
     orderSequence: OrderSequence[] = [];
     
-
-
     constructor(
         private orderManagmentService: OrderManagmentService,
         private orderDeliveryService: OrderDeliveryService,
