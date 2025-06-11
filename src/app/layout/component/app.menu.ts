@@ -32,11 +32,12 @@ export class AppMenu {
             {
                 label: 'WIRIN',
                 items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
+                    ...(this.isBibliotecario ? [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }] : []),
                     { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] },
                     ...(this.isBibliotecario ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] }] : []),
                     ...(this.isVoluntario ? [{ label: 'Mis tareas', icon: 'pi pi-fw pi-clipboard', routerLink: ['/wirin/tasks-voluntario'] }] : []),
-                    { label: 'Entregas', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/deliveries'] } // 🔥 Siempre visible
+                    ...(this.isBibliotecario ? [{ label: 'Entregas', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/deliveries'] }] : [])
+                    
                 ]
                 
             },

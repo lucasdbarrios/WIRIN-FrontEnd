@@ -11,7 +11,7 @@ import { BackButtonComponent } from '../ui/back-button/back-button.component';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ButtonModule, CardModule, BackButtonComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ButtonModule, CardModule],
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
