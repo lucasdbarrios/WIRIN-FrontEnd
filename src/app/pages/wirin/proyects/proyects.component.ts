@@ -13,6 +13,9 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ViewChild } from '@angular/core';
+import { OrderDelivery } from '../../../types/orderDelivery.type';
+import { OrderDeliveryService } from '../../../services/orderDelivery.service';
+import { getSeverity } from '../../../utils/getSeverity';
 
 
 @Component({
@@ -24,30 +27,29 @@ import { ViewChild } from '@angular/core';
     providers: [ProductService, MessageService, InputIconModule]
 })
 export class ProyectsComponent implements OnInit {
-    projects = [
-        {
-            Id: 101, Title: "Proyecto A", Status: "Active", StudentUserId: "User123",
-            CreationDate: new Date('2025-06-01'), DeliveryDate: new Date('2025-07-01'),
-            Tasks: [
-                { Id: 1, Name: "Tarea 1", Description: "Resolver ecuaciones", Status: "Pending", CreationDate: new Date('2025-06-01'), LimitDate: new Date('2025-06-15') },
-                { Id: 2, Name: "Tarea 2", Description: "Redacción", Status: "Completed", CreationDate: new Date('2025-05-20'), LimitDate: new Date('2025-06-05') }
-            ]
-        },
-        {
-            Id: 102, Title: "Proyecto B", Status: "In Progress", StudentUserId: "User456",
-            CreationDate: new Date('2025-06-10'), DeliveryDate: new Date('2025-07-05'),
-            Tasks: [
-                { Id: 3, Name: "Tarea 3", Description: "Diseño gráfico", Status: "Pending", CreationDate: new Date('2025-06-10'), LimitDate: new Date('2025-06-25') }
-            ]
-        }
-    ];
+    projects: OrderDelivery[] = []; // 🔥 Ahora `projects` tendrá datos reales
 
     @ViewChild('dt2') dt2!: Table;
     expandedRows = {};
 
-    constructor(private messageService: MessageService) {}
+    constructor(private messageService: MessageService, 
+        private orderDeliveryService: OrderDeliveryService) {}
 
-    ngOnInit() {}
+    ngOnInit(): void {
+        this.orderDeliveryService.getOrderDeliveriesWithOrders().subscribe({
+            next: (data: OrderDelivery[]) => {
+                this.projects = data;
+                console.log(this.projects);
+            },
+            error: (error: any) => {
+                console.error('Error al obtener los proyectos:', error);
+            }
+        });
+    }
+
+    getSeverity(task: any): string {
+        return getSeverity(task);
+    }
 
     onFilter(event: Event) {
         const inputElement = event.target as HTMLInputElement;
@@ -58,14 +60,6 @@ export class ProyectsComponent implements OnInit {
         table.clear();
     }
 
-    getStatusSeverity(status: string) {
-        switch (status) {
-            case 'Pending': return 'warn';
-            case 'Completed': return 'success';
-            default: return 'danger';
-        }
-    }
-
     onRowExpand(event: any) {
         this.messageService.add({ severity: 'info', summary: 'Proyecto Expandido', detail: event.data.Title, life: 3000 });
     }
@@ -73,9 +67,4 @@ export class ProyectsComponent implements OnInit {
     onRowCollapse(event: any) {
         this.messageService.add({ severity: 'success', summary: 'Proyecto Colapsado', detail: event.data.Title, life: 3000 });
     }
-
-    // onShowTaskDetail(taskId: number) {
-    //     this.taskId = taskId;
-    //     setTimeout(() => this.isTaskDetailOpen = true, 0);
-    // }
 }

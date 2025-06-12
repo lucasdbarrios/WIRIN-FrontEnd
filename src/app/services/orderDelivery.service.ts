@@ -46,4 +46,8 @@ export class OrderDeliveryService {
     return this.http.get(`${this.apiUrl}`, this.getHeaders());
   }
 
+  getOrderDeliveriesWithOrders(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/orderDeliveriesWithOrders`, this.getHeaders());
+  }
+
 }

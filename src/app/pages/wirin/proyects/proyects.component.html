@@ -1,5 +1,5 @@
 <div class="card">
-    <p-table #dt2 [value]="projects" [globalFilterFields]="['Title', 'Status', 'StudentUserId']" dataKey="Id"
+    <p-table #dt2 [value]="projects" [globalFilterFields]="['title', 'status', 'studentUserId']" dataKey="id"
         [tableStyle]="{ 'min-width': '60rem' }" [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)"
         (onRowCollapse)="onRowCollapse($event)">
 
@@ -18,11 +18,11 @@
         <ng-template #header>
             <tr>
                 <th style="width: 5rem"></th>
-                <th pSortableColumn="Title">Title <p-sortIcon field="Title" /></th>
-                <th pSortableColumn="Status">Status <p-sortIcon field="Status" /></th>
-                <th pSortableColumn="StudentUserId">Student <p-sortIcon field="StudentUserId" /></th>
-                <th>Creation Date</th>
-                <th>Delivery Date</th>
+                <th pSortableColumn="Title">Titulo <p-sortIcon field="Title" /></th>
+                <th pSortableColumn="Status">Estado <p-sortIcon field="Status" /></th>
+                <th pSortableColumn="StudentUserId">Alumno <p-sortIcon field="StudentUserId" /></th>
+                <th>Cantidad de tareas</th>
+                <th>Fecha de entrega</th>
             </tr>
         </ng-template>
 
@@ -32,11 +32,11 @@
                     <p-button type="button" pRipple [pRowToggler]="project" [text]="true" [rounded]="true"
                         [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
                 </td>
-                <td>{{ project.Title }}</td>
-                <td><p-tag [value]="project.Status" [severity]="getStatusSeverity(project.Status)" /></td>
-                <td>{{ project.StudentUserId }}</td>
-                <td>{{ project.CreationDate | date:'dd/MM/yyyy' }}</td>
-                <td>{{ project.DeliveryDate | date:'dd/MM/yyyy' }}</td>
+                <td>{{ project.title }}</td>
+                <td><p-tag [value]="project.status" [severity]="getSeverity(project.status)" /></td>
+                <td>{{ project.studentId }}</td>
+                <td>{{ project.orders.length }}</td>
+                <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
             </tr>
         </ng-template>
 
@@ -44,25 +44,24 @@
             <tr>
                 <td colspan="6">
                     <div class="p-4">
-                        <h5>Tareas de {{ project.Title }}</h5>
-                        <p-table [value]="project.Tasks" dataKey="Id">
+                        <p-table [value]="project.orders" dataKey="id">
                             <ng-template #header>
             <tr>
-                <th pSortableColumn="Name">Name <p-sortIcon field="Name" /></th>
-                <th>Description</th>
-                <th pSortableColumn="Status">Status <p-sortIcon field="Status" /></th>
-                <th>Creation Date</th>
-                <th>Limit Date</th>
-                <th>Acciones</th>
+                <th pSortableColumn="Name">Nombre <p-sortIcon field="Name" /></th>
+                <th>Descripción</th>
+                <th pSortableColumn="Status">Estado <p-sortIcon field="Status" /></th>
+                <th>Fecha de creación</th>
+                <th>Vencimiento</th>
+                <th></th>
             </tr>
         </ng-template>
         <ng-template #body let-task>
             <tr>
-                <td>{{ task.Name }}</td>
-                <td>{{ task.Description }}</td>
-                <td><p-tag [value]="task.Status" [severity]="getStatusSeverity(task.Status)" /></td>
-                <td>{{ task.CreationDate | date:'dd/MM/yyyy' }}</td>
-                <td>{{ task.LimitDate | date:'dd/MM/yyyy' }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.description }}</td>
+                <td><p-tag [value]="task.status" [severity]="getSeverity(task.status)" /></td>
+                <td>{{ task.creationDate | date:'dd/MM/yyyy' }}</td>
+                <td>{{ task.limitDate | date:'dd/MM/yyyy' }}</td>
                 <td>
                     <p-button icon="pi pi-eye" label="Detalles"
                         styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
