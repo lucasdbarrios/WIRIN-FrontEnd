@@ -18,6 +18,7 @@ import { AddUserFormComponent } from './app/pages/wirin/form-add-user/form-add-u
 import { EditUserComponent } from './app/pages/wirin/form-edit-user/form-edit-user.component';
 import { DeliveriesComponent } from './app/pages/wirin/deliveries/deliveries.component';
 import { TasksVoluntarioComponent } from './app/pages/wirin/tasks-voluntario/tasks-voluntario.component';
+import { ProyectsComponent } from './app/pages/wirin/proyects/proyects.component';
 
 export const appRoutes: Routes = [
     {
@@ -48,6 +49,7 @@ export const appRoutes: Routes = [
             { path: 'ocr-viewer/:id', component: OcrViewerComponent, canActivate: [AuthGuard] },
             { path: 'add-user-form', component: AddUserFormComponent, canActivate: [AuthGuard] },
             { path: 'edit-user-form/:id', component: EditUserComponent, canActivate: [AuthGuard] },
+            { path: 'proyects', component: ProyectsComponent, canActivate: [AuthGuard] },
             { path: 'users', component: UsersListComponent, canActivate: [AuthGuard] },
             { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
