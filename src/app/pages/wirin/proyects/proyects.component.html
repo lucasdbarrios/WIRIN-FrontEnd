@@ -10,7 +10,7 @@
                     <p-inputicon>
                         <i class="pi pi-search"></i>
                     </p-inputicon>
-                    <input pInputText type="text" (input)="onFilter($event)" placeholder="Search keyword" />
+                    <input pInputText type="text" (input)="onFilter($event)" placeholder="Buscar" />
                 </p-iconfield>
             </div>
         </ng-template>
@@ -34,7 +34,7 @@
                 </td>
                 <td>{{ project.title }}</td>
                 <td><p-tag [value]="project.status" [severity]="getSeverity(project.status)" /></td>
-                <td>{{ project.studentId }}</td>
+                <td>{{ project.studentUserName }}</td>
                 <td>{{ project.orders.length }}</td>
                 <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
             </tr>
@@ -63,8 +63,9 @@
                 <td>{{ task.creationDate | date:'dd/MM/yyyy' }}</td>
                 <td>{{ task.limitDate | date:'dd/MM/yyyy' }}</td>
                 <td>
-                    <p-button icon="pi pi-eye" label="Detalles"
+                    <p-button icon="pi pi-eye" label="Detalles" (click)="onShowTaskDetail(project.id, task.id)"
                         styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
+
                 </td>
             </tr>
         </ng-template>
@@ -75,3 +76,8 @@
 </ng-template>
 </p-table>
 </div>
+
+<p-dialog header="Detalles de la tarea" [modal]="true" [(visible)]="isTaskDetailOpen" styleClass="max-w-4xl w-full">
+    <app-task-detail *ngIf="taskId && selectedProject" [taskId]="taskId"
+        (taskDeleted)="handleTaskDeletion(selectedProject.id, taskId)"></app-task-detail>
+</p-dialog>

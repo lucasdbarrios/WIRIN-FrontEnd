@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { RatingModule } from 'primeng/rating';
@@ -6,16 +6,16 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
-import { Product, ProductService } from '../../service/product.service';
 import { FormsModule } from '@angular/forms';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ViewChild } from '@angular/core';
-import { OrderDelivery } from '../../../types/orderDelivery.type';
+import { OrderDelivery } from '../../../types/orderDelivery.interface';
 import { OrderDeliveryService } from '../../../services/orderDelivery.service';
 import { getSeverity } from '../../../utils/getSeverity';
+import { DialogModule } from 'primeng/dialog';
+import { TaskDetailComponent } from '../task-detail/task-detail.component';
 
 
 @Component({
@@ -23,14 +23,18 @@ import { getSeverity } from '../../../utils/getSeverity';
     templateUrl: 'proyects.component.html',
     standalone: true,
     imports: [TableModule, TagModule, ToastModule, RatingModule, ButtonModule, CommonModule, 
-        FormsModule, IconFieldModule, InputIconModule, InputTextModule],
-    providers: [ProductService, MessageService, InputIconModule]
+        FormsModule, IconFieldModule, InputIconModule, InputTextModule, DialogModule, TaskDetailComponent],
+    providers: [ MessageService, InputIconModule]
 })
 export class ProyectsComponent implements OnInit {
-    projects: OrderDelivery[] = []; // 🔥 Ahora `projects` tendrá datos reales
+    projects: OrderDelivery[] = [];
 
     @ViewChild('dt2') dt2!: Table;
     expandedRows = {};
+    taskId: number = 0;
+    isTaskDetailOpen: boolean = false;
+    @Output() taskDeleted = new EventEmitter<number>();
+    selectedProject: OrderDelivery | null = null;
 
     constructor(private messageService: MessageService, 
         private orderDeliveryService: OrderDeliveryService) {}
@@ -48,7 +52,7 @@ export class ProyectsComponent implements OnInit {
     }
 
     getSeverity(task: any): string {
-        return getSeverity(task);
+        return getSeverity(task); // 🔥 Llama a la función importada
     }
 
     onFilter(event: Event) {
@@ -66,5 +70,21 @@ export class ProyectsComponent implements OnInit {
 
     onRowCollapse(event: any) {
         this.messageService.add({ severity: 'success', summary: 'Proyecto Colapsado', detail: event.data.Title, life: 3000 });
+    }
+
+    onShowTaskDetail(projectId: number, taskId: number) {
+        console.log("hola")
+        this.selectedProject = this.projects.find(p => p.id === projectId) || null;
+        this.taskId = taskId;
+        console.log(taskId)
+        setTimeout(() => this.isTaskDetailOpen = true, 0);
+    }
+
+    handleTaskDeletion(projectId: number, taskId: number): void {
+        const project = this.projects.find(p => p.id === projectId);
+        if (project) {
+            project.orders = project.orders?.filter(task => task.id !== taskId);
+        }
+        this.isTaskDetailOpen = false;
     }
 }

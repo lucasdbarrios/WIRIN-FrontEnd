@@ -1,3 +1,4 @@
+import { Order } from "./order.interface";
 import { User } from "./user.interface";
 
 export type OrderDelivery = {
@@ -9,4 +10,5 @@ export type OrderDelivery = {
     id?: number;
     orderQuantity?: number;
     user?: User;
+    orders?: Order[];
 }

@@ -172,5 +172,5 @@ export class TasksComponent implements OnInit{
     handleTaskDeletion(taskId: number): void {
         this.isTaskDetailOpen = false;
         this.tasks = this.tasks.filter(task => task.id !== taskId);
-      }
+    }
 }
