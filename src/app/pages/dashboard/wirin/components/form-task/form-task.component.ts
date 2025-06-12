@@ -1,14 +1,19 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { subscribeOn } from 'rxjs';
+import { DialogModule } from 'primeng/dialog';
+
+interface OrderDelivery {
+  id: string;
+  name: string;
+}
 
 @Component({
   standalone: true,
   selector: 'app-form-task',
   templateUrl: './form-task.component.html',
   styleUrls: ['./form-task.component.css'],
-  imports: [ReactiveFormsModule, CommonModule]
+  imports: [ReactiveFormsModule, CommonModule, DialogModule]
 })
 export class FormTaskComponent implements OnInit {
   @Input() isEditMode: boolean = false;
@@ -25,7 +30,8 @@ export class FormTaskComponent implements OnInit {
         name: data.name,
         description: data.description,
         limitDate: formattedDate,
-        status: data.status
+        status: data.status,
+        orderDeliveryId: data.orderDeliveryId
       });
 
       if (data.filePath) {
@@ -34,9 +40,14 @@ export class FormTaskComponent implements OnInit {
     }
   }
   @Output() formSubmitted = new EventEmitter<FormData>();
+  @Output() deliveryCreated = new EventEmitter<OrderDelivery>();
+
   formTask: FormGroup;
+  deliveryForm: FormGroup;
   selectedFile: File | null = null;
   currentFileName: string = '';
+  showNewDeliveryModal: boolean = false;
+  orderDeliveries: OrderDelivery[] = [];
 
   constructor(
     private fb: FormBuilder
@@ -46,7 +57,12 @@ export class FormTaskComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(5)]],
       limitDate: ['', Validators.required],
       status: ['Pendiente'],
-      file: [null]
+      file: [null],
+      orderDeliveryId: ['', Validators.required]
+    });
+
+    this.deliveryForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]]
     });
   }
 
@@ -55,6 +71,42 @@ export class FormTaskComponent implements OnInit {
       this.formTask.get('status')?.enable();
     } else {
       this.formTask.get('status')?.disable();
+    }
+    this.loadOrderDeliveries();
+  }
+
+  loadOrderDeliveries(): void {
+    // Aquí deberías cargar las entregas desde tu servicio
+    // Por ahora usaremos datos de ejemplo
+    this.orderDeliveries = [
+      { id: '1', name: 'Entrega 1' },
+      { id: '2', name: 'Entrega 2' },
+    ];
+  }
+
+  openNewDeliveryModal(): void {
+    this.showNewDeliveryModal = true;
+    this.deliveryForm.reset();
+  }
+
+  onDeliverySubmit(): void {
+    if (this.deliveryForm.valid) {
+      const newDelivery: OrderDelivery = {
+        id: Date.now().toString(), // Esto debería ser generado por el backend
+        name: this.deliveryForm.get('name')?.value
+      };
+      
+      this.orderDeliveries.push(newDelivery);
+      this.deliveryCreated.emit(newDelivery);
+      this.showNewDeliveryModal = false;
+      this.formTask.patchValue({ orderDeliveryId: newDelivery.id });
+    } else {
+      Object.keys(this.deliveryForm.controls).forEach(key => {
+        const control = this.deliveryForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
     }
   }
 
@@ -78,13 +130,13 @@ export class FormTaskComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.formTask);
     if (this.formTask.valid) {
       const formData = new FormData();
       formData.append('name', this.formTask.get('name')?.value);
       formData.append('description', this.formTask.get('description')?.value);
       formData.append('limitDate', this.formTask.get('limitDate')?.value);
       formData.append('status', this.formTask.get('status')?.value);
+      formData.append('orderDeliveryId', this.formTask.get('orderDeliveryId')?.value);
 
       if (this.selectedFile) {
         formData.append('file', this.selectedFile);
@@ -101,14 +153,13 @@ export class FormTaskComponent implements OnInit {
     }
   }
 
-  getErrorMessage(controlName: string): string {
-    const control = this.formTask.get(controlName);
+  getErrorMessage(fieldName: string): string {
+    const control = this.formTask.get(fieldName);
     if (control?.hasError('required')) {
-      return 'Este campo es requerido';
+      return `El campo ${fieldName} es requerido`;
     }
     if (control?.hasError('minlength')) {
-      const requiredLength = control.errors?.['minlength'].requiredLength;
-      return `Debe tener al menos ${requiredLength} caracteres`;
+      return `El campo ${fieldName} debe tener al menos ${control.errors?.['minlength'].requiredLength} caracteres`;
     }
     return '';
   }

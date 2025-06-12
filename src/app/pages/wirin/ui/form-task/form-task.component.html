@@ -44,6 +44,40 @@
                 </p-message>
             </div>
 
+            <div class="mb-4">
+                <label for="orderDelivery" class="block text-black-700">Entrega</label>
+                <div class="flex gap-2">
+                  <p-dropdown id="orderDelivery" 
+                    formControlName="orderDeliveryId"
+                    [options]="orderDeliveries"
+                    optionLabel="title"
+                    optionValue="id"
+                    [filter]="true"
+                    filterBy="title"
+                    placeholder="Selecciona una entrega"
+                    [showClear]="true"
+                    class="w-full">
+                    <ng-template pTemplate="emptyfilter">
+                      <div class="p-2 text-center">
+                        <p>No se encontraron entregas</p>
+                        <button type="button" (click)="openNewDeliveryModal()"
+                          class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mt-2">
+                          <i class="pi pi-plus mr-2"></i>Crear nueva entrega
+                        </button>
+                      </div>
+                    </ng-template>
+                  </p-dropdown>
+                  <button type="button" (click)="openNewDeliveryModal()"
+                    class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+                    <i class="pi pi-plus"></i>
+                  </button>
+                </div>
+                <span class="text-red-500 text-sm" 
+                  *ngIf="formTask.get('orderDeliveryId')?.invalid && formTask.get('orderDeliveryId')?.touched">
+                  {{ getErrorMessage('orderDeliveryId') }}
+                </span>
+              </div>
+
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex flex-wrap gap-2 w-full">
                     <label for="authorName">Autor</label>
@@ -124,8 +158,9 @@
             <div class="flex flex-col md:flex-row gap-6">
 
                 <div class="flex flex-col gap-2 w-1/2">
-                    <p-fileupload (onSelect)="onFileSelected($event)" accept="application/pdf" maxFileSize="1000000"
-                        mode="advanced" [customUpload]="true">
+                    
+                    <p-fileupload (onSelect)="onFileSelected($event)" chooseLabel="Seleccionar archivo" accept="application/pdf" maxFileSize="1000000"
+                        mode="basic" [customUpload]="true">
                         <ng-template pTemplate="content">
                             <div *ngIf="existingFile" class="flex align-items-center gap-2 mb-2">
                                 <span>Archivo actual: {{ existingFile }}</span>
@@ -163,3 +198,33 @@
         </div>
     </div>
 </form>
+
+<p-dialog header="Nueva Entrega" [(visible)]="showNewDeliveryModal" [modal]="true" [style]="{width: '450px'}">
+    <form [formGroup]="deliveryForm" (ngSubmit)="onDeliverySubmit()" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+            <label for="deliveryName">Nombre de la entrega</label>
+            <input pInputText id="deliveryName" type="text" formControlName="name" placeholder="Ingresa el nombre de la entrega" />
+            <small class="text-red-500" *ngIf="deliveryForm.get('name')?.invalid && deliveryForm.get('name')?.touched">
+                El nombre de la entrega es requerido
+            </small>
+        </div>
+        <div class="flex flex-col gap-2 w-full">
+            <label for="deliveryStudentId">Seleccionar alumno</label>
+            <p-select id="deliveryStudentId" formControlName="deliveryStudentId" [options]="dropdownItemsUsers" optionLabel="name"
+                optionValue="value" placeholder="Selecciona el usuario">
+            </p-select>
+            <p-message severity="error" variant="simple" size="small">
+                <span
+                    *ngIf="deliveryForm.get('deliveryStudentId')?.hasError('required') && deliveryForm.get('deliveryStudentId')?.touched">
+                    El usuario es requerido
+                </span>
+                <span
+                    *ngIf="!(deliveryForm.get('deliveryStudentId')?.invalid && deliveryForm.get('deliveryStudentId')?.touched)">&nbsp;</span>
+            </p-message>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+            <p-button type="button" label="Cancelar" (click)="showNewDeliveryModal = false" styleClass="p-button-text"></p-button>
+            <p-button type="submit" label="Guardar" (click)="saveOrderDelivery()"></p-button>
+        </div>
+    </form>
+</p-dialog>

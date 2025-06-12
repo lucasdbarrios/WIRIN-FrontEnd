@@ -2,10 +2,11 @@ import { User } from "./user.interface";
 
 export type OrderDelivery = {
     studentId: string;
-    userId: string;
-    deliveryDate: Date;
+    userId?: string;
+    title: string;
+    deliveryDate?: Date;
     status: string;
-    id: number;
+    id?: number;
     orderQuantity?: number;
     user?: User;
 }

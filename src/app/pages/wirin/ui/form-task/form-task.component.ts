@@ -16,13 +16,18 @@ import { BackButtonComponent } from '../back-button/back-button.component';
 import { AuthService } from '../../../../services/auth.service';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToastService } from '../../../../services/toast.service';
+import { OrderDelivery } from '../../../../types/orderDelivery.type';
+import { OrderDeliveryService } from '../../../../services/orderDelivery.service';
+import { DropdownModule } from 'primeng/dropdown';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   standalone: true,
   selector: 'app-form-task',
   templateUrl: './form-task.component.html',
-  imports: [ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, CheckboxModule,
-    SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule, BackButtonComponent]
+  imports: [DropdownModule, ReactiveFormsModule, ButtonModule, MessageModule, CommonModule, RouterModule, CheckboxModule,
+    SelectModule, FormsModule, InputTextModule, TextareaModule, DatePickerModule, FileUploadModule, BackButtonComponent,
+    DialogModule]
 })
 export class FormTaskComponent implements OnInit {
   @Input() isEditMode: boolean = false;
@@ -36,6 +41,10 @@ export class FormTaskComponent implements OnInit {
   uploadStatus: string = '';
   uploadProgress: number = 0;
   existingFile: string = '';
+  deliveryForm!: FormGroup;
+  showNewDeliveryModal: boolean = false;
+  orderDeliveries: OrderDelivery[] = [];
+  deliveryCreated!: Date;
   dropdownItemsSubjects: DropDown[] = [
     { name: 'Matemáticas', value: 'Matemáticas' },
     { name: 'Historia', value: 'Historia' },
@@ -86,7 +95,8 @@ export class FormTaskComponent implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private orderDeliveryService: OrderDeliveryService,
   ) {
     this.formTask = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -100,7 +110,13 @@ export class FormTaskComponent implements OnInit {
       limitDate: ['', Validators.required],
       alumnoId: ['', Validators.required],
       createdByUserId: [''],
-  });
+      orderDeliveryId: ['', Validators.required]
+    });
+
+    this.deliveryForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      deliveryStudentId: ['', [Validators.required]]
+    });
 
     this.userService.getAllStudents().subscribe({
       next: (response) => {
@@ -123,6 +139,8 @@ export class FormTaskComponent implements OnInit {
       this.formTask.get('status')?.disable();
     }
 
+    this.loadOrderDeliveries();
+
     this.authService.getCurrentUser().subscribe({
       next: (userData) => {
           if (userData && userData.id) {
@@ -136,7 +154,65 @@ export class FormTaskComponent implements OnInit {
     });
   }
 
-  
+  saveOrderDelivery(): void {
+    if (this.deliveryForm.valid) {
+      const newDelivery: OrderDelivery = {
+        title: this.deliveryForm.get('name')?.value,
+        status: "En proceso",
+        studentId: this.deliveryForm.get('deliveryStudentId')?.value,
+      };
+
+      this.orderDeliveryService.createDelivery(newDelivery).subscribe({
+        next: (createdDelivery) => {
+          this.orderDeliveries.push(createdDelivery);
+          this.showNewDeliveryModal = false;
+          this.loadOrderDeliveries()
+
+        },
+        error: (error) => {
+          console.error('Error al crear la entrega:', error);
+        }
+      });
+    }
+  }
+
+  loadOrderDeliveries(): void {
+   this.orderDeliveryService.getDeliveries().subscribe({
+      next: (deliveries) => {
+        this.orderDeliveries = deliveries;
+      },
+      error: (error) => {
+        console.error('Error al cargar las entregas:', error);
+      }
+    });
+  }
+
+  openNewDeliveryModal(): void {
+    this.showNewDeliveryModal = true;
+    this.deliveryForm.reset();
+  }
+
+  onDeliverySubmit(): void {
+    if (this.deliveryForm.valid) {
+      const newDelivery: OrderDelivery = {
+        title: this.deliveryForm.get('name')?.value,
+        status: "En proceso",
+        studentId: this.formTask.get('alumnoId')?.value,
+      };
+      
+      this.orderDeliveries.push(newDelivery);
+      //this.deliveryCreated.emit(newDelivery);
+      this.showNewDeliveryModal = false;
+      this.formTask.patchValue({ orderDeliveryId: newDelivery.id });
+    } else {
+      Object.keys(this.deliveryForm.controls).forEach(key => {
+        const control = this.deliveryForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
+    }
+  }
 
   onFileSelected(event: any): void {
     if (event.files && event.files.length > 0) {
@@ -183,5 +259,15 @@ onSubmit(): void {
           }
       });
   }
+}
+getErrorMessage(fieldName: string): string {
+  const control = this.formTask.get(fieldName);
+  if (control?.hasError('required')) {
+    return `El campo ${fieldName} es requerido`;
+  }
+  if (control?.hasError('minlength')) {
+    return `El campo ${fieldName} debe tener al menos ${control.errors?.['minlength'].requiredLength} caracteres`;
+  }
+  return '';
 }
 }

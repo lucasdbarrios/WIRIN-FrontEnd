@@ -156,7 +156,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
     this.uploadProgress = 0;
     this.ocrResponse = null;
 
-    await this.saveUserId();
+    
 
     if (condition && (this.isEarring || this.isDenegated)) {
       await this.changeStateTask(status);

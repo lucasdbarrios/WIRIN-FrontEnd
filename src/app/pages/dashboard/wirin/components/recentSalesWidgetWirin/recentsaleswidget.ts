@@ -55,6 +55,7 @@ ngOnInit() {
     }).subscribe(({ users, orders }) => {
         this.users = users;
         this.tasksDelived = orders.map(order => ({
+            title: order.title || '', // Add missing required title property
             studentId: order.studentId,
             status: order.status,
             userId: order.userId,

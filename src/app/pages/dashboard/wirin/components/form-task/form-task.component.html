@@ -37,6 +37,27 @@
       </span>
     </div>
 
+    <div class="mb-4">
+      <label for="orderDelivery" class="block text-black-700">Entrega</label>
+      <div class="flex gap-2">
+        <select id="orderDelivery" formControlName="orderDeliveryId" 
+          class="w-full bg-white rounded-md p-2 focus:outline-none">
+          <option value="" selected disabled>Selecciona una entrega</option>
+          <option *ngFor="let delivery of orderDeliveries" [value]="delivery.id">
+            {{ delivery.name }}
+          </option>
+        </select>
+        <button type="button" (click)="openNewDeliveryModal()"
+          class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+          <i class="pi pi-plus"></i>
+        </button>
+      </div>
+      <span class="text-red-500 text-sm" 
+        *ngIf="formTask.get('orderDeliveryId')?.invalid && formTask.get('orderDeliveryId')?.touched">
+        {{ getErrorMessage('orderDeliveryId') }}
+      </span>
+    </div>
+
     <div class="mb-4" *ngIf="!isEditMode">
       <label class="block text-white-700">Estudiante</label>
       <select id="studient" class="w-full bg-white rounded-md p-2 focus:outline-none">
@@ -87,3 +108,30 @@
 
   </form>
 </div>
+
+<!-- Modal para nueva entrega -->
+<p-dialog [(visible)]="showNewDeliveryModal" header="Nueva Entrega" [modal]="true" [style]="{width: '450px'}">
+  <form [formGroup]="deliveryForm" (ngSubmit)="onDeliverySubmit()" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <label for="deliveryName" class="text-black-700">Nombre de la entrega</label>
+      <input id="deliveryName" type="text" formControlName="name" 
+        class="w-full bg-white rounded-md p-2 border focus:outline-none focus:border-blue-500" 
+        placeholder="Ingresa el nombre de la entrega">
+      <span class="text-red-500 text-sm" 
+        *ngIf="deliveryForm.get('name')?.invalid && deliveryForm.get('name')?.touched">
+        El nombre es requerido
+      </span>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4">
+      <button type="button" (click)="showNewDeliveryModal = false"
+        class="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600">
+        Cancelar
+      </button>
+      <button type="submit"
+        class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+        Guardar
+      </button>
+    </div>
+  </form>
+</p-dialog>
