@@ -24,6 +24,7 @@ import { User } from '../../../types/user.interface';
 import { ToastService } from '../../../services/toast.service';
 import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
+import { getSeverity } from '../../../utils/getSeverity';
 
 @Component({
     selector: 'app-tasks-component',
@@ -45,6 +46,11 @@ export class TasksVoluntarioComponent implements OnInit{
     selectedEstado: string = '';
     isVoluntario: boolean = false;
     taskId: number = 0;
+    stateOptions = [
+        { label: 'Todas', value: false },
+        { label: 'Prioritarias', value: true }
+    ];
+    value: string = 'off';
     dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
         { name: 'Todos', value: '' },
@@ -112,23 +118,20 @@ export class TasksVoluntarioComponent implements OnInit{
         );
     }
 
+    togglePriorityFilter() {
+        this.tasks = this.value 
+            ? this.allTasks.filter(task => task.isPriority && this.canUserSeeTask(task))
+            : this.allTasks.filter(task => this.canUserSeeTask(task));
+    }
+    
+    // Método auxiliar para verificar si el usuario puede ver la tarea
+    canUserSeeTask(task: any): boolean {
+        if (this.isVoluntario) return task.voluntarioId === this.user?.id && task.status.toLowerCase() === 'pendiente';
+        return false;
+    }
+
     getSeverity(task: any): string {
-        switch (task.status) {
-            case 'En Proceso':
-                return 'help';
-            case 'En Revisión':
-                return 'warn';
-            case 'Completada':
-                return 'success';
-            case 'Validada':
-                return 'success';
-            case 'Entregada':
-                return 'success';
-            case 'Denegada':
-                return 'danger';
-            default:
-                return 'info';
-        }
+        return getSeverity(task.status);
     }
 
     newTask() {

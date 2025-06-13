@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
 import { PickListModule } from 'primeng/picklist';
 import { OrderListModule } from 'primeng/orderlist';
@@ -24,13 +23,14 @@ import { User } from '../../../types/user.interface';
 import { ToastService } from '../../../services/toast.service';
 import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
+import { SelectButton } from 'primeng/selectbutton';
 
 @Component({
     selector: 'app-tasks-component',
     standalone: true,
-    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
+    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, PickListModule, 
     OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
-    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent
+    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent, SelectButton
 ],
     templateUrl: './tasks.component.html',
 })
@@ -48,6 +48,12 @@ export class TasksComponent implements OnInit{
     isBibliotecario: boolean = false;
     isAlumno: boolean = false;
     taskId: number = 0;
+    showOnlyPriority: boolean = false;
+    stateOptions = [
+        { label: 'Todas', value: false },
+        { label: 'Prioritarias', value: true }
+    ];
+    value: string = 'off';
     dropdownValue:  DropDown | null = null;
     dropdownValues: DropDown[] = [
         { name: 'Todos', value: '' },
@@ -67,7 +73,6 @@ export class TasksComponent implements OnInit{
       private toastService: ToastService
     ) {
     }
-
 
     ngOnInit(): void {
         this.isRevisor = this.authService.hasRole('Voluntario Administrativo');
@@ -139,6 +144,21 @@ export class TasksComponent implements OnInit{
         this.tasks = this.allTasks.filter(task =>
             task.name.toLowerCase().includes(query)
         );
+    }
+
+    togglePriorityFilter() {
+        this.tasks = this.value 
+            ? this.allTasks.filter(task => task.isPriority && this.canUserSeeTask(task))
+            : this.allTasks.filter(task => this.canUserSeeTask(task));
+    }
+    
+    // Método auxiliar para verificar si el usuario puede ver la tarea
+    canUserSeeTask(task: any): boolean {
+        if (this.isVoluntario) return task.status.toLowerCase() === 'pendiente';
+        if (this.isRevisor) return task.status.toLowerCase() === 'en revisión';
+        if (this.isBibliotecario) return task.createdByUserId === this.user?.id;
+        if (this.isAlumno) return task.alumnoId === this.user?.id;
+        return false;
     }
 
     getSeverity(task: any): string {

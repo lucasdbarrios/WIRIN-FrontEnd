@@ -2,6 +2,16 @@
     <div class="font-semibold text-xl mb-4">Tareas</div>
 
     <p-toolbar>
+        <ng-template #start>
+            <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
+                placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()" />
+        </ng-template>
+        <ng-template #end>
+            <p-selectbutton [options]="stateOptions" [(ngModel)]="value" optionLabel="label" optionValue="value"
+                aria-labelledby="basic" (onChange)="togglePriorityFilter()"
+                class="p-selectbutton bg-white text-black border-none">
+            </p-selectbutton>
+        </ng-template>
         <ng-template #center>
             <p-iconfield iconPosition="left">
                 <input pInputText type="text" placeholder="Buscar tarea" (input)="searchTasks($event)" />

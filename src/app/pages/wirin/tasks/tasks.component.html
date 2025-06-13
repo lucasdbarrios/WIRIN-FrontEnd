@@ -1,11 +1,17 @@
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Tareas</div>
+    <div class="flex justify-between mb-4">
+        <div class="font-semibold text-xl mb-4">Tareas</div>
+        <p-selectbutton [options]="stateOptions" [(ngModel)]="value" optionLabel="label" optionValue="value"
+            aria-labelledby="basic" (onChange)="togglePriorityFilter()">
+        </p-selectbutton>
+    </div>
 
     <p-toolbar>
         <ng-template #start>
             <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
-                placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()" *ngIf="isBibliotecario" />
+                placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()" />
         </ng-template>
+
         <ng-template #center>
             <p-iconfield iconPosition="left">
                 <input pInputText type="text" placeholder="Buscar tarea" (input)="searchTasks($event)" />
@@ -15,6 +21,7 @@
         <ng-template #end>
             <p-button label="Nueva tarea" icon="pi pi-plus" (onClick)="newTask()" *ngIf="isBibliotecario"></p-button>
         </ng-template>
+
     </p-toolbar>
 
     <div *ngIf="isLoading" aria-live="polite" class="flex justify-center mt-6">
