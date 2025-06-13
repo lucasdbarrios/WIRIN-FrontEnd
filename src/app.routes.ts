@@ -19,6 +19,7 @@ import { EditUserComponent } from './app/pages/wirin/form-edit-user/form-edit-us
 import { DeliveriesComponent } from './app/pages/wirin/deliveries/deliveries.component';
 import { TasksVoluntarioComponent } from './app/pages/wirin/tasks-voluntario/tasks-voluntario.component';
 import { ProyectsComponent } from './app/pages/wirin/proyects/proyects.component';
+import { AutoRefreshExampleComponent } from './app/pages/example/auto-refresh-example.component';
 
 export const appRoutes: Routes = [
     {
@@ -29,7 +30,8 @@ export const appRoutes: Routes = [
             { path: '', component: DashboardWirin },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
-            { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
+            { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
+            { path: 'auto-refresh-example', component: AutoRefreshExampleComponent, canActivate: [AuthGuard] }
         ]
     },
     { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -43,6 +45,7 @@ export const appRoutes: Routes = [
             { path: 'tasks', component: TasksComponent, canActivate: [AuthGuard] },
             { path: 'tasks-voluntario', component: TasksVoluntarioComponent, canActivate: [AuthGuard] },
             { path: 'deliveries', component: DeliveriesComponent, canActivate: [AuthGuard] },
+            { path: 'bibliographs', component: ProyectsComponent, canActivate: [AuthGuard] },
             { path: 'add-task-form', component: AddTaskFormComponent, canActivate: [AuthGuard] },
             { path: 'edit-task-form/:id', component: EditTaskComponent, canActivate: [AuthGuard] },
             { path: 'task-detail/:id', component: TaskDetailComponent, canActivate: [AuthGuard] },
