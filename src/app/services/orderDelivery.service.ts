@@ -20,17 +20,11 @@ export class OrderDeliveryService {
     return {
       headers: {
         'Authorization': `Bearer ${token}`,
-         'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
       }
     };
   }
 
-  /**
-   * Procesa la entrega de tareas a un estudiante
-   * @param orderSequence Secuencia de órdenes a entregar
-   * @param studentId ID del estudiante seleccionado
-   * @returns Observable con la respuesta del servidor
-   */
   processDelivery(orderSequence: OrderSequence[], studentId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/performDelivery`, {
         SelectedOrders: orderSequence,
@@ -39,7 +33,7 @@ export class OrderDeliveryService {
   }
 
   createDelivery(deliveryData: OrderDelivery): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, deliveryData, this.getHeaders());
+    return this.http.post(`${this.apiUrl}/create`, deliveryData, this.getHeaders());
   }
 
   getDeliveries(): Observable<any> {
@@ -47,7 +41,7 @@ export class OrderDeliveryService {
   }
 
   getOrderDeliveriesWithOrders(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/orderDeliveriesWithOrders`, this.getHeaders());
+    return this.http.get(`${this.apiUrl}/WithOrders`, this.getHeaders());
   }
 
 }

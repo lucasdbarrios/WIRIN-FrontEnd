@@ -23,15 +23,15 @@ export class OrderManagmentService {
   }
 
   getOrdersByState(status: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/status?status=${status}`, this.getHeaders());
+    return this.http.get<any[]>(`${this.apiUrl}/Bystatus?status=${status}`, this.getHeaders());
   }
 
   getAssignedOrders(UserId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/assigned?UserId=${UserId}`, this.getHeaders());
+    return this.http.get<any[]>(`${this.apiUrl}/byAssigned?UserId=${UserId}`, this.getHeaders());
   }
 
   changeStatus(formData: FormData): Observable<any> {
-    return this.http.put(`${this.apiUrl}/changeStatus`, { 
+    return this.http.put(`${this.apiUrl}`, { 
       id: formData.get('id'), 
       status: formData.get('status')
     }, this.getHeaders());

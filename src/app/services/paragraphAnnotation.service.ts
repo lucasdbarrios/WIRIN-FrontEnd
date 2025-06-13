@@ -25,7 +25,7 @@ export class ParagraphAnnotationService {
 
     saveErrorMessageParagraph(annotation: Annotation): Observable<any> {
         console.log(annotation);
-        return this.http.post(`${this.apiUrl}/SaveParagraphAnnotationAsync`, { paragraphAnnotation: annotation }, {
+        return this.http.post(`${this.apiUrl}`, { paragraphAnnotation: annotation }, {
             ...this.getHeaders(),
             headers: { 'Content-Type': 'application/json' },
             responseType: 'text'

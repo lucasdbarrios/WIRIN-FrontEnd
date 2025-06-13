@@ -24,7 +24,7 @@ export class OrderParagraphService {
   }
 
   processParagraphs(body: ProcessParagraphRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/processParagraphs`, body, {
+    return this.http.post(`${this.apiUrl}`, body, {
         headers: { 
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
             'Content-Type': 'application/json'
