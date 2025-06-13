@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
 import { Paragraph } from '../types/paragraph.Interface';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,30 +11,25 @@ import { Paragraph } from '../types/paragraph.Interface';
 export class OrderService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService) {
+  constructor(
+    private http: HttpClient, 
+    private envService: EnvService, 
+    private authService: AuthService // Inyectar AuthHeaderService
+  ) {
     this.apiUrl = this.envService.getApiUrl() + "/Order";
   }
 
-  private getHeaders() {
-    const token = localStorage.getItem('auth_token');
-    return {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    };
-  }
-
   getOrders(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl, this.getHeaders());
+    return this.http.get<any[]>(this.apiUrl, this.authService.getHeaders());
   }
 
   getOrdersDelivered(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl + '/delivered', this.getHeaders());
+    return this.http.get<any[]>(this.apiUrl + '/delivered', this.authService.getHeaders());
   }
 
   createOrder(formData: FormData): Observable<any> {
     return this.http.post(this.apiUrl, formData, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       reportProgress: true,
       observe: 'events'
     });
@@ -42,7 +38,7 @@ export class OrderService {
   downloadFile(id: number): Observable<Blob> {
     const downloadUrl = `${this.apiUrl}/download/${id}`;
     return this.http.get(downloadUrl, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       responseType: 'blob'
     });
   }
@@ -50,33 +46,33 @@ export class OrderService {
   recoveryFile(id: number): Observable<Blob> {
     const downloadUrl = `${this.apiUrl}/recovery/${id}`;
     return this.http.get(downloadUrl, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       responseType: 'blob'
     });
   }
 
   deleteOrder(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`, this.getHeaders());
+    return this.http.delete(`${this.apiUrl}/${id}`, this.authService.getHeaders());
   }
 
   updateOrder(id: number, formData: FormData): Observable<any> {
     formData.append('id', id.toString());
     return this.http.put(`${this.apiUrl}/${id}`, formData, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       reportProgress: true,
       observe: 'events'
     });
   }
 
   getTaskById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`, this.getHeaders());
+    return this.http.get<any>(`${this.apiUrl}/${id}`, this.authService.getHeaders());
   }
 
   checkOcrPrevius(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/ocr-previus/${id}`, this.getHeaders());
+    return this.http.get<any>(`${this.apiUrl}/ocr-previus/${id}`, this.authService.getHeaders());
   }
 
   getParagraphsByOrderId(orderId: number): Observable<Paragraph[]> {
-    return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`, this.getHeaders());
+    return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`, this.authService.getHeaders());
   }
 }

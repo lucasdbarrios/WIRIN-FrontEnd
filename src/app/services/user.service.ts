@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
 import { User } from '../types/user.interface';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,47 +11,38 @@ import { User } from '../types/user.interface';
 export class UserService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService) {
+  constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
     this.apiUrl = this.envService.getApiUrl() + '/User';
   }
 
-  private getHeaders() {
-    const token = localStorage.getItem('auth_token');
-    return {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    };
-  }
-
   getUserById(id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`, this.getHeaders());
+    return this.http.get(`${this.apiUrl}/${id}`, this.authService.getHeaders());
   }
 
   getAll(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl, this.getHeaders());
+    return this.http.get<any[]>(this.apiUrl, this.authService.getHeaders());
   }
 
   getAllStudents(): Observable<any[]> {
     const url = `${this.apiUrl}/students`;
-    return this.http.get<any[]>(url, this.getHeaders());
+    return this.http.get<any[]>(url, this.authService.getHeaders());
   }
 
   getUsersByRole(role: string): Observable<any[]> {
     const url = `${this.apiUrl}/by-role/${role}`;
-    return this.http.get<any[]>(url, this.getHeaders());
+    return this.http.get<any[]>(url, this.authService.getHeaders());
   }
 
   updateUser(id: string, user: User): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, user, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
   deleteUser(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       responseType: 'text'
     });
   }

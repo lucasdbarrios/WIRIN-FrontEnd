@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from './env.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,17 +10,8 @@ import { EnvService } from './env.service';
 export class FileUploadService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService) {
+  constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
     this.apiUrl = this.envService.getApiUrl();
-  }
-
-  private getHeaders() {
-    const token = localStorage.getItem('auth_token');
-    return {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    };
   }
 
   uploadFile(file: File): Observable<HttpEvent<any>> {
@@ -27,7 +19,7 @@ export class FileUploadService {
     formData.append('file', file, file.name);
 
     return this.http.post<any>(`${this.apiUrl}/upload`, formData, { 
-      ...this.getHeaders(), 
+      ...this.authService.getHeaders(), 
       reportProgress: true, 
       observe: 'events' 
     });
@@ -37,11 +29,11 @@ export class FileUploadService {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}`, formData, this.getHeaders());
+    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}`, formData, this.authService.getHeaders());
   }
 
   newProcessOcr(id: number, processor: string = 'Local'): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}?id=${id}`, processor, this.getHeaders());
+    return this.http.post<any>(`${this.apiUrl}/ocr/${processor}?id=${id}`, processor, this.authService.getHeaders());
   }
 
   isValidFileType(file: File): boolean {

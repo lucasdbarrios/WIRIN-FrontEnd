@@ -220,4 +220,27 @@ export class AuthService {
     );
   }
 
+  getHeaders() {
+    const token = localStorage.getItem('auth_token');
+
+    if (!token || this.isTokenExpired(token)) {
+      localStorage.removeItem('auth_token');
+      window.location.href = "/login";
+      return {};
+    }
+
+    return {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+  }
+
+  //verifica si el token sigue siendo válido o ya expiro
+  private isTokenExpired(token: string): boolean {
+    const decodedToken: any = jwtDecode(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decodedToken.exp < currentTime;
+  }
+
 }

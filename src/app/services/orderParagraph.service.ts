@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { EnvService } from './env.service';
 import { Observable } from 'rxjs';
 import { ProcessParagraphRequest } from '../types/Requests/ProcessParagraphRequest';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,17 +11,8 @@ import { ProcessParagraphRequest } from '../types/Requests/ProcessParagraphReque
 export class OrderParagraphService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService) {
+  constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
     this.apiUrl = this.envService.getApiUrl() + "/OrderParagraph";
-  }
-
-  private getHeaders() {
-    const token = localStorage.getItem('auth_token');
-    return {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    };
   }
 
   processParagraphs(body: ProcessParagraphRequest): Observable<any> {
@@ -34,12 +26,12 @@ export class OrderParagraphService {
 }
 
   getParagraphsByOrderId(orderId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`, this.getHeaders());
+    return this.http.get<any>(`${this.apiUrl}/getParagraphsByOrderId/${orderId}`, this.authService.getHeaders());
   }
 
   saveErrorMessageParagraph(body: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/hasError`, { ...body }, {
-      ...this.getHeaders(),
+      ...this.authService.getHeaders(),
       headers: { 'Content-Type': 'application/json' },
       responseType: 'text'
     });
