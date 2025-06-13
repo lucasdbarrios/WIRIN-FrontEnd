@@ -14,6 +14,6 @@ export interface Order {
   voluntarioId?: string;
   alumnoId?: string;
   revisorId?: string;
-  delivererId?: string;
+  orderDeliveryId?: string;
   assignedUserId?: string;
 }

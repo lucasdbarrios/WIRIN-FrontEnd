@@ -37,18 +37,17 @@ export class AddTaskFormComponent{
         this.uploadProgress = 0;
 
         this.orderService.createOrder(this.formDataToSubmit).subscribe({
-        next: (event: any) => {
-            if (event.type === HttpEventType.UploadProgress) {
-            if (event.total) {
-                this.uploadProgress = Math.round(100 * event.loaded / event.total);
-            }
-            } else if (event instanceof HttpResponse) {
-                this.uploadStatus = 'success';
-                this.toastService.showSuccess('Tarea creada con éxito');
-                this.router.navigate(['/wirin/tasks']);
-            }
-
-        },
+            next: (event: any) => {
+                if (event.type === HttpEventType.UploadProgress) {
+                if (event.total) {
+                    this.uploadProgress = Math.round(100 * event.loaded / event.total);
+                }
+                } else if (event instanceof HttpResponse) {
+                    this.uploadStatus = 'success';
+                    this.toastService.showSuccess('Tarea creada con éxito');
+                    this.router.navigate(['/wirin/tasks']);
+                }
+            },
         error: (error: any) => {
             console.error('Error al crear la tarea:', error);
             this.uploadStatus = 'error';

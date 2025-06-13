@@ -1,9 +1,10 @@
 <div class="card">
-    <div class="flex justify-between mb-4">
-        <div class="font-semibold text-xl mb-4">Tareas</div>
-        <p-selectbutton [options]="stateOptions" [(ngModel)]="value" optionLabel="label" optionValue="value"
-            aria-labelledby="basic" (onChange)="togglePriorityFilter()">
-        </p-selectbutton>
+    <div class="card flex justify-between mb-4">
+        <div class="font-semibold text-xl">Tareas</div>
+        <div class="flex items-center gap-2">
+            <span>Mostrar solo tareas prioritarias</span>
+            <p-toggleswitch [(ngModel)]="value" (onChange)="togglePriorityFilter()" />
+        </div>
     </div>
 
     <p-toolbar>
@@ -41,7 +42,7 @@
                         <div>
                             <div class="flex flex-row justify-between tasks-start gap-2">
                                 <div>
-                                    <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
+                                    <p-tag [value]="task.status" [severity]="getSeverity(task.status)"></p-tag>
                                     <div class="text-xl mt-1 font-bold">{{ task.name }}</div>
                                     <div class="text-base font-medium mt-2">
                                         Prioridad: {{ task.isPriority ? 'Alta' : 'Normal' }}

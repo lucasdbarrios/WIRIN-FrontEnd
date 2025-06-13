@@ -21,6 +21,7 @@ import { OrderDeliveryService } from '../../../../services/orderDelivery.service
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { OrderStatus } from '../../../../types/orderStatus.type';
 
 @Component({
   standalone: true,
@@ -59,25 +60,16 @@ export class FormTaskComponent implements OnInit {
   existingFile: string = '';
   orderDeliveries: OrderDelivery[] = [];
   
-  dropdownItemsSubjects: DropDown[] = [
-    { name: 'Matemáticas', value: 'Matemáticas' },
-    { name: 'Historia', value: 'Historia' },
-    { name: 'Ciencias', value: 'Ciencias' },
-    { name: 'Lengua', value: 'Lengua' },
-    { name: 'Geografía', value: 'Geografía' },
-    { name: 'Arte', value: 'Arte' },
-    { name: 'Educación Física', value: 'Educación Física' }
-  ];
-  
-  dropdownItems: DropDown[] = [
-    { name: 'Pendiente', value: 'Pendiente' },
-    { name: 'En Proceso', value: 'En Proceso' },
-    { name: 'En Revisión', value: 'En Revisión' },
-    { name: 'Denegada', value: 'Denegada' },
-    { name: 'Aprobada', value: 'Aprobada' },
-    { name: 'Completada', value: 'Completada' },
-    { name: 'Entregada', value: 'Entregada' }
-  ];
+  subjects = ['Matemáticas', 'Historia', 'Ciencias', 'Lengua', 'Geografía', 'Arte', 'Educación Física'];
+
+  dropdownItemsSubjects: DropDown[] = this.subjects.map(subject => ({ name: subject, value: subject }));
+
+  dropdownValue: OrderStatus | null = null;
+
+  dropdownItems: { name: string; value: OrderStatus }[] = Object.values(OrderStatus).map(status => ({
+    name: status,
+    value: status
+  }));
   
   dropdownItemsUsers: DropDown[] = [];
 
@@ -174,6 +166,7 @@ export class FormTaskComponent implements OnInit {
         limitDate: formattedDate,
         alumnoId: data.alumnoId,
         createdByUserId: data.createdByUserId,
+        orderDeliveryId: data.orderDeliveryId,
       });
 
       if (data.filePath) {
