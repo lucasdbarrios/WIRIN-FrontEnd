@@ -1,4 +1,4 @@
-<div class="container max-w-6xl mx-auto mb-4 dark:text-gray-200 flex flex-col">
+<div class="container w-3/4 mx-auto mb-4 dark:text-gray-200 flex flex-col min-h-screen">
 
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
@@ -29,14 +29,15 @@
     <p class="text-blue-600 dark:text-blue-300 text-lg">No hay datos OCR disponibles.</p>
   </div>
 
-  <div class="flex gap-6 lg:flex-row sm:flex-col min-h-[70vh]">
+  <div class="flex gap-6 sm:flex-col lg:flex-row min-h-[70vh] flex-grow ocr-pdf">
     <app-ocr-text-viewer class="h-[70vh] transition-all duration-300" [ocrData]="ocrData" [currentPage]="currentPage"
       [isEditing]="isEditing" [editingText]="editingText" (editClicked)="startEditing()"
       (cancelEditing)="cancelEditing()" (pageChange)="goToPage($event)"
-      (showPdfPreviewChange)="actualizarEstado($event)" [style.width]="showPdfPreview ? '50%' : '100%'">
+      (showPdfPreviewChange)="actualizarEstado($event)" [style.width]="showPdfPreview ? '100%' : '100%'">
     </app-ocr-text-viewer>
 
     <iframe *ngIf="showPdfPreview" [src]="urlSafe" type="application/pdf"
+      [style.width]="showPdfPreview ? '100%' : '100%'"
       class="h-[70vh] border rounded-lg shadow-lg transition-all duration-300 w-1/2">
     </iframe>
   </div>

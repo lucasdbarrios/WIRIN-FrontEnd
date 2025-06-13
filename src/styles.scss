@@ -11,3 +11,13 @@
 .layout-main{
     padding: 0;
 }
+
+@media screen and (max-width: 1024px) {
+    .ocr-pdf{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 2em;
+    }
+}
