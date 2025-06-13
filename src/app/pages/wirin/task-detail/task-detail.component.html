@@ -29,8 +29,8 @@
             <div><strong>Estado:</strong>
                 <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
             </div>
-            <div><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd MMMM yyyy' : 'es' }}</div>
-            <div><strong>Fecha de creación:</strong> {{ task.creationDate | date:'dd MMMM yyyy' : 'es' }}</div>
+            <div><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd/MM/yyyy' }}</div>
+            <div><strong>Fecha de creación:</strong> {{ task.creationDate | date:'dd/MM/yyyy' }}</div>
             <div><strong>Archivo a digitalizar:</strong> {{ task.fileName || 'Sin archivo' }}</div>
             <div><strong>Procesado por:</strong> {{ requesterName }}</div>
             <div><strong>Solicitante del material:</strong> {{ alumnoName }}</div>

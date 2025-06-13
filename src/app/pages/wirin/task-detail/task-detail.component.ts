@@ -19,6 +19,7 @@ import { ToastService } from '../../../services/toast.service';
   imports: [CommonModule, CardModule, ButtonModule, TagModule],
   templateUrl: './task-detail.component.html',
 })
+
 export class TaskDetailComponent implements OnInit, OnChanges  {
   task: any = {};
   isLoading: boolean = true;
@@ -72,6 +73,10 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
     this.loadTaskDetails();
     this.getStatus();
   }
+
+  formatFecha(fecha: Date): string {
+    return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).format(fecha);
+}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['taskId'] && changes['taskId'].currentValue !== changes['taskId'].previousValue) {

@@ -170,7 +170,7 @@ export class FormTaskComponent implements OnInit {
         authorName: data.authorName,
         rangePage: data.rangePage,
         isPriority: data.isPriority,
-        status: data.status,
+        status: data.status || 'Pendiente',
         limitDate: formattedDate,
         alumnoId: data.alumnoId,
         createdByUserId: data.createdByUserId,
@@ -245,6 +245,7 @@ export class FormTaskComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log(this.formTask);
     if (this.formTask.valid) {
       const formData = new FormData();
       Object.keys(this.formTask.value).forEach(key => {
@@ -258,7 +259,7 @@ export class FormTaskComponent implements OnInit {
       if (this.selectedFile) {
         formData.append('file', this.selectedFile);
       }
-
+      formData.append('status', 'Pendiente');
       this.formSubmitted.emit(formData);
     } else {
       Object.keys(this.formTask.controls).forEach(key => {
