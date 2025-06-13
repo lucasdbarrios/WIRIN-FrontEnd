@@ -12,11 +12,13 @@ import { UserService } from '../../../services/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
 import { ToastService } from '../../../services/toast.service';
+import { PopupComponent } from '../ui/popup/popup.component';
+import { getSeverity } from '../../../utils/getSeverity';
 
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, TagModule],
+  imports: [CommonModule, CardModule, ButtonModule, TagModule, PopupComponent],
   templateUrl: './task-detail.component.html',
 })
 
@@ -46,6 +48,10 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
   creatorName: string = '';
   alumnoName: string = '';
   isProcessing: boolean = false;
+  showConfirmPopup: boolean = false;
+  taskToDeleteId: number | null = null;
+
+
 
   constructor(
     private router: Router,
@@ -229,39 +235,32 @@ async changeStateTask(status: string): Promise<void> {
     });
 }
 
-getSeverity(task: any): string {
-  switch (task.status) {
-      case 'En Proceso':
-          return 'help';
-      case 'En Revisión':
-          return 'warn';
-      case 'Completada':
-          return 'success';
-      case 'Validada':
-          return 'success';
-      case 'Entregada':
-          return 'success';
-      case 'Denegada':
-          return 'danger';
-      default:
-          return 'info';
-  }
+getSeverity(status: string): string {
+  return getSeverity(status);
 }
 
-deleteTask(taskId: number, event: Event): void {
+confirmDeleteTask(taskId: number, event: Event) {
   event.stopPropagation();
-
-  this.orderService.deleteOrder(taskId).subscribe({
-      next: () => {
-          this.toastService.showSuccess('Tarea eliminada con éxito');
-          this.taskDeleted.emit(true);
-      },
-      error: error => {
-          this.toastService.showError('Error al eliminar tarea');
-          console.error('Error al eliminar tarea:', error);
-      }
-  });
+  this.taskToDeleteId = taskId;
+  this.showConfirmPopup = true;
 }
+
+onDeleteTask() {
+  if (this.taskToDeleteId !== null) {
+      this.orderService.deleteOrder(this.taskToDeleteId).subscribe({
+          next: () => {
+              this.toastService.showSuccess('Tarea eliminada con éxito');
+              this.taskDeleted.emit(true); // 🔥 Emite evento al componente padre
+          },
+          error: error => {
+              this.toastService.showError('Error al eliminar tarea');
+              console.error('Error al eliminar tarea:', error);
+          }
+      });
+  }
+  this.showConfirmPopup = false;
+}
+
 
   editTask(id: number) {
     this.router.navigate([`/wirin/edit-task-form/${id}`]);

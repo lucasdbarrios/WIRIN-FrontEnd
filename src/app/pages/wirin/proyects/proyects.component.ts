@@ -52,7 +52,7 @@ export class ProyectsComponent implements OnInit {
     }
 
     getSeverity(task: any): string {
-        return getSeverity(task); // 🔥 Llama a la función importada
+        return getSeverity(task);
     }
 
     onFilter(event: Event) {

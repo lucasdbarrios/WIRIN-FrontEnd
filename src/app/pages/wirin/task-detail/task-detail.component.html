@@ -10,7 +10,7 @@
             <div class="flex justify-between md:flex-row md:justify-end gap-1">
                 <p-button icon="pi pi-pencil" label="Editar" [severity]="'warn'" (onClick)="editTask(task.id)">
                 </p-button>
-                <p-button icon="pi pi-trash" label="Eliminar" (onClick)="deleteTask(task.id, $event)"
+                <p-button icon="pi pi-trash" label="Eliminar" (click)="confirmDeleteTask(task.id, $event)"
                     [severity]="'danger'">
                 </p-button>
             </div>
@@ -67,3 +67,8 @@
         </div>
     </ng-template>
 </p-card>
+
+<app-popup [isVisible]="showConfirmPopup" title="Eliminar tarea"
+    question="¿Estás seguro de que deseas eliminar esta tarea?" primaryActionText="Eliminar"
+    secondaryActionText="Cancelar" (primaryAction)="onDeleteTask()" (secondaryAction)="showConfirmPopup = false">
+</app-popup>
