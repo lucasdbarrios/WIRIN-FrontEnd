@@ -1,7 +1,7 @@
 <p-toast></p-toast>
 
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Entregas</div>
+    <h2>Entregas</h2>
 
     <div *ngIf="isLoading" class="flex justify-center mt-6">
         <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
@@ -14,22 +14,13 @@
     <div class="grid grid-cols-12 gap-4">
         <!-- Lista de tareas disponibles -->
         <div class="col-span-12 lg:col-span-8">
-            <p-card header="Tareas disponibles" styleClass="mb-4">
+            <p-card>
                 <p-dataview [value]="tasks" [layout]="'list'">
                     <ng-template #list let-items>
                         <div class="grid grid-cols-12 gap-4">
-                            <div *ngFor="let item of items" class="col-span-12 sm:col-span-6 lg:col-span-4 p-2">
-                                <div class="p-6 border border-blue-500 shadow-lg rounded-lg flex flex-col">
-                                    <p-tag [value]="item.status.toUpperCase()" [severity]="getSeverity(item)"></p-tag>
-                                    <div class="text-lg font-medium mt-1">{{ item.name }}</div>
-                                    <div class="text-base font-medium mt-2">
-                                        Vencimiento: {{ item.limitDate | date:'dd/MM/yyyy' }}
-                                    </div>
-                                    <div class="mt-2">
-                                        <input type="checkbox" [(ngModel)]="item.selected"
-                                            (change)="onTaskSelectionChange()" /> Seleccionar
-                                    </div>
-                                </div>
+                            <div *ngFor="let item of items" class="col-span-12 sm:col-span-6 lg:col-span-6 p-2">
+                                <app-card-task [task]="item" [showCheckbox]="true"
+                                    (taskSelectionChange)="onTaskSelectionChange()"></app-card-task>
                             </div>
                         </div>
                     </ng-template>
@@ -39,19 +30,27 @@
 
         <!-- Lista de tareas seleccionadas para reordenar -->
         <div class="col-span-12 lg:col-span-4">
-            <p-card header="Tareas seleccionadas" *ngIf="selectedTasks.length > 0" styleClass="mb-4">
-                <p-orderList [value]="selectedTasks" [listStyle]="{'max-height':'30rem'}" [dragdrop]="true"
-                    (onReorder)="onReorder()">
-                    <ng-template let-task pTemplate="item">
-                        <div class="flex flex-col p-3 border-bottom-1 surface-border">
-                            <span class="font-bold mb-2">{{ task.name }}</span>
-                            <div class="flex justify-content-between align-items-center">
-                                <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
-                                <span class="text-sm">Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}</span>
+            <p-card header="Tareas seleccionadas" styleClass="mb-4">
+                <ng-container *ngIf="selectedTasks.length > 0; else noTasks">
+                    <p-orderList [value]="selectedTasks" [listStyle]="{'max-height':'30rem'}" [dragdrop]="true"
+                        (onReorder)="onReorder()">
+                        <ng-template let-task pTemplate="item">
+                            <div class="flex flex-col p-3 border-bottom-1 surface-border">
+                                <span class="font-bold mb-2">{{ task.name }}</span>
+                                <div class="flex justify-between items-center">
+                                    <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task)"></p-tag>
+                                    <span class="text-sm">Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}</span>
+                                </div>
                             </div>
-                        </div>
-                    </ng-template>
-                </p-orderList>
+                        </ng-template>
+                    </p-orderList>
+                </ng-container>
+
+                <ng-template #noTasks>
+                    <div class="text-center text-gray-500 p-4">
+                        No hay tareas seleccionadas.
+                    </div>
+                </ng-template>
             </p-card>
         </div>
     </div>

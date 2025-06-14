@@ -21,9 +21,17 @@
     <ng-template #subtitle> Prioridad: {{ task.isPriority ? 'Alta' : 'Normal' }} </ng-template>
     <p>Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}</p>
     <ng-template #footer>
-        <div #end>
-            <p-button icon="pi pi-eye" label="Detalles" (onClick)="showTaskDetail.emit(task.id)"
-                [style]="{float: 'right'}"></p-button>
+        <div style="display: flex; justify-content: end; align-items: center;">
+            <ng-container *ngIf="showCheckbox; else buttonTemplate">
+                <label class="flex justify-center items-center gap-1">
+                    <input type="checkbox" [(ngModel)]="task.selected"
+                        (change)="taskSelectionChange.emit(task.selected)" />
+                    Seleccionar
+                </label>
+            </ng-container>
+            <ng-template #buttonTemplate>
+                <p-button icon="pi pi-eye" label="Detalles" (onClick)="showTaskDetail.emit(task.id)"></p-button>
+            </ng-template>
         </div>
     </ng-template>
 </p-card>

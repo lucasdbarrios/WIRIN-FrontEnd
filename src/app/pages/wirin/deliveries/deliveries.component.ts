@@ -16,13 +16,14 @@ import { OrderSequence } from '../../../types/orderSequence.type';
 import { OrderListModule } from 'primeng/orderlist';
 import { CardModule } from 'primeng/card';
 import { ToastService } from '../../../services/toast.service';
+import { CardTaskComponent } from '../ui/card-task/card-task.component';
 
 @Component({
     selector: 'app-deliveries-component',
     standalone: true,
     imports: [
         CommonModule, RouterModule, DataViewModule, FormsModule, TagModule, ButtonModule,
-        DialogModule, DropdownModule, ToastModule, OrderListModule, CardModule
+        DialogModule, DropdownModule, ToastModule, OrderListModule, CardModule, CardTaskComponent
     ],
     providers: [MessageService],
     templateUrl: './deliveries.component.html',
