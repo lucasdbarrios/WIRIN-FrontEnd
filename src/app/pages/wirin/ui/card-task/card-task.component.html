@@ -1,0 +1,29 @@
+<!-- <p-card>
+    <div>
+        <p-tag [value]="task.status" [severity]="getSeverity(task.status)"></p-tag>
+        <h3>{{ task.name }}</h3>
+
+        <p><strong>Prioridad:</strong> {{ task.isPriority ? 'Alta' : 'Normal' }}</p>
+        <p><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd/MM/yyyy' }}</p>
+    </div>
+
+    <div>
+        <p-button icon="pi pi-eye" label="Detalles" (onClick)="showTaskDetail.emit(task.id)"></p-button>
+    </div>
+</p-card> -->
+
+<p-card [style]="{ overflow: 'hidden', wordWrap: 'break-word' }">
+    <ng-template #header>
+        <p-tag [value]="task.status" [severity]="getSeverity(task.status)"
+            [style]="{float: 'right', fontSize: '1.4em'}"></p-tag>
+    </ng-template>
+    <ng-template #title><strong>{{ task.name }}</strong></ng-template>
+    <ng-template #subtitle> Prioridad: {{ task.isPriority ? 'Alta' : 'Normal' }} </ng-template>
+    <p>Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}</p>
+    <ng-template #footer>
+        <div #end>
+            <p-button icon="pi pi-eye" label="Detalles" (onClick)="showTaskDetail.emit(task.id)"
+                [style]="{float: 'right'}"></p-button>
+        </div>
+    </ng-template>
+</p-card>

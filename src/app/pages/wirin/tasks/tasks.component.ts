@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
-import { TagModule } from 'primeng/tag';
 import { AuthService } from '../../../services/auth.service';
 import { OrderManagmentService } from '../../../services/orderManagment.service';
 import { OrderService } from '../../../services/order.service';
@@ -22,15 +21,16 @@ import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { UserRoleService } from '../../../services/userRole.service';
 import { lastValueFrom } from 'rxjs';
-import { getSeverity } from '../../../utils/getSeverity';
 import { OrderStatus } from '../../../types/orderStatus.type';
 import { ToggleSwitch } from 'primeng/toggleswitch';
+import { CardTaskComponent } from '../ui/card-task/card-task.component';
+import { CardModule } from 'primeng/card';
 
 @Component({
     selector: 'app-tasks-component',
     standalone: true,
-    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
-    SplitButtonModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent, ToggleSwitch
+    imports: [CommonModule, RouterModule, DataViewModule, FormsModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
+    SplitButtonModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent, ToggleSwitch, CardTaskComponent, CardModule
 ],
     templateUrl: './tasks.component.html',
 })
@@ -145,7 +145,6 @@ export class TasksComponent implements OnInit{
             : this.allTasks.filter(task => this.canUserSeeTask(task));
     }
     
-    // Método auxiliar para verificar si el usuario puede ver la tarea
     canUserSeeTask(task: any): boolean {
         if (this.isVoluntario) return task.status.toLowerCase() === 'pendiente';
         if (this.isRevisor) return task.status.toLowerCase() === 'en revisión';
@@ -154,17 +153,13 @@ export class TasksComponent implements OnInit{
         return false;
     }
 
-    getSeverity(status: string): string {
-        return getSeverity(status);
-    }
-
     newTask() {
         this.router.navigate(['/wirin/add-task-form']);
     }
 
     onShowTaskDetail(taskId: number) {
         this.taskId = taskId;
-        setTimeout(() => this.isTaskDetailOpen = true, 0);
+        this.isTaskDetailOpen = true;
     }
 
     handleTaskDeletion(taskId: number): void {
