@@ -1,24 +1,25 @@
-<!-- <p-card>
-    <div>
-        <p-tag [value]="task.status" [severity]="getSeverity(task.status)"></p-tag>
-        <h3>{{ task.name }}</h3>
-
-        <p><strong>Prioridad:</strong> {{ task.isPriority ? 'Alta' : 'Normal' }}</p>
-        <p><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd/MM/yyyy' }}</p>
-    </div>
-
-    <div>
-        <p-button icon="pi pi-eye" label="Detalles" (onClick)="showTaskDetail.emit(task.id)"></p-button>
-    </div>
-</p-card> -->
-
-<p-card [style]="{ overflow: 'hidden', wordWrap: 'break-word' }">
+<p-card [style]="{ overflow: 'hidden', wordWrap: 'break-word', border: task.isPriority ? '2px solid #ff4d4f' : 'none' }">
     <ng-template #header>
-        <p-tag [value]="task.status" [severity]="getSeverity(task.status)"
-            [style]="{float: 'right', fontSize: '1.4em'}"></p-tag>
+        <div style="display: flex; justify-content: space-between; align-items: center">
+            <div *ngIf="task.isPriority" style="color: #ff4d4f; font-weight: bold; display: flex; align-items: center">
+                <i class="pi pi-exclamation-triangle" style="margin-right: 5px;"></i>
+                <span>Prioritaria</span>
+            </div>
+            <p-tag [value]="task.status" [severity]="getSeverity(task.status)"
+                [style]="{fontSize: '1.2em'}"></p-tag>
+        </div>
     </ng-template>
     <ng-template #title><strong>{{ task.name }}</strong></ng-template>
-    <ng-template #subtitle> Prioridad: {{ task.isPriority ? 'Alta' : 'Normal' }} </ng-template>
+    <ng-template #subtitle>
+        <div style="display: flex; align-items: center;">
+            <span>Prioridad: </span>
+            <span *ngIf="task.isPriority" style="color: #ff4d4f; font-weight: bold; display: flex; align-items: center; margin-left: 5px;">
+                Alta
+                <i class="pi pi-exclamation-triangle" style="margin-left: 5px;"></i>
+            </span>
+            <span *ngIf="!task.isPriority">Normal</span>
+        </div>
+    </ng-template>
     <p>Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}</p>
     <ng-template #footer>
         <div style="display: flex; justify-content: end; align-items: center;">
