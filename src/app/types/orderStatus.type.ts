@@ -1,9 +1,9 @@
 export enum OrderStatus {
-  Pendiente = 'PENDIENTE',
-  EnProceso = 'EN PROCESO',
-  EnRevision = 'EN REVISIÓN',
-  Denegada = 'DENEGADA',
-  Aprobada = 'APROBADA',
-  Completada = 'COMPLETADA',
-  Entregado = 'ENTREGADO'
+  Pendiente = 'Pendiente',
+  EnProceso = 'En Proceso',
+  EnRevision = 'En Revisión',
+  Denegada = 'Denegada',
+  Aprobada = 'Aprobada',
+  Completada = 'Completada',
+  Entregado = 'Entregado'
 }

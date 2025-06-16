@@ -2,7 +2,8 @@
     [style]="{ overflow: 'hidden', wordWrap: 'break-word', border: task.isPriority ? '2px solid #ff4d4f' : 'none' }">
     <ng-template #header>
         <div style="display: flex; justify-content: end; align-items: center">
-            <p-tag [value]="task.status" [severity]="getSeverity(task.status)" [style]="{fontSize: '1.2em'}"></p-tag>
+            <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task.status)"
+                [style]="{fontSize: '1.2em'}"></p-tag>
         </div>
     </ng-template>
     <ng-template #title><strong>{{ task.name }}</strong></ng-template>

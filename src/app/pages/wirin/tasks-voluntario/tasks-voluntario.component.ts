@@ -26,6 +26,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { getSeverity } from '../../../utils/getSeverity';
 import { ToggleSwitch } from 'primeng/toggleswitch';
+import { CardTaskComponent } from '../ui/card-task/card-task.component';
 
 
 @Component({
@@ -33,7 +34,8 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
     standalone: true,
     imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
     OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
-    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent, ToggleSwitch
+    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent, 
+    ToggleSwitch, CardTaskComponent
 ],
     templateUrl: './tasks-voluntario.component.html',
 })
