@@ -95,6 +95,10 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
     this.orderService.getTaskById(this.taskId).subscribe({
       next: (task) => {
         this.statusTask = task.status;
+        if (this.statusTask === 'Completada' || this.statusTask === 'Entregada') {
+          this.changeStateTask(this.statusTask);
+        }
+  
         this.isEarring = this.statusTask === 'Pendiente';
         this.isProcess = this.statusTask === 'En Proceso';
         this.isRevision = this.statusTask === 'En Revisión';
