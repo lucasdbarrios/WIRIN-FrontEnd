@@ -98,7 +98,7 @@ export class TasksComponent implements OnInit{
             const data = await lastValueFrom(request);
             this.allTasks = data;
             this.tasks = [...data];
-console.log(this.tasks)
+
             this.tasks = this.filterTasksByRole(data);
             this.tasks = this.filterTasksByExpirationDate(this.tasks);
 
@@ -113,60 +113,44 @@ console.log(this.tasks)
 
     private filterTasksByExpirationDate(tasks: any[]): any[] {
         const selectedDate = this.dropdownDate?.value;
-        console.log('🟡 Fecha seleccionada:', selectedDate);
         if (!selectedDate) return tasks;
-      
+    
         const hoy = new Date();
-        // "Normalizamos" la fecha de hoy a medianoche para evitar problemas con la hora
         const hoySinHora = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-        console.log('📋 Cantidad de tareas recibidas para filtrar por fecha:', tasks.length);
+    
         return tasks.filter(task => {
-          if (!task.limitDate) {
-            console.warn('⚠️ Tarea sin fecha de vencimiento:', task);
-            return false;
-          }
-      
-          const vencimiento = new Date(task.limitDate);
-          const vencimientoSinHora = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), vencimiento.getDate());
-      
-          console.log(`\n📌 Tarea: ${task.name || task.id}`);
-          console.log('  🧪 Fecha bruta:', task.limitDate);
-          console.log('  📆 Vencimiento normalizado:', vencimientoSinHora.toDateString());
-      
-          switch (selectedDate) {
-            case ExpirationDate.Hoy:
-              const esHoy = vencimientoSinHora.getTime() === hoySinHora.getTime();
-              console.log('  ✅ ¿Vence hoy?', esHoy);
-              return esHoy;
-      
-            case ExpirationDate.Proximos7Dias:
-              const limite = new Date(hoySinHora);
-              limite.setDate(hoySinHora.getDate() + 7);
-              const en7Dias = vencimientoSinHora >= hoySinHora && vencimientoSinHora <= limite;
-              console.log('  ✅ ¿Dentro de los próximos 7 días?', en7Dias);
-              return en7Dias;
-      
-            case ExpirationDate.EsteMes:
-              const esEsteMes =
-                vencimiento.getMonth() === hoy.getMonth() &&
-                vencimiento.getFullYear() === hoy.getFullYear();
-              console.log('  ✅ ¿Este mes?', esEsteMes);
-              return esEsteMes;
-      
-            case ExpirationDate.ProximoMes:
-              const proximoMes = new Date(hoy);
-              proximoMes.setMonth(hoy.getMonth() + 1);
-              const esProximoMes =
-                vencimiento.getMonth() === proximoMes.getMonth() &&
-                vencimiento.getFullYear() === proximoMes.getFullYear();
-              console.log('  ✅ ¿Próximo mes?', esProximoMes);
-              return esProximoMes;
-      
-            default:
-              return true;
-          }
+            if (!task.limitDate) {
+                return false;
+            }
+    
+            const vencimiento = new Date(task.limitDate);
+            const vencimientoSinHora = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), vencimiento.getDate());
+    
+            switch (selectedDate) {
+                case ExpirationDate.Hoy:
+                    return vencimientoSinHora.getTime() === hoySinHora.getTime();
+    
+                case ExpirationDate.Proximos7Dias:
+                    const limite = new Date(hoySinHora);
+                    limite.setDate(hoySinHora.getDate() + 7);
+                    return vencimientoSinHora >= hoySinHora && vencimientoSinHora <= limite;
+    
+                case ExpirationDate.EsteMes:
+                    return vencimiento.getMonth() === hoy.getMonth() && vencimiento.getFullYear() === hoy.getFullYear();
+    
+                case ExpirationDate.ProximoMes:
+                    const proximoMes = new Date(hoy);
+                    proximoMes.setMonth(hoy.getMonth() + 1);
+                    return vencimiento.getMonth() === proximoMes.getMonth() && vencimiento.getFullYear() === proximoMes.getFullYear();
+    
+                case ExpirationDate.Vencidas:
+                    return vencimientoSinHora < hoySinHora;
+    
+                default:
+                    return true;
+            }
         });
-      }
+    }
 
     private filterTasksByRole(tasks: any[]): any[] {
         if (this.isVoluntario) {
@@ -187,7 +171,7 @@ console.log(this.tasks)
             next: (data: any[]) => {
                 this.allTasks = data;
                 this.tasks = [...data];
-                console.log(data);
+
                 this.isLoading = false;
             },
             error: error => {
