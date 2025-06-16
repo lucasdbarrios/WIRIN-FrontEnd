@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
-import { EnvService } from './env.service';
+import { EnvService } from '../env/env.service';
 import { jwtDecode } from 'jwt-decode';
-import { User } from '../types/user.interface';
+import { User } from '../../types/user.interface';
 import { Router } from '@angular/router';
 
 export interface LoginRequest {
@@ -20,6 +20,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
+  
   private apiUrl: string;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();

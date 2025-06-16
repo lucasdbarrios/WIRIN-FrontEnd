@@ -8,14 +8,14 @@ import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { OrderManagmentService } from '../../../services/orderManagment.service';
-import { OrderDeliveryService } from '../../../services/orderDelivery.service';
-import { UserService } from '../../../services/user.service';
+import { OrderManagmentService } from '../../../services/order-managment/orderManagment.service';
+import { OrderDeliveryService } from '../../../services/order-delivery/orderDelivery.service';
+import { UserService } from '../../../services/user/user.service';
 import { RouterModule } from '@angular/router';
 import { OrderSequence } from '../../../types/orderSequence.type';
 import { OrderListModule } from 'primeng/orderlist';
 import { CardModule } from 'primeng/card';
-import { ToastService } from '../../../services/toast.service';
+import { ToastService } from '../../../services/toast/toast.service';
 import { CardTaskComponent } from '../ui/card-task/card-task.component';
 
 @Component({

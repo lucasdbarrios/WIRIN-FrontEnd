@@ -12,11 +12,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ViewChild } from '@angular/core';
 import { OrderDelivery } from '../../../types/orderDelivery.interface';
-import { OrderDeliveryService } from '../../../services/orderDelivery.service';
+import { OrderDeliveryService } from '../../../services/order-delivery/orderDelivery.service';
 import { getSeverity } from '../../../utils/getSeverity';
 import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
-
 
 @Component({
     selector: 'table-row-expansion-demo',
@@ -26,9 +25,9 @@ import { TaskDetailComponent } from '../task-detail/task-detail.component';
         FormsModule, IconFieldModule, InputIconModule, InputTextModule, DialogModule, TaskDetailComponent],
     providers: [ MessageService, InputIconModule]
 })
+
 export class ProyectsComponent implements OnInit {
     projects: OrderDelivery[] = [];
-
     @ViewChild('dt2') dt2!: Table;
     expandedRows = {};
     taskId: number = 0;

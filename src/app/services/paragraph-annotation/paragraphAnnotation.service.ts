@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EnvService } from './env.service';
+import { EnvService } from '../env/env.service';
 import { Observable } from 'rxjs';
-import { Annotation } from '../types/annotation.interface';
+import { Annotation } from '../../types/annotation.interface';
 
 @Injectable({
     providedIn: 'root'

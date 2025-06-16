@@ -4,10 +4,9 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { OrderDelivery } from '../../../../../types/orderDelivery.type';
-import { OrderService } from '../../../../../services/order.service';
+import { OrderService } from '../../../../../services/order/order.service';
 import { User } from '../../../../../types/user.interface';
-import { UserService } from '../../../../../services/user.service';
-import { AuthService } from '../../../../../services/auth.service';
+import { UserService } from '../../../../../services/user/user.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -38,7 +37,7 @@ import { forkJoin } from 'rxjs';
             </ng-template>
         </p-table>
     </div>`,
-    providers: [OrderService]
+    // providers: [OrderService]
 })
 export class RecentSalesWidgetWirin {
     tasksDelived!: OrderDelivery[];
@@ -46,24 +45,22 @@ export class RecentSalesWidgetWirin {
 
     constructor(private orderService: OrderService, private userService: UserService) {}
 
-    
-
-ngOnInit() {
-    forkJoin({
-        users: this.userService.getAllStudents(),
-        orders: this.orderService.getOrdersDelivered()
-    }).subscribe(({ users, orders }) => {
-        this.users = users;
-        this.tasksDelived = orders.map(order => ({
-            title: order.title || '', // Add missing required title property
-            studentId: order.studentId,
-            status: order.status,
-            userId: order.userId,
-            deliveryDate: order.deliveryDate,
-            id: order.id,
-            orderQuantity: 0,
-            user: this.users.find(user => user.id === order.studentId)
-        }));
-    });
-}
+    ngOnInit() {
+        forkJoin({
+            users: this.userService.getAllStudents(),
+            orders: this.orderService.getOrdersDelivered()
+        }).subscribe(({ users, orders }) => {
+            this.users = users;
+            this.tasksDelived = orders.map(order => ({
+                title: order.title || '', // Add missing required title property
+                studentId: order.studentId,
+                status: order.status,
+                userId: order.userId,
+                deliveryDate: order.deliveryDate,
+                id: order.id,
+                orderQuantity: 0,
+                user: this.users.find(user => user.id === order.studentId)
+            }));
+        });
+    }
 }

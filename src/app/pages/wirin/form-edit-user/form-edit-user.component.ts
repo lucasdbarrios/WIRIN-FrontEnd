@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormUserComponent } from '../ui/form-user/form-user.component';
-import { UserService } from '../../../services/user.service';
+import { UserService } from '../../../services/user/user.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { FluidModule } from 'primeng/fluid';
 import { User } from '../../../types/user.interface';
 import { MessageService } from 'primeng/api';
-import { ToastService } from '../../../services/toast.service';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
   selector: 'app-form-edit-user',
@@ -28,7 +28,6 @@ export class EditUserComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService,
     private toastService: ToastService
   ) {}
 

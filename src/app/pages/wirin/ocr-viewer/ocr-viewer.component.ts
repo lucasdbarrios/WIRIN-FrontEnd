@@ -2,10 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { OrderManagmentService } from '../../../services/orderManagment.service';
+import { OrderManagmentService } from '../../../services/order-managment/orderManagment.service';
 import { ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
-import { OrderService } from '../../../services/order.service';
+import { AuthService } from '../../../services/auth/auth.service';
+import { OrderService } from '../../../services/order/order.service';
 import { OcrPage, OcrResponse } from '../../../types/ocr.interface';
 import { OcrTextViewerComponent } from '../ui/ocr-text-viewer/ocr-text-viewer.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -13,9 +13,9 @@ import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
-import { OrderParagraphService } from '../../../services/orderParagraph.service';
-import { FileUploadService } from '../../../services/file-upload.service';
-import { ToastService } from '../../../services/toast.service';
+import { OrderParagraphService } from '../../../services/order-paragraph/orderParagraph.service';
+import { FileUploadService } from '../../../services/file-upload/file-upload.service';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
   selector: 'app-ocr-viewer',

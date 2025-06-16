@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { EnvService } from './env.service';
-import { OrderSequence } from '../types/orderSequence.type';
-import { OrderDelivery } from '../types/orderDelivery.type';
-import { AuthService } from './auth.service';
+import { EnvService } from '../env/env.service';
+import { OrderSequence } from '../../types/orderSequence.type';
+import { OrderDelivery } from '../../types/orderDelivery.type';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'

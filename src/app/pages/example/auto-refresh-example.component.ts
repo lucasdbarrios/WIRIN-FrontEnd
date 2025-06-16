@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AutoRefreshService } from '../../services/auto-refresh.service';
+import { AutoRefreshService } from '../../services/auto-refresh/auto-refresh.service';
 import { Observable, Subscription } from 'rxjs';
 
 interface ExampleData {

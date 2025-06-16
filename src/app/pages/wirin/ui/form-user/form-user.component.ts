@@ -9,6 +9,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { User } from '../../../../types/user.interface';
 import { BackButtonComponent } from '../back-button/back-button.component';
 import { PasswordModule } from 'primeng/password';
+import { UserRoles } from '../../../../types/userRoles.type';
 
 @Component({
   standalone: true,
@@ -26,13 +27,10 @@ export class FormUserComponent{
   @Output() formSubmitted = new EventEmitter<FormData>();
   
   formUser: FormGroup;
-  dropdownRoles: { name: string, value: string }[] = [
-    { name: 'Admin', value: 'Admin' },
-    { name: 'Bibliotecario', value: 'Bibliotecario' },
-    { name: 'Voluntario', value: 'Voluntario' },
-    { name: 'Revisor', value: 'Voluntario Administrativo' },
-    { name: 'Alumno', value: 'Alumno' },
-  ];
+  dropdownRoles = Object.entries(UserRoles).map(([key, value]) => ({
+    name: key,
+    value: value
+  }));
 
   @Input() set userData(data: User) {
     if (data) {

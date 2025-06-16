@@ -2,10 +2,10 @@ import { Component } from "@angular/core";
 import { FluidModule } from "primeng/fluid";
 import { FormTaskComponent } from "../../wirin/ui/form-task/form-task.component";
 import { HttpEventType, HttpResponse } from "@angular/common/http";
-import { OrderService } from "../../../services/order.service";
+import { OrderService } from "../../../services/order/order.service";
 import { Router } from "@angular/router";
 import { PopupComponent } from "../ui/popup/popup.component";
-import { ToastService } from "../../../services/toast.service";
+import { ToastService } from "../../../services/toast/toast.service";
 
 @Component({
     selector: 'app-form-add-task',

@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormTaskComponent } from '../ui/form-task/form-task.component';
-import { OrderService } from '../../../services/order.service';
+import { OrderService } from '../../../services/order/order.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { FluidModule } from 'primeng/fluid';
 import { Order } from '../../../types/order.interface';
-import { MessageService } from 'primeng/api';
 import { Location } from '@angular/common';
-import { ToastService } from '../../../services/toast.service';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
   selector: 'app-form-edit-task',
@@ -29,7 +28,6 @@ export class EditTaskComponent implements OnInit {
     private orderService: OrderService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService,
     private location: Location,
     private toastService: ToastService
   ) {}

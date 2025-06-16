@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { OrderService } from '../../../services/order.service';
-import { AuthService } from '../../../services/auth.service';
+import { OrderService } from '../../../services/order/order.service';
+import { AuthService } from '../../../services/auth/auth.service';
 import { saveAs } from 'file-saver';
-import { FileUploadService } from '../../../services/file-upload.service';
-import { OrderManagmentService } from '../../../services/orderManagment.service';
+import { FileUploadService } from '../../../services/file-upload/file-upload.service';
+import { OrderManagmentService } from '../../../services/order-managment/orderManagment.service';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
-import { UserService } from '../../../services/user.service';
+import { UserService } from '../../../services/user/user.service';
 import { TagModule } from 'primeng/tag';
 import { firstValueFrom } from 'rxjs';
-import { ToastService } from '../../../services/toast.service';
+import { ToastService } from '../../../services/toast/toast.service';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { getSeverity } from '../../../utils/getSeverity';
 
@@ -50,8 +50,6 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
   isProcessing: boolean = false;
   showConfirmPopup: boolean = false;
   taskToDeleteId: number | null = null;
-
-
 
   constructor(
     private router: Router,
@@ -195,28 +193,28 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
             this.isProcessing = false;
         }
     });
-}
-
-async saveUserId(): Promise<void> {
-  this.formData = new FormData();
-  this.formData.append('id', this.taskId.toString());
-  this.formData.append('userId', this.userIdActive);
-
-  if(this.isRevision){
-    await firstValueFrom(this.orderManagmentService.saveRevisorId(this.formData));
-  }else{
-    await firstValueFrom(this.orderManagmentService.saveVoluntarioId(this.formData));
   }
-  
-}
 
-async changeStateTask(status: string): Promise<void> {
-  this.formData = new FormData();
-  this.formData.append('id', this.taskId.toString());
-  this.formData.append('status', status);
+  async saveUserId(): Promise<void> {
+    this.formData = new FormData();
+    this.formData.append('id', this.taskId.toString());
+    this.formData.append('userId', this.userIdActive);
 
-  await firstValueFrom(this.orderManagmentService.changeStatus(this.formData));
-}
+    if(this.isRevision){
+      await firstValueFrom(this.orderManagmentService.saveRevisorId(this.formData));
+    }else{
+      await firstValueFrom(this.orderManagmentService.saveVoluntarioId(this.formData));
+    }
+    
+  }
+
+  async changeStateTask(status: string): Promise<void> {
+    this.formData = new FormData();
+    this.formData.append('id', this.taskId.toString());
+    this.formData.append('status', status);
+
+    await firstValueFrom(this.orderManagmentService.changeStatus(this.formData));
+  }
 
   confirmarEntrega(): void {
     this.formData = new FormData();
@@ -233,33 +231,33 @@ async changeStateTask(status: string): Promise<void> {
             console.error('Error al cambiar el estado:', err);
         }
     });
-}
-
-getSeverity(status: string): string {
-  return getSeverity(status);
-}
-
-confirmDeleteTask(taskId: number, event: Event) {
-  event.stopPropagation();
-  this.taskToDeleteId = taskId;
-  this.showConfirmPopup = true;
-}
-
-onDeleteTask() {
-  if (this.taskToDeleteId !== null) {
-      this.orderService.deleteOrder(this.taskToDeleteId).subscribe({
-          next: () => {
-              this.toastService.showSuccess('Tarea eliminada con éxito');
-              this.taskDeleted.emit(true); // 🔥 Emite evento al componente padre
-          },
-          error: error => {
-              this.toastService.showError('Error al eliminar tarea');
-              console.error('Error al eliminar tarea:', error);
-          }
-      });
   }
-  this.showConfirmPopup = false;
-}
+
+  getSeverity(status: string): string {
+    return getSeverity(status);
+  }
+
+  confirmDeleteTask(taskId: number, event: Event) {
+    event.stopPropagation();
+    this.taskToDeleteId = taskId;
+    this.showConfirmPopup = true;
+  }
+
+  onDeleteTask() {
+    if (this.taskToDeleteId !== null) {
+        this.orderService.deleteOrder(this.taskToDeleteId).subscribe({
+            next: () => {
+                this.toastService.showSuccess('Tarea eliminada con éxito');
+                this.taskDeleted.emit(true); // 🔥 Emite evento al componente padre
+            },
+            error: error => {
+                this.toastService.showError('Error al eliminar tarea');
+                console.error('Error al eliminar tarea:', error);
+            }
+        });
+    }
+    this.showConfirmPopup = false;
+  }
 
 
   editTask(id: number) {

@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ButtonModule } from 'primeng/button';
-import { OrderParagraphService } from '../../../../services/orderParagraph.service';
+import { OrderParagraphService } from '../../../../services/order-paragraph/orderParagraph.service';
 import { ProcessParagraphRequest } from '../../../../types/Requests/ProcessParagraphRequest';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
@@ -14,10 +14,10 @@ import { ToastModule } from 'primeng/toast';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
-import { AuthService } from '../../../../services/auth.service';
+import { AuthService } from '../../../../services/auth/auth.service';
 import { Annotation } from '../../../../types/annotation.interface';
-import { ParagraphAnnotationService } from '../../../../services/paragraphAnnotation.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ParagraphAnnotationService } from '../../../../services/paragraph-annotation/paragraphAnnotation.service';
+import { ToastService } from '../../../../services/toast/toast.service';
 
 @Component({
     selector: 'app-ocr-text-viewer',

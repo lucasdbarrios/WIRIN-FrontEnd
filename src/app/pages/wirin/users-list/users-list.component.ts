@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { UserService } from '../../../services/user.service';
+import { UserService } from '../../../services/user/user.service';
 import { CommonModule } from '@angular/common';
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
@@ -12,8 +12,9 @@ import { DropDown } from '../../../types/dropDown';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { AuthService } from '../../../services/auth.service';
-import { ToastService } from '../../../services/toast.service';
+import { AuthService } from '../../../services/auth/auth.service';
+import { ToastService } from '../../../services/toast/toast.service';
+import { UserRoles } from '../../../types/userRoles.type';
 
 @Component({
   selector: 'app-users-list',
@@ -29,15 +30,10 @@ export class UsersListComponent {
   loggedUserId: string = '';
   isLoading: boolean = true;
   dropdownValue:  DropDown | null = null;
-    dropdownValues: DropDown[] = [
-        { name: 'Todos', value: '' },
-        { name: 'Admin', value: 'Admin' },
-        { name: 'Bibliotecario', value: 'Bibliotecario' },
-        { name: 'Voluntario', value: 'Voluntario' },
-        { name: 'Revisor', value: 'Voluntario Administrativo' },
-        { name: 'Alumno', value: 'Alumno' },
-        
-    ];
+  dropdownValues = Object.entries(UserRoles).map(([key, value]) => ({
+    name: key,
+    value: value
+  }));
 
   constructor(private userService: UserService,
     private router: Router,

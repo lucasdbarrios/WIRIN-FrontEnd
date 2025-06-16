@@ -1,13 +1,13 @@
 import { Component } from "@angular/core";
 import { FluidModule } from "primeng/fluid";
 import { FormUserComponent } from "../ui/form-user/form-user.component";
-import { AuthService } from "../../../services/auth.service";
+import { AuthService } from '../../../services/auth/auth.service';
 import { Router } from "@angular/router";
 import { PopupComponent } from "../ui/popup/popup.component";
 import { User } from '../../../types/user.interface';
 import { HttpErrorResponse } from "@angular/common/http";
 import { MessageService } from "primeng/api";
-import { ToastService } from "../../../services/toast.service";
+import { ToastService } from "../../../services/toast/toast.service";
 
 @Component({
     selector: 'app-form-add-user',
@@ -26,7 +26,6 @@ export class AddUserFormComponent {
     constructor(
         private authService: AuthService,
         private router: Router,
-        private messageService: MessageService,
         private toastService: ToastService
     ) {}
 

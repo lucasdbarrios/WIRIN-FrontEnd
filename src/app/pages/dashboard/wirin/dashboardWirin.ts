@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Order } from '../../../types/order.interface';
-import { OrderService } from '../../../services/order.service';
+import { OrderService } from '../../../services/order/order.service';
 import { WirinStatsWidget } from './components/statsWidgetWirin/statswidget';
 import { RecentSalesWidgetWirin } from './components/recentSalesWidgetWirin/recentsaleswidget';
 import { ChartModule } from 'primeng/chart';

@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EnvService } from './env.service';
+import { EnvService } from '../env/env.service';
 import { Observable } from 'rxjs';
-import { ProcessParagraphRequest } from '../types/Requests/ProcessParagraphRequest';
-import { AuthService } from './auth.service';
+import { ProcessParagraphRequest } from '../../types/Requests/ProcessParagraphRequest';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
