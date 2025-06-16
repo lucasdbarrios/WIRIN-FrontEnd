@@ -24,10 +24,11 @@ export class ParagraphAnnotationService {
     }
 
     saveErrorMessageParagraph(annotation: Annotation): Observable<any> {
+        const tokenHeaders = this.getHeaders().headers;
         return this.http.post(`${this.apiUrl}`, { paragraphAnnotation: annotation }, {
-            ...this.getHeaders(),
-            headers: { 'Content-Type': 'application/json' },
+            headers: { ...tokenHeaders, 'Content-Type': 'application/json' },
             responseType: 'text'
         });
     }
+    
 }
