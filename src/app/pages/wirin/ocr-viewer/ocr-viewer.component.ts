@@ -16,12 +16,15 @@ import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
 import { OrderParagraphService } from '../../../services/order-paragraph/orderParagraph.service';
 import { FileUploadService } from '../../../services/file-upload/file-upload.service';
 import { ToastService } from '../../../services/toast/toast.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+
 
 @Component({
   selector: 'app-ocr-viewer',
   standalone: true,
-  imports: [CommonModule, FormsModule, OcrTextViewerComponent, ButtonModule, ToastModule],
-  providers: [MessageService],
+  imports: [CommonModule, FormsModule, OcrTextViewerComponent, ButtonModule, ToastModule, ConfirmDialogModule],
+  providers: [MessageService,ConfirmationService],
   templateUrl: './ocr-viewer.component.html',
 })
 export class OcrViewerComponent implements OnInit {
@@ -43,7 +46,8 @@ export class OcrViewerComponent implements OnInit {
   taskId: string  = '';
   estado: string | null = null;
 
-  constructor(private router: Router, 
+  constructor(private router: Router,
+    private confirmationService: ConfirmationService,  
     private orderManagmentService: OrderManagmentService,
     private route: ActivatedRoute,
     private authService: AuthService, 
@@ -52,6 +56,7 @@ export class OcrViewerComponent implements OnInit {
     private fileUploadService: FileUploadService,
     private orderParagraphService: OrderParagraphService,
     private toastService: ToastService
+    
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +101,17 @@ export class OcrViewerComponent implements OnInit {
       },
     });
 }
+
+confirmDenegarResultado(): void {
+  this.confirmationService.confirm({
+    message: '¿Estás seguro de que quieres denegar el resultado?',
+    accept: () => {
+      this.denegarResultado();
+    }
+  });
+}
+
+
 
 saveDocProcesed(pages: OcrPage[]): void {
   for (const page of pages) {
