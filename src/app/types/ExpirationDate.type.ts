@@ -1,6 +1,6 @@
 export enum ExpirationDate {
-    Hoy = 0,
-    Proximos7Dias = 7,
-    EsteMes = 30,
-    ProximoMes = 60
+    Hoy = 'Hoy',
+    Proximos7Dias = 'Proximos 7 dias',
+    EsteMes = 'Este mes',
+    ProximoMes = 'Proximo mes'
 }

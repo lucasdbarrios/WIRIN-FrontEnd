@@ -25,13 +25,15 @@ import { ToastService } from '../../../services/toast/toast.service';
 import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { getSeverity } from '../../../utils/getSeverity';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+
 
 @Component({
     selector: 'app-tasks-component',
     standalone: true,
     imports: [CommonModule, RouterModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, 
     OrderListModule, TagModule, ButtonModule,SelectModule, ToolbarModule, IconFieldModule, InputIconModule,
-    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent
+    SplitButtonModule, FluidModule, InputGroupModule, InputTextModule, DialogModule,TaskDetailComponent, ToggleSwitch
 ],
     templateUrl: './tasks-voluntario.component.html',
 })

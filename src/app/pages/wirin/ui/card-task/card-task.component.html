@@ -1,19 +1,16 @@
-<p-card [style]="{ overflow: 'hidden', wordWrap: 'break-word', border: task.isPriority ? '2px solid #ff4d4f' : 'none' }">
+<p-card
+    [style]="{ overflow: 'hidden', wordWrap: 'break-word', border: task.isPriority ? '2px solid #ff4d4f' : 'none' }">
     <ng-template #header>
-        <div style="display: flex; justify-content: space-between; align-items: center">
-            <div *ngIf="task.isPriority" style="color: #ff4d4f; font-weight: bold; display: flex; align-items: center">
-                <i class="pi pi-exclamation-triangle" style="margin-right: 5px;"></i>
-                <span>Prioritaria</span>
-            </div>
-            <p-tag [value]="task.status" [severity]="getSeverity(task.status)"
-                [style]="{fontSize: '1.2em'}"></p-tag>
+        <div style="display: flex; justify-content: end; align-items: center">
+            <p-tag [value]="task.status" [severity]="getSeverity(task.status)" [style]="{fontSize: '1.2em'}"></p-tag>
         </div>
     </ng-template>
     <ng-template #title><strong>{{ task.name }}</strong></ng-template>
     <ng-template #subtitle>
         <div style="display: flex; align-items: center;">
             <span>Prioridad: </span>
-            <span *ngIf="task.isPriority" style="color: #ff4d4f; font-weight: bold; display: flex; align-items: center; margin-left: 5px;">
+            <span *ngIf="task.isPriority"
+                style="color: #ff4d4f; font-weight: bold; display: flex; align-items: center; margin-left: 5px;">
                 Alta
                 <i class="pi pi-exclamation-triangle" style="margin-left: 5px;"></i>
             </span>

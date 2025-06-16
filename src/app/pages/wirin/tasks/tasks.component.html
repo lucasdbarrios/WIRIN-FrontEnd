@@ -10,16 +10,22 @@
 
         <p-toolbar>
             <ng-template #start>
-                <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
-                    placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()">
-                </p-select>
-            </ng-template>
-
-            <ng-template #center>
                 <p-iconfield iconPosition="left">
                     <input pInputText type="text" placeholder="Buscar tarea" (input)="searchTasks($event)" />
                     <p-inputicon class="pi pi-search"></p-inputicon>
                 </p-iconfield>
+            </ng-template>
+
+            <ng-template #center>
+                <div class="filters-wrapper"
+                    style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
+                    <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
+                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()">
+                    </p-select>
+                    <p-select [(ngModel)]="dropdownDate" [options]="dropdownDates" optionLabel="name"
+                        placeholder="Filtrar por vencimiento" [showClear]="true" (onChange)="loadTasks()">
+                    </p-select>
+                </div>
             </ng-template>
 
             <ng-template #end>

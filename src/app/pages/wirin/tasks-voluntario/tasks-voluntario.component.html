@@ -1,18 +1,20 @@
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Tareas</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Tareas</h2>
+        <div style="display: flex; align-items: center; gap: 2px;">
+            <span>Tareas prioritarias</span>
+            <p-toggleswitch [(ngModel)]="value" (onChange)="togglePriorityFilter()"></p-toggleswitch>
+        </div>
+    </div>
 
     <p-toolbar>
         <ng-template #start>
             <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
                 placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()" />
         </ng-template>
-        <ng-template #end>
-            <p-selectbutton [options]="stateOptions" [(ngModel)]="value" optionLabel="label" optionValue="value"
-                aria-labelledby="basic" (onChange)="togglePriorityFilter()"
-                class="p-selectbutton bg-white text-black border-none">
-            </p-selectbutton>
-        </ng-template>
         <ng-template #center>
+        </ng-template>
+        <ng-template #end>
             <p-iconfield iconPosition="left">
                 <input pInputText type="text" placeholder="Buscar tarea" (input)="searchTasks($event)" />
                 <p-inputicon class="pi pi-search" />
