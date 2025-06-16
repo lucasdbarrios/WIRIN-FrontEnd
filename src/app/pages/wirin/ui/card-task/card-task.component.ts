@@ -46,6 +46,10 @@ export class CardTaskComponent implements OnInit {
             if (diffDays <= 1) {
                 this.task.isPriority = true;
             }
+
+            if (this.task.status === "Completada" || this.task.status === "Entregada") {
+                this.task.isPriority = false;
+            }
         }
     }
 }
