@@ -10,12 +10,6 @@ export class AutoRefreshService implements OnDestroy {
 
   constructor() {}
 
-  /**
-   * Crea un observable que se actualiza automáticamente en un intervalo especificado
-   * @param dataFn Función que devuelve un Observable con los datos a actualizar
-   * @param interval Intervalo de actualización en milisegundos (por defecto 5000ms)
-   * @returns Observable que emite los datos actualizados periódicamente
-   */
   createAutoRefreshObservable<T>(
     dataFn: () => Observable<T>,
     interval: number = 5000
