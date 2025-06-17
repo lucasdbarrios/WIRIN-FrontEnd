@@ -8,14 +8,15 @@
     </ng-template>
     <ng-template #title><strong>{{ task.name }}</strong></ng-template>
     <ng-template #subtitle>
-        <div style="display: flex; align-items: center;">
-            <span>Prioridad: </span>
-            <span *ngIf="task.isPriority"
-                style="color: #ff4d4f; font-weight: bold; display: flex; align-items: center; margin-left: 5px;">
-                Alta
-                <i class="pi pi-exclamation-triangle" style="margin-left: 5px;"></i>
-            </span>
-            <span *ngIf="!task.isPriority">Normal</span>
+        <div>
+            <p>
+                Prioridad:
+                <span
+                    [ngStyle]="{'color': task.isPriority ? '#ff4d4f' : 'inherit', 'font-weight': task.isPriority ? 'bold' : 'normal'}">
+                    {{ task.isPriority ? 'Alta' : 'Normal' }}
+                    <i *ngIf="task.isPriority" class="pi pi-exclamation-triangle" style="margin-left: 5px;"></i>
+                </span>
+            </p>
         </div>
     </ng-template>
     <p>Vencimiento: {{ task.limitDate | date:'dd/MM/yyyy' }}</p>
