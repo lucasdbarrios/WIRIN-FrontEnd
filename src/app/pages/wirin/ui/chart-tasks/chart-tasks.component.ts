@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
+import { OrderDelivery } from '../../../../types/orderDelivery.interface';
 
 @Component({
     selector: 'app-chart-tasks',
@@ -7,12 +8,23 @@ import { ChartModule } from 'primeng/chart';
     standalone: true,
     imports: [ChartModule]
 })
-export class ChartTasksComponent {
+export class ChartTasksComponent implements AfterViewInit, OnChanges {
+    @Input() projects: OrderDelivery[] = [];
     barData: any;
     barOptions: any;
 
+    constructor(private cdRef: ChangeDetectorRef) {}
+
     ngAfterViewInit() {
         this.initCharts();
+        this.cdRef.detectChanges(); // Fuerza la actualización de la vista después de inicializar el gráfico
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['projects']) {
+            this.initCharts();
+            this.cdRef.detectChanges(); // Detecta cambios cuando `projects` cambia
+        }
     }
 
     initCharts() {
@@ -20,24 +32,36 @@ export class ChartTasksComponent {
         const textColor = documentStyle.getPropertyValue('--text-color');
         const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
         const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
+        const deliveredByMonth = Array(12).fill(0);
+        const pendingByMonth = Array(12).fill(0);
+        
+        this.projects.forEach(project => {
+            const monthIndex = new Date(project.deliveryDate).getMonth();
+            if (project.status === "Entregado") {
+                deliveredByMonth[monthIndex]++;
+            } else if (project.status !== "Entregado") {
+                pendingByMonth[monthIndex]++;
+            }
+        });
+        
         this.barData = {
-            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
             datasets: [
                 {
-                    label: 'Bibliografia entregada',
+                    label: `Bibliografía entregada (${deliveredByMonth.reduce((a, b) => a + b, 0)})`,
                     backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
                     borderColor: documentStyle.getPropertyValue('--p-primary-500'),
-                    data: [65, 59, 80, 81, 56, 55, 40]
+                    data: deliveredByMonth
                 },
                 {
-                    label: 'Bibliografia adaptada',
+                    label: `Bibliografía creada (${pendingByMonth.reduce((a, b) => a + b, 0)})`,
                     backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
                     borderColor: documentStyle.getPropertyValue('--p-primary-200'),
-                    data: [28, 48, 40, 19, 86, 27, 90]
+                    data: pendingByMonth
                 }
             ]
         };
+
         this.barOptions = {
             maintainAspectRatio: false,
             aspectRatio: 0.8,

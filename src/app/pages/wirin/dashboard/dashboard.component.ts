@@ -6,6 +6,7 @@ import { TableModule } from 'primeng/table';
 import { ChartTasksComponent } from '../ui/chart-tasks/chart-tasks.component';
 import { OrderDeliveryService } from '../../../services/order-delivery/orderDelivery.service';
 import { OrderDelivery } from '../../../types/orderDelivery.interface';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -32,7 +33,8 @@ export class DashboardComponent {
         { bgClass: 'bg-green-100 dark:bg-green-400/10', iconClass: 'pi pi-check-circle text-green-500 !text-xl' }
     ];
 
-    constructor(private orderDeliveryService: OrderDeliveryService
+    constructor(private orderDeliveryService: OrderDeliveryService,
+        private toastService: ToastService
     ) { }
 
     ngOnInit() {
@@ -44,11 +46,13 @@ export class DashboardComponent {
     
         this.orderDeliveryService.getOrderDeliveriesWithOrders().subscribe({
             next: (response) => {
+                console.log(response);
                 this.projects = response;
                 this.getFilterTasksByStatus(this.projects);
                 this.isLoading = false;
             },
             error: (error) => {
+                this.toastService.showError('Error al obtener los proyectos');
                 console.error('Error al obtener proyectos:', error);
                 this.isLoading = false;
             }

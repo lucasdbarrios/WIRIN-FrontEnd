@@ -9,6 +9,6 @@ import { User } from "./user.interface";
     deliveryDate: string;
     title: string;
     orders: Order[];
-    user: User;
-    studentUser: User;
+    userName: string;
+    studentUserName: string;
   }

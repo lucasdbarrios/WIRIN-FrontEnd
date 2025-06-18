@@ -1,9 +1,3 @@
-<div *ngIf="isLoading" aria-live="polite" class="fixed inset-0 flex flex-col justify-center items-center bg-white/80">
-    <div class="animate-spin rounded-full mb-1" style="height: 5rem; width: 5em; border-top: 5px solid #3B82F6;"
-        aria-label="Cargando..."></div>
-    <span>Cargando datos</span>
-</div>
-
 <div class="grid grid-cols-1 md:grid-cols-3 md:auto-rows-auto gap-4">
 
     <!-- Div 1 -->
@@ -38,11 +32,19 @@
 
     <!-- Div 5 -->
     <div class="order-6 md:order-none md:row-start-2 md:row-span-2 md:col-start-2 md:col-span-2">
-        <p-table [value]="projects" [paginator]="true" [rows]="5">
+        <div *ngIf="isLoading" aria-live="polite"
+            class="fixed inset-0 flex flex-col justify-center items-center bg-white/80">
+            <div class="animate-spin rounded-full mb-1" style="height: 5rem; width: 5em; border-top: 5px solid #3B82F6;"
+                aria-label="Cargando..."></div>
+            <span>Cargando datos</span>
+        </div>
+        <p-table class="h-full" *ngIf="!isLoading" [value]="projects" [scrollable]="true" scrollHeight="250px">
             <ng-template pTemplate="header">
                 <tr>
                     <th>Bibliografias</th>
                     <th>Cantidad de tareas</th>
+                    <th>Estado</th>
+                    <th>Alumno</th>
                     <th>Fecha de creacion</th>
                 </tr>
             </ng-template>
@@ -50,6 +52,8 @@
                 <tr>
                     <td>{{ project.title }}</td>
                     <td>{{ project.orders.length }}</td>
+                    <td>{{ project.status}}</td>
+                    <td>{{ project.studentUserName }}</td>
                     <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
                 </tr>
             </ng-template>
@@ -58,7 +62,7 @@
 
     <!-- Div 7 -->
     <div class="order-7 md:order-none md:col-span-3">
-        <app-chart-tasks></app-chart-tasks>
+        <app-chart-tasks *ngIf="projects.length > 0" [projects]="projects"></app-chart-tasks>
     </div>
 
 </div>
