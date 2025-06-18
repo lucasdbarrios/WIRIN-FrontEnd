@@ -1,0 +1,11 @@
+<div class="card mb-0">
+    <div class="flex justify-between mb-4">
+        <div>
+            <span class="block text-muted-color font-medium mb-4">{{ label }}</span>
+            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">{{ value }}</div>
+        </div>
+        <div class="flex items-center justify-center" [ngClass]="bgClass" style="width: 2.5rem; height: 2.5rem">
+            <i [ngClass]="iconClass"></i>
+        </div>
+    </div>
+</div>

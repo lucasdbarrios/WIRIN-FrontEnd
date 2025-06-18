@@ -1,7 +1,16 @@
 <div class="card">
-    <p-table #dt2 [value]="projects" [globalFilterFields]="['title', 'status', 'studentUserId']" dataKey="id"
-        [tableStyle]="{ 'min-width': '60rem' }" [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)"
-        (onRowCollapse)="onRowCollapse($event)">
+    <div *ngIf="isLoading" aria-live="polite" class="flex flex-col justify-center items-center mt-2">
+        <div class="animate-spin rounded-full mb-1"
+            style="height: 2.5rem; width: 2.5rem; border-top: 2px solid #3B82F6;" aria-label="Cargando..."></div>
+        <span>Cargando bibliografias</span>
+    </div>
+
+    <div *ngIf="!isLoading && projects.length === 0" style="text-align: center; color: #6B7280; margin-top: 1.5rem;">
+        No hay bibliografias disponibles en este momento.
+    </div>
+    <p-table *ngIf="!isLoading" #dt2 [value]="projects" [paginator]="true" [rows]="10"
+        [globalFilterFields]="['title', 'status', 'studentUserId']" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }"
+        [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)">
 
         <ng-template #caption>
             <div class="flex">

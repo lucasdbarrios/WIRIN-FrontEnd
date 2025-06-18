@@ -34,20 +34,26 @@ export class ProyectsComponent implements OnInit {
     isTaskDetailOpen: boolean = false;
     @Output() taskDeleted = new EventEmitter<number>();
     selectedProject: OrderDelivery | null = null;
+    isLoading: boolean = true;
 
     constructor(private messageService: MessageService, 
         private orderDeliveryService: OrderDeliveryService) {}
 
     ngOnInit(): void {
+        this.loadTasksDelivered();
+    }
+
+    loadTasksDelivered(): void {
+        this.isLoading = true;
         this.orderDeliveryService.getOrderDeliveriesWithOrders().subscribe({
             next: (data: OrderDelivery[]) => {
                 this.projects = data;
-                console.log(this.projects);
+                this.isLoading = false;
             },
             error: (error: any) => {
                 console.error('Error al obtener los proyectos:', error);
             }
-        });
+        })
     }
 
     getSeverity(task: any): string {

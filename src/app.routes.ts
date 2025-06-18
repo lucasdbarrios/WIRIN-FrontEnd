@@ -20,6 +20,7 @@ import { DeliveriesComponent } from './app/pages/wirin/deliveries/deliveries.com
 import { TasksVoluntarioComponent } from './app/pages/wirin/tasks-voluntario/tasks-voluntario.component';
 import { ProyectsComponent } from './app/pages/wirin/proyects/proyects.component';
 import { AutoRefreshExampleComponent } from './app/pages/example/auto-refresh-example.component';
+import { DashboardComponent } from './app/pages/wirin/dashboard/dashboard.component';
 
 export const appRoutes: Routes = [
     {
@@ -55,6 +56,7 @@ export const appRoutes: Routes = [
             { path: 'proyects', component: ProyectsComponent, canActivate: [AuthGuard] },
             { path: 'users', component: UsersListComponent, canActivate: [AuthGuard] },
             { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+            { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

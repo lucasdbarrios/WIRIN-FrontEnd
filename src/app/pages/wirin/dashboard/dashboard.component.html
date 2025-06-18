@@ -1,0 +1,55 @@
+<div *ngIf="isLoading" aria-live="polite" class="fixed inset-0 flex flex-col justify-center items-center bg-white/80">
+    <div class="animate-spin rounded-full mb-1" style="height: 5rem; width: 5em; border-top: 5px solid #3B82F6;"
+        aria-label="Cargando..."></div>
+    <span>Cargando datos</span>
+</div>
+
+<div *ngIf="!isLoading && projects.length === 0" style="text-align: center; color: #6B7280; margin-top: 1.5rem;">
+    No hay datos disponibles en este momento.
+</div>
+
+<div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-rows-4 gap-8">
+    <!-- Row 1 -->
+    <app-data-task [label]="'Total tareas'" [value]="tasks.length" [bgClass]="taskStats[0].bgClass"
+        [iconClass]="taskStats[0].iconClass"></app-data-task>
+    <app-data-task [label]="'Tareas pendientes'" [value]="tasksPend" [bgClass]="taskStats[1].bgClass"
+        [iconClass]="taskStats[1].iconClass"></app-data-task>
+    <app-data-task [label]="'Tareas en proceso'" [value]="tasksInProcess" [bgClass]="taskStats[2].bgClass"
+        [iconClass]="taskStats[2].iconClass"></app-data-task>
+
+    <!-- Row 2 -->
+    <app-data-task [label]="'Tareas para revisar'" [value]="tasksInReview" [bgClass]="taskStats[3].bgClass"
+        [iconClass]="taskStats[3].iconClass"></app-data-task>
+    <div class="col-span-1 md:col-span-2 lg:col-span-2 row-span-3">
+        <p-table [value]="projects" [paginator]="true" [rows]="9">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Bibliografias</th>
+                    <th>Cantidad de tareas</th>
+                    <th>Fecha de creacion</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-project>
+                <tr>
+                    <td>{{ project.title }}</td>
+                    <td>{{ project.orders.length }}</td>
+                    <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Row 3 → Tarea en columna 1 -->
+    <app-data-task [label]="'Tareas para validar'" [value]="tasksToValidate" [bgClass]="taskStats[4].bgClass"
+        [iconClass]="taskStats[4].iconClass"></app-data-task>
+
+    <!-- Row 4  -->
+    <app-data-task [label]="'Tareas completadas'" [value]="tasksCompleted" [bgClass]="taskStats[5].bgClass"
+        [iconClass]="taskStats[5].iconClass"></app-data-task>
+
+    <!-- Row 5 → Ubica el gráfico en toda la última fila -->
+    <div class="col-span-1 md:col-span-2 lg:col-span-3 row-span-1">
+        <app-chart-tasks></app-chart-tasks>
+    </div>
+
+</div>
