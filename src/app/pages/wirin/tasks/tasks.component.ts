@@ -54,7 +54,7 @@ export class TasksComponent implements OnInit{
         { label: 'Todas', value: false },
         { label: 'Prioritarias', value: true }
     ];
-    value: string = 'off';
+    value: boolean = false;
     dropdownValue:  DropDown | null = null;
     dropdownValues: { name: string; value: OrderStatus }[] = Object.values(OrderStatus).map(status => ({
         name: status, 
@@ -98,9 +98,10 @@ export class TasksComponent implements OnInit{
             const data = await lastValueFrom(request);
             this.allTasks = data;
             this.tasks = [...data];
-
             this.tasks = this.filterTasksByRole(data);
             this.tasks = this.filterTasksByExpirationDate(this.tasks);
+            this.togglePriorityFilter();
+
 
 
         } catch (error) {
@@ -188,10 +189,12 @@ export class TasksComponent implements OnInit{
         );
     }
 
-    togglePriorityFilter() {
-        this.tasks = this.value 
-            ? this.allTasks.filter(task => task.isPriority && this.canUserSeeTask(task))
-            : this.allTasks.filter(task => this.canUserSeeTask(task));
+    togglePriorityFilter(): void {
+       const onlyPriority = this.value;
+       this.tasks = onlyPriority
+       ? this.allTasks.filter(task => task.isPriority)
+       : [...this.allTasks];
+
     }
     
     canUserSeeTask(task: any): boolean {
