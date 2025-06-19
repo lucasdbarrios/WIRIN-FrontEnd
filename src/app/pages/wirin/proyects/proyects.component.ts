@@ -16,13 +16,18 @@ import { OrderDeliveryService } from '../../../services/order-delivery/orderDeli
 import { getSeverity } from '../../../utils/getSeverity';
 import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
+import { ProgressBar } from 'primeng/progressbar';
+import { DropdownModule } from 'primeng/dropdown';
+import { UserService } from '../../../services/user/user.service';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
     selector: 'table-row-expansion-demo',
     templateUrl: 'proyects.component.html',
     standalone: true,
     imports: [TableModule, TagModule, ToastModule, RatingModule, ButtonModule, CommonModule, 
-        FormsModule, IconFieldModule, InputIconModule, InputTextModule, DialogModule, TaskDetailComponent],
+        FormsModule, IconFieldModule, InputIconModule, InputTextModule, DialogModule, 
+        TaskDetailComponent, ProgressBar, DropdownModule],
     providers: [ MessageService, InputIconModule]
 })
 
@@ -35,9 +40,17 @@ export class ProyectsComponent implements OnInit {
     @Output() taskDeleted = new EventEmitter<number>();
     selectedProject: OrderDelivery | null = null;
     isLoading: boolean = true;
+    isDeliveryOpen: boolean = false;
+    selectedStudent: any = null;
+    students: any[] = [];
+    orderDeliveryIdSelected: number = 0;
+
 
     constructor(private messageService: MessageService, 
-        private orderDeliveryService: OrderDeliveryService) {}
+        private orderDeliveryService: OrderDeliveryService,
+        private userService: UserService,
+        private toastService: ToastService,
+    ) {}
 
     ngOnInit(): void {
         this.loadTasksDelivered();
@@ -91,5 +104,39 @@ export class ProyectsComponent implements OnInit {
             project.orders = project.orders?.filter(task => task.id !== taskId);
         }
         this.isTaskDetailOpen = false;
+    }
+
+    openDelivery(orderDeliveryId: number){
+        this.orderDeliveryIdSelected = orderDeliveryId;
+        this.isDeliveryOpen = true;
+    }
+
+    sendDelivery(): void {
+        
+        this.isLoading = true;
+    }
+
+    getPercent(project: OrderDelivery): number{
+        
+        if( project.orders.length != 0){
+            const tasksCompleted = this.projects.filter(project => project.status == "Completada").length;
+            console.log(tasksCompleted)
+            return Number(((tasksCompleted*100)/project.orders.length).toFixed(0));
+        }
+        return 0;
+    }
+
+
+    sendOrderDelivery(): void {
+        this.userService.getAllStudents(this.orderDeliveryIdSelected).subscribe({
+            next: (data: any[]) => {
+                this.students = data;
+            },
+            error: (error) => {
+                this.toastService.showError('Error al cargar los alumnos');
+                console.error('Error al cargar los alumnos:', error);
+            }
+        });
+        this.isLoading = true;
     }
 }

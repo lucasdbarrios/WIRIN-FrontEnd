@@ -8,7 +8,7 @@
     <div *ngIf="!isLoading && projects.length === 0" style="text-align: center; color: #6B7280; margin-top: 1.5rem;">
         No hay bibliografias disponibles en este momento.
     </div>
-    <p-table *ngIf="!isLoading" #dt2 [value]="projects" [paginator]="true" [rows]="10"
+    <p-table *ngIf="!isLoading" #dt2 [value]="projects" [paginator]="true" [rows]="15"
         [globalFilterFields]="['title', 'status', 'studentUserId']" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }"
         [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)">
 
@@ -32,6 +32,7 @@
                 <th pSortableColumn="StudentUserId">Alumno <p-sortIcon field="StudentUserId" /></th>
                 <th>Cantidad de tareas</th>
                 <th>Fecha de entrega</th>
+                <th></th>
             </tr>
         </ng-template>
 
@@ -42,10 +43,15 @@
                         [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
                 </td>
                 <td>{{ project.title }}</td>
-                <td><p-tag [value]="project.status" [severity]="getSeverity(project.status)" /></td>
+                <td><p-progressbar [value]="getPercent(project)" /></td>
                 <td>{{ project.studentUserName }}</td>
                 <td>{{ project.orders.length }}</td>
                 <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
+                <td>
+                    <p-button icon="pi pi-sent" [disabled]="getPercent(project) != 100" label="Entregar"
+                        severity="success" (click)="openDelivery(project.id)">
+                    </p-button>
+                </td>
             </tr>
         </ng-template>
 
@@ -61,7 +67,7 @@
                 <th pSortableColumn="Status">Estado <p-sortIcon field="Status" /></th>
                 <th>Fecha de creación</th>
                 <th>Vencimiento</th>
-                <th></th>
+
             </tr>
         </ng-template>
         <ng-template #body let-task>
@@ -74,7 +80,6 @@
                 <td>
                     <p-button icon="pi pi-eye" label="Detalles" (click)="onShowTaskDetail(project.id, task.id)"
                         styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
-
                 </td>
             </tr>
         </ng-template>
@@ -89,4 +94,17 @@
 <p-dialog header="Detalles de la tarea" [modal]="true" [(visible)]="isTaskDetailOpen" styleClass="max-w-4xl w-full">
     <app-task-detail *ngIf="taskId && selectedProject" [taskId]="taskId"
         (taskDeleted)="handleTaskDeletion(selectedProject.id, taskId)"></app-task-detail>
+</p-dialog>
+
+<p-dialog header="Entregar bibliografia" [modal]="true" [(visible)]="isDeliveryOpen">
+    <div class="flex flex-col gap-4">
+        <label>Seleccione alumno:</label>
+        <p-dropdown [options]="students" [(ngModel)]="selectedStudent" optionLabel="fullName"
+            placeholder="Seleccione un alumno" appendTo="body"></p-dropdown>
+        <div class="flex justify-end gap-2 mt-4">
+            <p-button label="Cancelar" icon="pi pi-times" (onClick)="isDeliveryOpen = false"></p-button>
+            <p-button label="Confirmar entrega" icon="pi pi-check" (onClick)="sendOrderDelivery()"
+                [disabled]="!selectedStudent"></p-button>
+        </div>
+    </div>
 </p-dialog>
