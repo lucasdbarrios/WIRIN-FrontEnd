@@ -1,0 +1,169 @@
+<!-- Toast para mensajes tipo “borrador guardado” o “mensaje enviado” -->
+<p-toast position="bottom-right"></p-toast>
+
+<!-- Layout principal -->
+<div class="flex flex-col md:flex-row bg-gray-900 text-gray-200 min-h-screen">
+  <!-- Sidebar -->
+  <div class="w-full md:w-64 p-4 border-r border-surface-border surface-800">
+    <h2 class="text-lg font-semibold mb-4">Mensajes</h2>
+    <ul class="space-y-2">
+      <li>
+        <p-button
+          label="Recibidos"
+          icon="pi pi-inbox"
+          class="w-full p-button-text"
+          (click)="activeFolder = 'inbox'; loadMessages()"
+          [class.p-button-secondary]="activeFolder !== 'inbox'"
+        ></p-button>
+      </li>
+      <li>
+        <p-button
+          label="Enviados"
+          icon="pi pi-send"
+          class="w-full p-button-text"
+          (click)="activeFolder = 'sent'; loadMessages()"
+          [class.p-button-secondary]="activeFolder !== 'sent'"
+        ></p-button>
+      </li>
+      <li>
+        <p-button
+          label="Borradores"
+          icon="pi pi-file"
+          class="w-full p-button-text"
+          (click)="activeFolder = 'drafts'; loadMessages()"
+          [class.p-button-secondary]="activeFolder !== 'drafts'"
+        ></p-button>
+      </li>
+    </ul>
+
+    <p-button
+      label="Redactar"
+      icon="pi pi-pencil"
+      class="mt-6 w-full p-button-info"
+      (click)="showComposer = true"
+    ></p-button>
+  </div>
+
+  <!-- Lista de mensajes -->
+  <div class="flex-1 p-4">
+    <h3 class="text-xl mb-3 capitalize">Bandeja: {{ activeFolder }}</h3>
+
+    <p-table
+      [value]="messages"
+      [paginator]="true"
+      [rows]="10"
+      class="surface-800 text-gray-200"
+      [tableStyle]="{ minWidth: '100%' }"
+      selectionMode="single"
+      [(selection)]="selectedMessage"
+      (onRowSelect)="viewMessage(selectedMessage)"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Asunto</th>
+          <th>Remitente</th>
+          <th>Fecha</th>
+          <th *ngIf="activeFolder === 'inbox'">Tipo</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-msg>
+        <tr>
+          <td class="font-medium">{{ msg.subject }}</td>
+          <td>{{ msg.sender }}</td>
+          <td>{{ msg.date | date: 'short' }}</td>
+          <td *ngIf="activeFolder === 'inbox'">
+            <p-tag
+              [value]="msg.studentId ? 'Alumno' : 'Interno'"
+              [severity]="msg.studentId ? 'info' : 'success'"
+              rounded
+            ></p-tag>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Diálogo de lectura -->
+  <p-dialog
+    header="{{ selectedMessage?.subject }}"
+    [(visible)]="showViewer"
+    modal
+    [style]="{ width: '60vw' }"
+    *ngIf="selectedMessage"
+  >
+    <div class="text-gray-200">
+      <div class="mb-2">
+        <strong>De:</strong> {{ selectedMessage.sender }}<br />
+        <strong>Fecha:</strong> {{ selectedMessage.date | date: 'short' }}
+      </div>
+
+      <p class="whitespace-pre-line">{{ selectedMessage.content }}</p>
+
+      <div *ngIf="selectedMessage.filePath" class="mt-3">
+        <a
+          [href]="'/api/messages/file/' + selectedMessage.id"
+          target="_blank"
+          class="text-blue-400 hover:underline"
+        >
+          Descargar archivo adjunto
+        </a>
+      </div>
+
+      <!-- Respuesta rápida -->
+      <div class="mt-4">
+        <p-inputTextarea
+          [(ngModel)]="quickReply"
+          rows="3"
+          placeholder="Responder..."
+          autoResize
+        ></p-inputTextarea>
+        <p-button
+          label="Enviar respuesta"
+          icon="pi pi-reply"
+          class="mt-2"
+          (click)="sendReply()"
+        ></p-button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Redactor -->
+  <p-dialog
+    header="Nuevo mensaje"
+    [(visible)]="showComposer"
+    modal
+    [style]="{ width: '45vw' }"
+  >
+    <div class="p-fluid text-gray-200">
+      <div class="field">
+        <label>Destinatario (ID usuario)</label>
+        <input pInputText [(ngModel)]="newMessage.studentId" />
+      </div>
+      <div class="field">
+        <label>Asunto</label>
+        <input pInputText [(ngModel)]="newMessage.subject" />
+      </div>
+      <div class="field">
+        <label>Contenido</label>
+        <textarea pInputTextarea rows="5" [(ngModel)]="newMessage.content"></textarea>
+      </div>
+      <div class="field">
+        <label>Adjuntar archivo</label>
+        <input type="file" (change)="onFileSelect($event)" />
+      </div>
+      <div class="mt-3 flex justify-end gap-2">
+        <p-button
+          label="Guardar borrador"
+          icon="pi pi-save"
+          class="p-button-secondary"
+          (click)="saveDraft()"
+        ></p-button>
+        <p-button
+          label="Enviar"
+          icon="pi pi-send"
+          (click)="sendMessage()"
+        ></p-button>
+      </div>
+    </div>
+  </p-dialog>
+</div>
