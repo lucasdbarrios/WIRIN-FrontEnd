@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, interval, switchMap, shareReplay } from 'rxjs';
+import { Observable, interval, switchMap, shareReplay, concat, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +15,15 @@ export class AutoRefreshService {
     dataFn: () => Observable<T>,
     intervalMs: number = 60000
   ): Observable<T> {
-    // Combina la obtención inicial de datos con actualizaciones periódicas
-    return interval(intervalMs).pipe(
-      // Comienza con una emisión inmediata (0ms)
-      // Luego continúa con el intervalo especificado
-      switchMap(() => dataFn()),
+    // Utilizamos startWith y concat para emitir inmediatamente y luego seguir con el intervalo
+    return concat(
+      // Primero emitimos los datos iniciales inmediatamente
+      dataFn(),
+      // Luego configuramos el intervalo para actualizaciones periódicas
+      interval(intervalMs).pipe(
+        switchMap(() => dataFn())
+      )
+    ).pipe(
       // shareReplay permite que múltiples suscriptores compartan la misma secuencia de datos
       // y obtengan el último valor emitido al suscribirse
       shareReplay(1)
