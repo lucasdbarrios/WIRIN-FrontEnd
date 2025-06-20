@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../services/order/order.service';
@@ -10,7 +10,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { UserService } from '../../../services/user/user.service';
 import { TagModule } from 'primeng/tag';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { ToastService } from '../../../services/toast/toast.service';
 import { PopupComponent } from '../ui/popup/popup.component';
 import { getSeverity } from '../../../utils/getSeverity';
@@ -22,7 +22,7 @@ import { getSeverity } from '../../../utils/getSeverity';
   templateUrl: './task-detail.component.html',
 })
 
-export class TaskDetailComponent implements OnInit, OnChanges  {
+export class TaskDetailComponent implements OnInit, OnChanges, OnDestroy  {
   task: any = {};
   isLoading: boolean = true;
   errorMessage: string = '';
@@ -48,6 +48,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
   creatorName: string = '';
   alumnoName: string = '';
   isProcessing: boolean = false;
+  private subscriptions: Subscription[] = [];
   showConfirmPopup: boolean = false;
   taskToDeleteId: number | null = null;
 
@@ -62,7 +63,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
   ) {}
 
   ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe({
+    const subscription = this.authService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
         this.userIdActive = userData?.id ?? '';
@@ -71,7 +72,9 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
         this.toastService.showError('Error al obtener el usuario');
         console.error('Error al obtener el usuario:', err);
       }
-    })
+    });
+    this.subscriptions.push(subscription);
+    
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');
     this.loadTaskDetails();
@@ -91,8 +94,13 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
 }
 
 
+  ngOnDestroy(): void {
+    // Cancelar todas las suscripciones al destruir el componente
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
   getStatus(): void {
-    this.orderService.getTaskById(this.taskId).subscribe({
+    const subscription = this.orderService.getTaskByIdWithAutoRefresh(this.taskId).subscribe({
       next: (task) => {
         this.statusTask = task.status;
         if (this.statusTask === 'Completada' || this.statusTask === 'Entregada') {
@@ -120,7 +128,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
       return;
     }
 
-    this.orderService.getTaskById(this.taskId).subscribe({
+    const subscription = this.orderService.getTaskByIdWithAutoRefresh(this.taskId).subscribe({
       next: async (data: any) => { 
           this.task = {
               ...data,
@@ -141,6 +149,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
           this.isLoading = false;
       }
   });
+  this.subscriptions.push(subscription);
   }
 
   downloadFile(taskId: number, fileName: string | null): void {
@@ -175,7 +184,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
       await this.changeStateTask(status);
     }
 
-    this.fileUploadService.newProcessOcr(orderId, this.selectedOcrProcessor).subscribe({
+    const subscription = this.fileUploadService.newProcessOcrWithAutoRefresh(orderId, this.selectedOcrProcessor).subscribe({
         next: (response) => {
           
             this.isProcessing = false;
@@ -197,6 +206,7 @@ export class TaskDetailComponent implements OnInit, OnChanges  {
             this.isProcessing = false;
         }
     });
+    this.subscriptions.push(subscription);
   }
 
   async saveUserId(): Promise<void> {

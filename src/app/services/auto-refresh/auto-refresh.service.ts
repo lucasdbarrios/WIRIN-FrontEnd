@@ -1,29 +1,28 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, Subject, timer } from 'rxjs';
-import { switchMap, takeUntil, retry, share, startWith } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { Observable, interval, switchMap, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AutoRefreshService implements OnDestroy {
-  private stopPolling = new Subject<void>();
-
-  constructor() {}
-
+export class AutoRefreshService {
+  /**
+   * Crea un Observable que se actualiza automáticamente a intervalos regulares
+   * @param dataFn Función que devuelve un Observable con los datos a actualizar
+   * @param intervalMs Intervalo de actualización en milisegundos (por defecto 60000ms = 1 minuto)
+   * @returns Observable que emite datos actualizados en el intervalo especificado
+   */
   createAutoRefreshObservable<T>(
     dataFn: () => Observable<T>,
-    interval: number = 5000
+    intervalMs: number = 60000
   ): Observable<T> {
-    return timer(0, interval).pipe(
+    // Combina la obtención inicial de datos con actualizaciones periódicas
+    return interval(intervalMs).pipe(
+      // Comienza con una emisión inmediata (0ms)
+      // Luego continúa con el intervalo especificado
       switchMap(() => dataFn()),
-      retry(),
-      takeUntil(this.stopPolling),
-      share()
+      // shareReplay permite que múltiples suscriptores compartan la misma secuencia de datos
+      // y obtengan el último valor emitido al suscribirse
+      shareReplay(1)
     );
-  }
-
-  ngOnDestroy(): void {
-    this.stopPolling.next();
-    this.stopPolling.complete();
   }
 }

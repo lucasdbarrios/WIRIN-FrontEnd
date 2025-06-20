@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Order } from '../../../types/order.interface';
 import { DataTaskComponent } from '../ui/data-task/data-task.component';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { ChartTasksComponent } from '../ui/chart-tasks/chart-tasks.component';
 import { OrderDeliveryService } from '../../../services/order-delivery/orderDelivery.service';
 import { OrderDelivery } from '../../../types/orderDelivery.interface';
 import { ToastService } from '../../../services/toast/toast.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-dashboard',
@@ -15,7 +16,7 @@ import { ToastService } from '../../../services/toast/toast.service';
     imports: [DataTaskComponent, CommonModule, TableModule, ChartTasksComponent],
 })
 
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy {
     isLoading: boolean = true;
     projects: OrderDelivery[] = [];
     tasks: Order[] = [];
@@ -33,14 +34,23 @@ export class DashboardComponent {
         { bgClass: 'bg-green-100 dark:bg-green-400/10', iconClass: 'pi pi-check-circle text-green-500 !text-xl' }
     ];
 
+    // Suscripciones para gestionar la limpieza al destruir el componente
+    private subscriptions: Subscription[] = [];
+    
     constructor(private orderDeliveryService: OrderDeliveryService,
         private toastService: ToastService
     ) { }
 
     ngOnInit() {
-        this.getProjects();
+        this.getProjectsWithAutoRefresh();
+    }
+    
+    ngOnDestroy(): void {
+        // Cancelar todas las suscripciones al destruir el componente
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 
+    // Método original para cargar proyectos (se mantiene para compatibilidad)
     getProjects() {
         this.isLoading = true;
     
@@ -56,9 +66,27 @@ export class DashboardComponent {
                 console.error('Error al obtener proyectos:', error);
                 this.isLoading = false;
             }
-    });
+        });
+    }
     
-            
+    // Nuevo método que utiliza auto-refresh para actualizar los proyectos cada minuto
+    getProjectsWithAutoRefresh() {
+        this.isLoading = true;
+        
+        const subscription = this.orderDeliveryService.getOrderDeliveriesWithOrdersWithAutoRefresh().subscribe({
+            next: (response) => {
+                this.projects = response;
+                this.getFilterTasksByStatus(this.projects);
+                this.isLoading = false;
+            },
+            error: (error) => {
+                this.toastService.showError('Error al obtener los proyectos');
+                console.error('Error al obtener proyectos:', error);
+                this.isLoading = false;
+            }
+        });
+        
+        this.subscriptions.push(subscription);
     }
 
     private getFilterTasksByStatus(projects: OrderDelivery[]) {

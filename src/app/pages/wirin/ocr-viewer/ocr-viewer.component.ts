@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,6 +18,7 @@ import { FileUploadService } from '../../../services/file-upload/file-upload.ser
 import { ToastService } from '../../../services/toast/toast.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -27,7 +28,7 @@ import { ConfirmationService } from 'primeng/api';
   providers: [MessageService,ConfirmationService],
   templateUrl: './ocr-viewer.component.html',
 })
-export class OcrViewerComponent implements OnInit {
+export class OcrViewerComponent implements OnInit, OnDestroy {
   @Input() ocrData: OcrResponse | null = null;
   showPdfPreview: boolean = false;
   fileName: any;
@@ -44,6 +45,7 @@ export class OcrViewerComponent implements OnInit {
   urlSafe: SafeResourceUrl = '';
   task: any;
   taskId: string  = '';
+  private subscriptions: Subscription[] = [];
   estado: string | null = null;
 
   constructor(private router: Router,
@@ -63,23 +65,50 @@ export class OcrViewerComponent implements OnInit {
     this.task = Number(this.route.snapshot.paramMap.get('id'));
     this.estado = this.route.snapshot.queryParamMap.get('estado');
 
-    this.orderService.getTaskById(this.task).subscribe(task => {
-      this.state = task.status;
-      this.taskId = task.id;
-    });
+    this.loadTaskWithAutoRefresh();
+    this.processOcrWithAutoRefresh();
+    this.recoverFileWithAutoRefresh();
+    this.loadCurrentUser();
+  }
 
-    this.fileUploadService.newProcessOcr(this.task, "Local").subscribe({
+  ngOnDestroy(): void {
+    // Cancelar todas las suscripciones al destruir el componente
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+  private loadTaskWithAutoRefresh(): void {
+    const subscription = this.orderService.getTaskByIdWithAutoRefresh(this.task).subscribe({
+      next: (task) => {
+        this.state = task.status;
+        this.taskId = task.id;
+      },
+      error: (error) => {
+        console.error('Error al cargar la tarea:', error);
+        this.toastService.showError('Error al cargar la información de la tarea.');
+      }
+    });
+    this.subscriptions.push(subscription);
+  }
+
+  private processOcrWithAutoRefresh(): void {
+    const subscription = this.fileUploadService.newProcessOcrWithAutoRefresh(this.task, "Local").subscribe({
       next: (response) => {
         this.ocrData = response;
         this.totalPages = this.ocrData?.metadata?.totalPages?? 1;
         this.fileName = this.ocrData?.metadata?.fileName.split("\\").pop()?? ''
         this.pages = this.ocrData?.pages?? [];
         localStorage.setItem('ocrData', JSON.stringify(this.ocrData));
+      },
+      error: (error) => {
+        console.error('Error al procesar OCR:', error);
+        this.toastService.showError('Error al procesar el documento con OCR.');
       }
-     })
-    
+    });
+    this.subscriptions.push(subscription);
+  }
 
-    this.orderService.recoveryFile(this.task).subscribe({
+  private recoverFileWithAutoRefresh(): void {
+    const subscription = this.orderService.recoveryFile(this.task).subscribe({
       next: (data) => {
         const blob = new Blob([data], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
@@ -89,9 +118,12 @@ export class OcrViewerComponent implements OnInit {
         this.toastService.showError('Error al recuperar el archivo.');
         console.error('Error al recuperar el archivo:', error);
       }
-    })
+    });
+    this.subscriptions.push(subscription);
+  }
 
-    this.authService.getCurrentUser().subscribe({
+  private loadCurrentUser(): void {
+    const subscription = this.authService.getCurrentUser().subscribe({
       next: (userData) => {
         this.user = userData;
       },
@@ -100,6 +132,7 @@ export class OcrViewerComponent implements OnInit {
         this.errorMessage = 'No se pudo cargar la información del perfil.';
       },
     });
+    this.subscriptions.push(subscription);
 }
 
 confirmDenegarResultado(): void {
