@@ -134,7 +134,7 @@ export class ProyectsComponent implements OnInit {
         });
     }
 
-    sendOrderDelivery(): void {
+    sendProjectDelivery(): void {
         if (!this.selectedProject || !this.selectedStudent) return;
       
         const request = {
