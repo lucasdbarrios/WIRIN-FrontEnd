@@ -1,6 +1,7 @@
 <form [formGroup]="formTask" (ngSubmit)="onSubmit()" class="p-4">
     <div class="flex justify-center items-center">
-        <div class="card w-full max-w-4xl p-6 shadow-lg" [ngClass]="{'ng-invalid': formTask.invalid && formTask.touched}">
+        <div class="card w-full max-w-4xl p-6 shadow-lg"
+            [ngClass]="{'ng-invalid': formTask.invalid && formTask.touched}">
             <div class="text-center mb-6">
                 <h2 class="text-2xl font-semibold">{{ isEditMode ? 'Modificar Tarea' : 'Crear Nueva Tarea' }}</h2>
             </div>
@@ -9,9 +10,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col">
                     <label for="name" class="mb-4 font-bold">Título *</label>
-                    <input pInputText id="name" type="text" formControlName="name" placeholder="Ingresá un título" 
+                    <input pInputText id="name" type="text" formControlName="name" placeholder="Ingresá un título"
                         [ngClass]="{'ng-invalid ng-dirty': formTask.get('name')?.invalid && (formTask.get('name')?.dirty || formTask.get('name')?.touched)}" />
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('name')?.hasError('required') && formTask.get('name')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('name')?.hasError('required') && formTask.get('name')?.touched">
                         El título es requerido
                     </small>
                 </div>
@@ -21,7 +23,8 @@
                         optionLabel="name" optionValue="value" placeholder="Selecciona una materia" class="w-full"
                         [ngClass]="{'ng-invalid ng-dirty': formTask.get('subject')?.invalid && (formTask.get('subject')?.dirty || formTask.get('subject')?.touched)}">
                     </p-dropdown>
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('subject')?.hasError('required') && formTask.get('subject')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('subject')?.hasError('required') && formTask.get('subject')?.touched">
                         La materia es requerida
                     </small>
                 </div>
@@ -33,7 +36,8 @@
                 <textarea pInputTextarea id="description" formControlName="description" rows="4"
                     placeholder="Agrega una breve descripción"
                     [ngClass]="{'ng-invalid ng-dirty': formTask.get('description')?.invalid && (formTask.get('description')?.dirty || formTask.get('description')?.touched)}"></textarea>
-                <small class="text-red-500 mt-2" *ngIf="formTask.get('description')?.hasError('required') && formTask.get('description')?.touched">
+                <small class="text-red-500 mt-2"
+                    *ngIf="formTask.get('description')?.hasError('required') && formTask.get('description')?.touched">
                     La descripción es requerida
                 </small>
             </div>
@@ -42,17 +46,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div class="flex flex-col">
                     <label for="authorName" class="mb-4 font-bold">Autor *</label>
-                    <input pInputText id="authorName" type="text" formControlName="authorName" placeholder="Ingresá el autor" 
+                    <input pInputText id="authorName" type="text" formControlName="authorName"
+                        placeholder="Ingresá el autor"
                         [ngClass]="{'ng-invalid ng-dirty': formTask.get('authorName')?.invalid && (formTask.get('authorName')?.dirty || formTask.get('authorName')?.touched)}" />
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('authorName')?.hasError('required') && formTask.get('authorName')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('authorName')?.hasError('required') && formTask.get('authorName')?.touched">
                         El autor es requerido
                     </small>
                 </div>
                 <div class="flex flex-col">
                     <label for="rangePage" class="mb-4 font-bold">Rango de páginas *</label>
-                    <input pInputText id="rangePage" type="text" formControlName="rangePage" placeholder="Ejemplo: 2-7" 
+                    <input pInputText id="rangePage" type="text" formControlName="rangePage" placeholder="Ejemplo: 2-7"
                         [ngClass]="{'ng-invalid ng-dirty': formTask.get('rangePage')?.invalid && (formTask.get('rangePage')?.dirty || formTask.get('rangePage')?.touched)}" />
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('rangePage')?.hasError('required') && formTask.get('rangePage')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('rangePage')?.hasError('required') && formTask.get('rangePage')?.touched">
                         El rango de páginas es requerido
                     </small>
                 </div>
@@ -65,7 +72,8 @@
                     <p-calendar id="limitDate" formControlName="limitDate" [showIcon]="true" [showButtonBar]="true"
                         dateFormat="dd/mm/yy" placeholder="Selecciona una fecha"
                         [ngClass]="{'ng-invalid ng-dirty': formTask.get('limitDate')?.invalid && (formTask.get('limitDate')?.dirty || formTask.get('limitDate')?.touched)}"></p-calendar>
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('limitDate')?.hasError('required') && formTask.get('limitDate')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('limitDate')?.hasError('required') && formTask.get('limitDate')?.touched">
                         La fecha es requerida
                     </small>
                 </div>
@@ -75,7 +83,8 @@
                         optionLabel="name" optionValue="value" placeholder="Selecciona el usuario" class="w-full"
                         [ngClass]="{'ng-invalid ng-dirty': formTask.get('alumnoId')?.invalid && (formTask.get('alumnoId')?.dirty || formTask.get('alumnoId')?.touched)}">
                     </p-dropdown>
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('alumnoId')?.hasError('required') && formTask.get('alumnoId')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('alumnoId')?.hasError('required') && formTask.get('alumnoId')?.touched">
                         El usuario es requerido
                     </small>
                 </div>
@@ -83,12 +92,15 @@
 
             <!-- Quinta fila: Entrega -->
             <div class="flex flex-col mt-6">
-                <label for="orderDelivery" class="mb-4 font-bold">Entrega *</label>
+                <label for="delivererId" class="mb-4 font-bold">Entrega *</label>
                 <div class="flex gap-2">
-                    <p-dropdown id="orderDelivery" formControlName="orderDeliveryId" [options]="orderDeliveries"
+                    <p-dropdown id="delivererId" formControlName="delivererId" [options]="orderDeliveries"
                         optionLabel="title" optionValue="id" [filter]="true" filterBy="title"
-                        placeholder="Selecciona una entrega" [showClear]="true" class="w-full"
-                        [ngClass]="{'ng-invalid ng-dirty': formTask.get('orderDeliveryId')?.invalid && (formTask.get('orderDeliveryId')?.dirty || formTask.get('orderDeliveryId')?.touched)}">
+                        placeholder="Selecciona una entrega" [showClear]="true" class="w-full" [ngClass]="{
+                            'ng-invalid ng-dirty':
+                            formTask.get('delivererId')?.invalid &&
+                            (formTask.get('delivererId')?.dirty || formTask.get('delivererId')?.touched)
+                        }">
                         <ng-template pTemplate="emptyfilter">
                             <div class="p-2 text-center">
                                 <p>No se encontraron entregas</p>
@@ -99,41 +111,41 @@
                             </div>
                         </ng-template>
                     </p-dropdown>
-                    <button type="button" (click)="openNewDeliveryModal()"
-                        class="p-button p-button-success" style="width: 3rem">
-                        <i class="pi pi-plus"></i>
-                    </button>
                 </div>
-                <small class="text-red-500 mt-2" *ngIf="formTask.get('orderDeliveryId')?.invalid && formTask.get('orderDeliveryId')?.touched">
-                    {{ getErrorMessage('orderDeliveryId') }}
+                <small class="text-red-500 mt-2"
+                    *ngIf="formTask.get('delivererId')?.invalid && formTask.get('delivererId')?.touched">
+                    {{ getErrorMessage('delivererId') }}
                 </small>
             </div>
 
             <!-- Sexta fila: Estado (solo en modo edición) -->
-            <div class="flex flex-col mt-6" *ngIf="isEditMode">
+            <div class="flex flex-col mt-6 w-1/2" *ngIf="isEditMode">
                 <label for="status" class="mb-4 font-bold">Estado</label>
-                <p-dropdown id="status" formControlName="status" [options]="dropdownItems"
-                    optionLabel="name" optionValue="value" placeholder="Selecciona el estado" class="w-full">
+                <p-dropdown id="status" formControlName="status" [options]="dropdownItems" optionLabel="name"
+                    optionValue="value" placeholder="Selecciona el estado" class="w-full">
                 </p-dropdown>
-                <small class="text-red-500 mt-2" *ngIf="formTask.get('status')?.hasError('required') && formTask.get('status')?.touched">
+                <small class="text-red-500 mt-2"
+                    *ngIf="formTask.get('status')?.hasError('required') && formTask.get('status')?.touched">
                     El estado es requerido
                 </small>
             </div>
 
             <!-- Séptima fila: Archivo y Prioridad -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div class="flex flex-col">
+                <div class="flex flex-col justify-start">
                     <label class="mb-4 font-bold">Archivo *</label>
-                    <p-fileUpload mode="basic" chooseLabel="Seleccionar archivo" class="w-full"
-                        accept="application/pdf" [maxFileSize]="1000000"
-                        (onSelect)="onFileSelected($event)" [customUpload]="true">
+                    <p-fileUpload mode="basic" chooseLabel="Seleccionar archivo" class="file-upload-adjust"
+                        accept="application/pdf" [maxFileSize]="1000000" (onSelect)="onFileSelected($event)"
+                        [customUpload]="true">
+
                         <ng-template pTemplate="content">
-                            <div *ngIf="existingFile" class="text-sm text-gray-600 mt-2">
-                                Archivo actual: {{ existingFile }}
+                            <div class="text-sm text-gray-600 mt-2" *ngIf="formTask.get('file')?.value">
+                                Archivo seleccionado: {{ formTask.get('file')?.value }}
                             </div>
                         </ng-template>
                     </p-fileUpload>
-                    <small class="text-red-500 mt-2" *ngIf="formTask.get('file')?.hasError('required') && formTask.get('file')?.touched">
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('file')?.hasError('required') && formTask.get('file')?.touched">
                         El archivo es requerido
                     </small>
                 </div>
@@ -160,22 +172,26 @@
     <form [formGroup]="deliveryForm" (ngSubmit)="onDeliverySubmit()" class="flex flex-col gap-4">
         <div class="flex flex-col">
             <label for="deliveryName" class="mb-4 font-bold">Nombre de la entrega</label>
-            <input pInputText id="deliveryName" type="text" formControlName="name" placeholder="Ingresa el nombre de la entrega" />
-            <small class="text-red-500 mt-2" *ngIf="deliveryForm.get('name')?.invalid && deliveryForm.get('name')?.touched">
+            <input pInputText id="deliveryName" type="text" formControlName="name"
+                placeholder="Ingresa el nombre de la entrega" />
+            <small class="text-red-500 mt-2"
+                *ngIf="deliveryForm.get('name')?.invalid && deliveryForm.get('name')?.touched">
                 El nombre de la entrega es requerido
             </small>
         </div>
         <div class="flex flex-col">
             <label for="deliveryStudentId" class="mb-4 font-bold">Seleccionar alumno</label>
-            <p-dropdown id="deliveryStudentId" formControlName="deliveryStudentId" [options]="dropdownItemsUsers" optionLabel="name"
-                optionValue="value" placeholder="Selecciona el usuario" class="w-full">
+            <p-dropdown id="deliveryStudentId" formControlName="deliveryStudentId" [options]="dropdownItemsUsers"
+                optionLabel="name" optionValue="value" placeholder="Selecciona el usuario" class="w-full">
             </p-dropdown>
-            <small class="text-red-500 mt-2" *ngIf="deliveryForm.get('deliveryStudentId')?.hasError('required') && deliveryForm.get('deliveryStudentId')?.touched">
+            <small class="text-red-500 mt-2"
+                *ngIf="deliveryForm.get('deliveryStudentId')?.hasError('required') && deliveryForm.get('deliveryStudentId')?.touched">
                 El usuario es requerido
             </small>
         </div>
         <div class="flex justify-end gap-2 mt-4">
-            <p-button type="button" label="Cancelar" (click)="showNewDeliveryModal = false" styleClass="p-button-text"></p-button>
+            <p-button type="button" label="Cancelar" (click)="showNewDeliveryModal = false"
+                styleClass="p-button-text"></p-button>
             <p-button type="submit" label="Guardar" (click)="saveOrderDelivery()"></p-button>
         </div>
     </form>
