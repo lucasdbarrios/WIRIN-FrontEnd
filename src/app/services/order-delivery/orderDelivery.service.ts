@@ -5,14 +5,22 @@ import { EnvService } from '../env/env.service';
 import { OrderSequence } from '../../types/orderSequence.type';
 import { OrderDelivery } from '../../types/orderDelivery.type';
 import { AuthService } from '../auth/auth.service';
+import { BaseService } from '../base/base.service';
+import { AutoRefreshService } from '../auto-refresh/auto-refresh.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class OrderDeliveryService {
+export class OrderDeliveryService extends BaseService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
+  constructor(
+    private http: HttpClient, 
+    private envService: EnvService, 
+    private authService: AuthService,
+    autoRefreshService: AutoRefreshService
+  ) {
+    super(autoRefreshService);
     this.apiUrl = this.envService.getApiUrl() + "/orderdelivery";
   }
 
@@ -31,8 +39,24 @@ export class OrderDeliveryService {
     return this.http.get(`${this.apiUrl}`, this.authService.getHeaders());
   }
 
+  /**
+   * Obtiene las entregas con actualización automática cada minuto
+   * @returns Observable que emite las entregas actualizadas cada minuto
+   */
+  getDeliveriesWithAutoRefresh(): Observable<any> {
+    return this.createAutoRefreshObservable(() => this.getDeliveries());
+  }
+
   getOrderDeliveriesWithOrders(): Observable<any> {
     return this.http.get(`${this.apiUrl}/WithOrders`, this.authService.getHeaders());
+  }
+
+  /**
+   * Obtiene las entregas con órdenes con actualización automática cada minuto
+   * @returns Observable que emite las entregas con órdenes actualizadas cada minuto
+   */
+  getOrderDeliveriesWithOrdersWithAutoRefresh(): Observable<any> {
+    return this.createAutoRefreshObservable(() => this.getOrderDeliveriesWithOrders());
   }
 
 }

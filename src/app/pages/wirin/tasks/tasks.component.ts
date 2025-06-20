@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
@@ -20,7 +20,7 @@ import { ToastService } from '../../../services/toast/toast.service';
 import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { UserRoleService } from '../../../services/user-role/userRole.service';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { OrderStatus } from '../../../types/orderStatus.type';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { CardTaskComponent } from '../ui/card-task/card-task.component';
@@ -35,7 +35,7 @@ import { ExpirationDate } from '../../../types/ExpirationDate.type';
 ],
     templateUrl: './tasks.component.html',
 })
-export class TasksComponent implements OnInit{
+export class TasksComponent implements OnInit, OnDestroy {
     isLoading: boolean = true;
     user: User | null = null;
     isTaskDetailOpen: boolean = false;
@@ -67,6 +67,9 @@ export class TasksComponent implements OnInit{
       }));
     checked: boolean = false;
 
+    // Suscripciones para gestionar la limpieza al destruir el componente
+    private subscriptions: Subscription[] = [];
+    
     constructor(private orderService: OrderService, 
         private authService: AuthService, 
         private orderManagmentService: OrderManagmentService,
@@ -83,9 +86,15 @@ export class TasksComponent implements OnInit{
         this.user = this.authService.getUserSync();
     
         const validLoadTasks = this.isRevisor || this.isVoluntario || this.isBibliotecario;
-        validLoadTasks ? this.loadTasks() : this.loadTasksDelivered();
+        validLoadTasks ? this.loadTasksWithAutoRefresh() : this.loadTasksDeliveredWithAutoRefresh();
+    }
+    
+    ngOnDestroy(): void {
+        // Cancelar todas las suscripciones al destruir el componente
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 
+    // Método original para cargar tareas (se mantiene para compatibilidad)
     async loadTasks(): Promise<void> {
         this.isLoading = true;
 
@@ -101,15 +110,40 @@ export class TasksComponent implements OnInit{
             this.tasks = this.filterTasksByRole(data);
             this.tasks = this.filterTasksByExpirationDate(this.tasks);
             this.togglePriorityFilter();
-
-
-
         } catch (error) {
             this.toastService.showError('Error al obtener las tareas');
             console.error('Error al obtener las tareas:', error);
         } finally {
             this.isLoading = false;
         }
+    }
+
+    // Nuevo método que utiliza auto-refresh para actualizar las tareas cada minuto
+    loadTasksWithAutoRefresh(): void {
+        this.isLoading = true;
+        
+        const selectedState = this.dropdownValue?.value || '';
+        const observable = selectedState 
+            ? this.orderManagmentService.getOrdersByStateWithAutoRefresh(selectedState) 
+            : this.orderService.getOrdersWithAutoRefresh();
+            
+        const subscription = observable.subscribe({
+            next: (data: any[]) => {
+                this.allTasks = data;
+                this.tasks = [...data];
+                this.tasks = this.filterTasksByRole(data);
+                this.tasks = this.filterTasksByExpirationDate(this.tasks);
+                this.togglePriorityFilter();
+                this.isLoading = false;
+            },
+            error: error => {
+                this.toastService.showError('Error al obtener las tareas');
+                console.error('Error al obtener las tareas:', error);
+                this.isLoading = false;
+            }
+        });
+        
+        this.subscriptions.push(subscription);
     }
 
     private filterTasksByExpirationDate(tasks: any[]): any[] {
@@ -165,6 +199,7 @@ export class TasksComponent implements OnInit{
         return [...tasks];
     }
 
+    // Método original para cargar tareas entregadas (se mantiene para compatibilidad)
     async loadTasksDelivered(): Promise<void> {
         this.isLoading = true;
 
@@ -180,6 +215,26 @@ export class TasksComponent implements OnInit{
                 this.isLoading = false;
             }
         });
+    }
+    
+    // Nuevo método que utiliza auto-refresh para actualizar las tareas entregadas cada minuto
+    loadTasksDeliveredWithAutoRefresh(): void {
+        this.isLoading = true;
+        
+        const subscription = this.orderService.getOrdersDeliveredWithAutoRefresh().subscribe({
+            next: (data: any[]) => {
+                this.allTasks = data;
+                this.tasks = [...data];
+                this.isLoading = false;
+            },
+            error: error => {
+                this.toastService.showError('Error al obtener las tareas');
+                console.error('Error al obtener las tareas:', error);
+                this.isLoading = false;
+            }
+        });
+        
+        this.subscriptions.push(subscription);
     }
 
     searchTasks(event: Event): void {

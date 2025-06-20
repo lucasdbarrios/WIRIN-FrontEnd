@@ -20,6 +20,7 @@ import { ProgressBar } from 'primeng/progressbar';
 import { DropdownModule } from 'primeng/dropdown';
 import { UserService } from '../../../services/user/user.service';
 import { ToastService } from '../../../services/toast/toast.service';
+import { StudentDelivery } from '../../../services/student-delivery/student-delivery.service';
 
 @Component({
     selector: 'table-row-expansion-demo',
@@ -45,11 +46,10 @@ export class ProyectsComponent implements OnInit {
     students: any[] = [];
     orderDeliveryIdSelected: number = 0;
 
-
     constructor(private messageService: MessageService, 
         private orderDeliveryService: OrderDeliveryService,
-        private userService: UserService,
         private toastService: ToastService,
+        private studentDeliveryService: StudentDelivery
     ) {}
 
     ngOnInit(): void {
@@ -106,37 +106,51 @@ export class ProyectsComponent implements OnInit {
         this.isTaskDetailOpen = false;
     }
 
-    openDelivery(orderDeliveryId: number){
-        this.orderDeliveryIdSelected = orderDeliveryId;
+    openDelivery(orderDelivery: OrderDelivery){
+        this.loadStudents(orderDelivery.id);
+        this.orderDeliveryIdSelected = orderDelivery.id;
+        this.selectedProject = orderDelivery;
         this.isDeliveryOpen = true;
     }
 
-    sendDelivery(): void {
-        
-        this.isLoading = true;
-    }
-
     getPercent(project: OrderDelivery): number{
-        
-        if( project.orders.length != 0){
-            const tasksCompleted = this.projects.filter(project => project.status == "Completada").length;
-            console.log(tasksCompleted)
-            return Number(((tasksCompleted*100)/project.orders.length).toFixed(0));
+        if (project.orders.length !== 0) {
+            const tasksCompleted = project.orders.filter(order => order.status === "Completada").length;
+            return Number(((tasksCompleted * 100) / project.orders.length).toFixed(0));
         }
         return 0;
     }
 
+    async loadStudents(projectId: number): Promise<void> {
+        this.studentDeliveryService.getUsersWithoutOrderDelivery(projectId).subscribe({
 
-    sendOrderDelivery(): void {
-        this.userService.getAllStudents(this.orderDeliveryIdSelected).subscribe({
-            next: (data: any[]) => {
-                this.students = data;
+            next: (students) => {
+                this.students = students;
             },
             error: (error) => {
                 this.toastService.showError('Error al cargar los alumnos');
                 console.error('Error al cargar los alumnos:', error);
             }
         });
-        this.isLoading = true;
     }
+
+    sendProjectDelivery(): void {
+        if (!this.selectedProject || !this.selectedStudent) return;
+      
+        const request = {
+          studentId: this.selectedStudent.id,
+          orderDeliveryId: this.selectedProject.id
+        };
+      
+        this.studentDeliveryService.createStudentDelivery(request).subscribe({
+          next: () => {
+            this.toastService.showSuccess('Entrega creada');
+            this.isDeliveryOpen = false;
+          },
+          error: (err) => {
+            this.toastService.showError('Error al crear entrega');
+            console.error('Error al crear entrega:', err);
+          }
+        });
+      }
 }

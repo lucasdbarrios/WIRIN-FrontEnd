@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Order } from '../../../types/order.interface';
 import { OrderService } from '../../../services/order/order.service';
 import { WirinStatsWidget } from './components/statsWidgetWirin/statswidget';
 import { RecentSalesWidgetWirin } from './components/recentSalesWidgetWirin/recentsaleswidget';
 import { ChartModule } from 'primeng/chart';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-dashboard-wirin',
@@ -23,7 +24,7 @@ import { ChartModule } from 'primeng/chart';
         </div>
     `
 })
-export class DashboardWirin implements OnInit{
+export class DashboardWirin implements OnInit, OnDestroy {
     tasks: Order[] = [];
     taskPend: number = 0;
     completedTasks: number = 0;
@@ -42,6 +43,9 @@ export class DashboardWirin implements OnInit{
         this.initCharts();
     }
 
+    // Suscripciones para gestionar la limpieza al destruir el componente
+    private subscriptions: Subscription[] = [];
+    
     constructor(private orderService: OrderService){}
 
     initCharts() {
@@ -260,16 +264,46 @@ export class DashboardWirin implements OnInit{
         this.taskPend = this.tasks.filter(t => t.status != "Pendiente").length;
         this.completedTasks = this.tasks.filter(t => t.status === "Completada").length;
     
+        this.loadOrdersWithAutoRefresh();
+    }
+    
+    ngOnDestroy(): void {
+        // Cancelar todas las suscripciones al destruir el componente
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+    }
+    
+    // Método original para cargar órdenes (se mantiene para compatibilidad)
+    loadOrders(): void {
         this.orderService.getOrders().subscribe({
             next: (orders) => {
                 this.tasks = orders;
+                this.updateTaskCounts();
             },
             error: (error) => {
                 console.error('Error fetching tasks:', error);
             }
-        });  
-
-       
+        });
+    }
+    
+    // Nuevo método que utiliza auto-refresh para actualizar las órdenes cada minuto
+    loadOrdersWithAutoRefresh(): void {
+        const subscription = this.orderService.getOrdersWithAutoRefresh().subscribe({
+            next: (orders) => {
+                this.tasks = orders;
+                this.updateTaskCounts();
+            },
+            error: (error) => {
+                console.error('Error fetching tasks:', error);
+            }
+        });
+        
+        this.subscriptions.push(subscription);
+    }
+    
+    // Método para actualizar los contadores de tareas
+    private updateTaskCounts(): void {
+        this.taskPend = this.tasks.filter(t => t.status != "Pendiente").length;
+        this.completedTasks = this.tasks.filter(t => t.status === "Completada").length;
     }
 
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'; 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
@@ -17,6 +17,7 @@ import { OrderListModule } from 'primeng/orderlist';
 import { CardModule } from 'primeng/card';
 import { ToastService } from '../../../services/toast/toast.service';
 import { CardTaskComponent } from '../ui/card-task/card-task.component';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-deliveries-component',
@@ -28,7 +29,7 @@ import { CardTaskComponent } from '../ui/card-task/card-task.component';
     providers: [MessageService],
     templateUrl: './deliveries.component.html',
 })
-export class DeliveriesComponent implements OnInit {
+export class DeliveriesComponent implements OnInit, OnDestroy {
     isLoading: boolean = true;
     allTasks: any[] = [];
     tasks: any[] = [];
@@ -39,6 +40,9 @@ export class DeliveriesComponent implements OnInit {
     formdata?: FormData;
     orderSequence: OrderSequence[] = [];
     
+    // Suscripciones para gestionar la limpieza al destruir el componente
+    private subscriptions: Subscription[] = [];
+    
     constructor(
         private orderManagmentService: OrderManagmentService,
         private orderDeliveryService: OrderDeliveryService,
@@ -48,10 +52,16 @@ export class DeliveriesComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.loadTasks();
-        this.loadStudents();
+        this.loadTasksWithAutoRefresh();
+        this.loadStudentsWithAutoRefresh();
+    }
+    
+    ngOnDestroy(): void {
+        // Cancelar todas las suscripciones al destruir el componente
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 
+    // Método original para cargar tareas (se mantiene para compatibilidad)
     async loadTasks(): Promise<void> {
         this.isLoading = true;
 
@@ -68,7 +78,28 @@ export class DeliveriesComponent implements OnInit {
             }
         });
     }
+    
+    // Nuevo método que utiliza auto-refresh para actualizar las tareas cada minuto
+    loadTasksWithAutoRefresh(): void {
+        this.isLoading = true;
+        
+        const subscription = this.orderManagmentService.getOrdersByStateWithAutoRefresh('Completada').subscribe({
+            next: (data: any[]) => {
+                this.allTasks = data;
+                this.tasks = data.filter(task => task.status.toLowerCase() === 'completada');
+                this.isLoading = false;
+            },
+            error: error => {
+                this.toastService.showError('Error al cargar las tareas');
+                console.error('Error al obtener las tareas:', error);
+                this.isLoading = false;
+            }
+        });
+        
+        this.subscriptions.push(subscription);
+    }
 
+    // Método original para cargar estudiantes (se mantiene para compatibilidad)
     async loadStudents(): Promise<void> {
         this.userService.getUsersByRole('Alumno').subscribe({
             next: (students) => {
@@ -79,6 +110,21 @@ export class DeliveriesComponent implements OnInit {
                 console.error('Error al cargar los alumnos:', error);
             }
         });
+    }
+    
+    // Nuevo método que utiliza auto-refresh para actualizar los estudiantes cada minuto
+    loadStudentsWithAutoRefresh(): void {
+        const subscription = this.userService.getUsersByRoleWithAutoRefresh('Alumno').subscribe({
+            next: (students) => {
+                this.students = students;
+            },
+            error: (error) => {
+                this.toastService.showError('Error al cargar los alumnos');
+                console.error('Error al cargar los alumnos:', error);
+            }
+        });
+        
+        this.subscriptions.push(subscription);
     }
 
     onTaskSelectionChange(): void {
@@ -121,7 +167,7 @@ export class DeliveriesComponent implements OnInit {
                     this.selectedStudent = null;
                     this.selectedTasks = [];
                     this.orderSequence = [];
-                    this.loadTasks();
+                    this.loadTasksWithAutoRefresh();
                     this.isLoading = false;
                 },
                 error: (error) => {

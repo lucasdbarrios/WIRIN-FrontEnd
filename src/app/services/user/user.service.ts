@@ -4,14 +4,22 @@ import { Observable } from 'rxjs';
 import { EnvService } from '../env/env.service';
 import { User } from '../../types/user.interface';
 import { AuthService } from '../auth/auth.service';
+import { BaseService } from '../base/base.service';
+import { AutoRefreshService } from '../auto-refresh/auto-refresh.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserService {
+export class UserService extends BaseService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
+  constructor(
+    private http: HttpClient, 
+    private envService: EnvService, 
+    private authService: AuthService,
+    autoRefreshService: AutoRefreshService
+  ) {
+    super(autoRefreshService);
     this.apiUrl = this.envService.getApiUrl() + '/User';
   }
 
@@ -19,23 +27,53 @@ export class UserService {
     return this.http.get(`${this.apiUrl}/${id}`, this.authService.getHeaders());
   }
 
+  /**
+   * Obtiene un usuario por ID con actualización automática cada minuto
+   * @param id ID del usuario
+   * @returns Observable que emite el usuario actualizado cada minuto
+   */
+  getUserByIdWithAutoRefresh(id: string): Observable<any> {
+    return this.createAutoRefreshObservable(() => this.getUserById(id));
+  }
+
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl, this.authService.getHeaders());
   }
 
-  getAllStudents(orderDeliveryId?: number): Observable<any[]> {
+  /**
+   * Obtiene todos los usuarios con actualización automática cada minuto
+   * @returns Observable que emite todos los usuarios actualizados cada minuto
+   */
+  getAllWithAutoRefresh(): Observable<any[]> {
+    return this.createAutoRefreshObservable(() => this.getAll());
+  }
+
+  getAllStudents(): Observable<any[]> {
     let url = `${this.apiUrl}/students`;
 
-    if (orderDeliveryId) {
-        url += `?orderDeliveryId=${orderDeliveryId}`;
-    }
-
     return this.http.get<any[]>(url, this.authService.getHeaders());
-}
+  }
+
+  /**
+   * Obtiene todos los estudiantes con actualización automática cada minuto
+   * @returns Observable que emite todos los estudiantes actualizados cada minuto
+   */
+  getAllStudentsWithAutoRefresh(): Observable<any[]> {
+    return this.createAutoRefreshObservable(() => this.getAllStudents());
+  }
 
   getUsersByRole(role: string): Observable<any[]> {
     const url = `${this.apiUrl}/by-role/${role}`;
     return this.http.get<any[]>(url, this.authService.getHeaders());
+  }
+
+  /**
+   * Obtiene usuarios por rol con actualización automática cada minuto
+   * @param role Rol de los usuarios a obtener
+   * @returns Observable que emite los usuarios por rol actualizados cada minuto
+   */
+  getUsersByRoleWithAutoRefresh(role: string): Observable<any[]> {
+    return this.createAutoRefreshObservable(() => this.getUsersByRole(role));
   }
 
   updateUser(id: string, user: User): Observable<any> {

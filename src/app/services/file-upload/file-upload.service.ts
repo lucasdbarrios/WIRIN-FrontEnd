@@ -3,14 +3,22 @@ import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EnvService } from '../env/env.service';
 import { AuthService } from '../auth/auth.service';
+import { BaseService } from '../base/base.service';
+import { AutoRefreshService } from '../auto-refresh/auto-refresh.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FileUploadService {
+export class FileUploadService extends BaseService {
   private apiUrl: string;
 
-  constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
+  constructor(
+    private http: HttpClient, 
+    private envService: EnvService, 
+    private authService: AuthService,
+    autoRefreshService: AutoRefreshService
+  ) {
+    super(autoRefreshService);
     this.apiUrl = this.envService.getApiUrl();
   }
 
@@ -34,6 +42,16 @@ export class FileUploadService {
 
   newProcessOcr(id: number, processor: string = 'Local'): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/ocr/${processor}?id=${id}`, processor, this.authService.getHeaders());
+  }
+
+  /**
+   * Procesa OCR con actualización automática cada minuto
+   * @param id ID de la tarea
+   * @param processor Tipo de procesador OCR (por defecto 'Local')
+   * @returns Observable que emite los datos OCR actualizados cada minuto
+   */
+  newProcessOcrWithAutoRefresh(id: number, processor: string = 'Local'): Observable<any> {
+    return this.createAutoRefreshObservable(() => this.newProcessOcr(id, processor));
   }
 
   isValidFileType(file: File): boolean {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -7,7 +7,7 @@ import { OrderDelivery } from '../../../../../types/orderDelivery.type';
 import { OrderService } from '../../../../../services/order/order.service';
 import { User } from '../../../../../types/user.interface';
 import { UserService } from '../../../../../services/user/user.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 
 @Component({
     standalone: true,
@@ -39,13 +39,26 @@ import { forkJoin } from 'rxjs';
     </div>`,
     // providers: [OrderService]
 })
-export class RecentSalesWidgetWirin {
+export class RecentSalesWidgetWirin implements OnInit, OnDestroy {
     tasksDelived!: OrderDelivery[];
     users!: User[];;
 
+    // Suscripciones para gestionar la limpieza al destruir el componente
+    private subscriptions: Subscription[] = [];
+    
     constructor(private orderService: OrderService, private userService: UserService) {}
 
     ngOnInit() {
+        this.loadDataWithAutoRefresh();
+    }
+    
+    ngOnDestroy(): void {
+        // Cancelar todas las suscripciones al destruir el componente
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+    }
+    
+    // Método original para cargar datos (se mantiene para compatibilidad)
+    loadData(): void {
         forkJoin({
             users: this.userService.getAllStudents(),
             orders: this.orderService.getOrdersDelivered()
@@ -62,5 +75,27 @@ export class RecentSalesWidgetWirin {
                 user: this.users.find(user => user.id === order.studentId)
             }));
         });
+    }
+    
+    // Nuevo método que utiliza auto-refresh para actualizar los datos cada minuto
+    loadDataWithAutoRefresh(): void {
+        const subscription = forkJoin({
+            users: this.userService.getAllStudentsWithAutoRefresh(),
+            orders: this.orderService.getOrdersDeliveredWithAutoRefresh()
+        }).subscribe(({ users, orders }) => {
+            this.users = users;
+            this.tasksDelived = orders.map(order => ({
+                title: order.title || '', // Add missing required title property
+                studentId: order.studentId,
+                status: order.status,
+                userId: order.userId,
+                deliveryDate: order.deliveryDate,
+                id: order.id,
+                orderQuantity: 0,
+                user: this.users.find(user => user.id === order.studentId)
+            }));
+        });
+        
+        this.subscriptions.push(subscription);
     }
 }
