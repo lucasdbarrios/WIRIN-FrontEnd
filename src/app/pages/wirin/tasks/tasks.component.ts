@@ -66,6 +66,7 @@ export class TasksComponent implements OnInit, OnDestroy {
         value: date
       }));
     checked: boolean = false;
+    filteredTasksBase: any[] = [];
 
     // Suscripciones para gestionar la limpieza al destruir el componente
     private subscriptions: Subscription[] = [];
@@ -130,10 +131,11 @@ export class TasksComponent implements OnInit, OnDestroy {
         const subscription = observable.subscribe({
             next: (data: any[]) => {
                 this.allTasks = data;
+                this.filteredTasksBase = this.filterTasksByExpirationDate(this.filterTasksByRole(data));
+                this.togglePriorityFilter();
                 this.tasks = [...data];
                 this.tasks = this.filterTasksByRole(data);
                 this.tasks = this.filterTasksByExpirationDate(this.tasks);
-                this.togglePriorityFilter();
                 this.isLoading = false;
             },
             error: error => {
@@ -239,17 +241,16 @@ export class TasksComponent implements OnInit, OnDestroy {
 
     searchTasks(event: Event): void {
         const query = (event.target as HTMLInputElement).value.toLowerCase();
-        this.tasks = this.allTasks.filter(task =>
+        this.tasks = this.filteredTasksBase.filter(task =>
             task.name.toLowerCase().includes(query)
         );
     }
 
     togglePriorityFilter(): void {
-       const onlyPriority = this.value;
-       this.tasks = onlyPriority
-       ? this.allTasks.filter(task => task.isPriority)
-       : [...this.allTasks];
-
+        const onlyPriority = this.value;
+        this.tasks = onlyPriority
+            ? this.filteredTasksBase.filter(task => task.isPriority)
+            : [...this.filteredTasksBase];
     }
     
     canUserSeeTask(task: any): boolean {

@@ -29,7 +29,8 @@
             <ng-template #start>
                 <ng-container>
                     <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
-                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()">
+                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()"
+                        *ngIf="isBibliotecario">
                     </p-select>
                 </ng-container>
             </ng-template>
