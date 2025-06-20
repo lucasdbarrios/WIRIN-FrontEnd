@@ -6,16 +6,20 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TagModule],
     template: ` <div class="layout-topbar" style="display: flex; align-items: center; justify-content: center;">
-    <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem;">
+    <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem; display: flex; align-items: center; gap: 1rem;">
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
+        <div class="flex gap-2">
+            <p-tag *ngFor="let role of userRoles" [value]="role" severity="info"></p-tag>
+        </div>
     </div>
 
     <a class="layout-topbar-logo" routerLink="/" style="display: flex; flex-direction: column; align-items: center;">
@@ -61,11 +65,14 @@ import { AuthService } from '../../services/auth/auth.service';
 })
 export class AppTopbar {
     items!: MenuItem[];
+    userRoles: string[] = [];
 
     constructor(public layoutService: LayoutService,
         private router: Router,
         private authService: AuthService
-    ) {}
+    ) {
+        this.userRoles = this.authService.getCurrentUserRole() || [];
+    }
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
