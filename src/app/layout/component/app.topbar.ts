@@ -13,11 +13,11 @@ import { TagModule } from 'primeng/tag';
     standalone: true,
     imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TagModule],
     template: ` <div class="layout-topbar" style="display: flex; align-items: center; justify-content: center;">
-    <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem; display: flex; align-items: center; gap: 1rem;">
+    <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem;">
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
-        <div class="flex gap-2">
+        <div class="flex gap-2 hidden xs:hidden md:flex sm:flex lg:flex">
             <p-tag *ngFor="let role of userRoles" [value]="role" severity="info"></p-tag>
         </div>
     </div>
