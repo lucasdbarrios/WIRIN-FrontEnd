@@ -15,7 +15,7 @@ import { MessageModule } from 'primeng/message';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule,ButtonModule, CheckboxModule, InputTextModule, PasswordModule, 
-    FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, MessageModule],
+    FormsModule, RouterModule, RippleModule, MessageModule],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
