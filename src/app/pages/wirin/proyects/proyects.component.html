@@ -49,7 +49,7 @@
                 <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
                 <td>
                     <p-button icon="pi pi-sent" [disabled]="getPercent(project) != 100" label="Entregar"
-                        severity="success" (click)="openDelivery(project.id)">
+                        severity="success" (click)="openDelivery(project)">
                     </p-button>
                 </td>
             </tr>

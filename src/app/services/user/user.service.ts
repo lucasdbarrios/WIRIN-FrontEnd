@@ -23,12 +23,8 @@ export class UserService {
     return this.http.get<any[]>(this.apiUrl, this.authService.getHeaders());
   }
 
-  getAllStudents(orderDeliveryId?: number): Observable<any[]> {
+  getAllStudents(): Observable<any[]> {
     let url = `${this.apiUrl}/students`;
-
-    if (orderDeliveryId) {
-        url += `?orderDeliveryId=${orderDeliveryId}`;
-    }
 
     return this.http.get<any[]>(url, this.authService.getHeaders());
 }
