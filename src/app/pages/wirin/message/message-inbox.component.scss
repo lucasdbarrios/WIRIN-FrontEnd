@@ -1,0 +1,111 @@
+.folder-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  color: var(--text-color);
+  text-decoration: none;
+
+  &:hover {
+    background-color: var(--surface-hover);
+  }
+
+  &.active {
+    background-color: var(--primary-color);
+    color: var(--primary-color-text);
+  }
+
+  .folder-icon {
+    margin-right: 0.75rem;
+  }
+}
+
+/* Estilos para los botones de carpeta */
+.folder-buttons {
+  .p-button {
+    &.folder-active {
+      background-color: var(--primary-color);
+      color: var(--primary-color-text);
+      border-color: var(--primary-color);
+    }
+  }
+}
+
+/* Estilos para las burbujas de conversación */
+.message-bubble {
+  position: relative;
+  max-width: 85%;
+  
+  &.bg-primary-50 {
+    margin-left: auto;
+    border-top-right-radius: 0;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -10px;
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-left-color: var(--primary-50);
+      border-right: 0;
+      border-top: 0;
+    }
+  }
+  
+  &.bg-gray-50 {
+    margin-right: auto;
+    border-top-left-radius: 0;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -10px;
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-right-color: var(--gray-50);
+      border-left: 0;
+      border-top: 0;
+    }
+  }
+}
+
+/* Estilos para el visor de mensajes */
+.message-popup-dialog {
+  .p-dialog-content {
+    padding: 0;
+  }
+}
+
+/* Estilos para el modal de respuesta */
+.reply-dialog {
+  .original-message {
+    border-left: 4px solid var(--primary-color);
+  }
+}
+
+/* Mejoras visuales para los botones de carpeta */
+.p-buttonset.folder-buttons {
+  .p-button {
+    font-weight: 500;
+    
+    &:first-child {
+      border-top-left-radius: 0.5rem;
+      border-bottom-left-radius: 0.5rem;
+    }
+    
+    &:last-child {
+      border-top-right-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+    
+    .p-button-icon {
+      font-size: 1rem;
+    }
+  }
+}

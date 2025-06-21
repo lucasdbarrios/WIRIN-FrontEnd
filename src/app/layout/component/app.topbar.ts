@@ -42,7 +42,7 @@ import { AuthService } from '../../services/auth/auth.service';
                         <i class="pi pi-calendar"></i>
                         <span>Calendar</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" (click)="router.navigate(['/wirin/messages'])">
                         <i class="pi pi-inbox"></i>
                         <span>Messages</span>
                     </button>
@@ -63,7 +63,7 @@ export class AppTopbar {
     items!: MenuItem[];
 
     constructor(public layoutService: LayoutService,
-        private router: Router,
+        public router: Router,
         private authService: AuthService
     ) {}
 
