@@ -197,7 +197,8 @@ export class FormTaskComponent implements OnInit {
   });
 
   if (data.filePath) {
-    this.currentFileName = data.filePath.split('/').pop() || data.filePath;
+    const pathParts = data.filePath.split(/[/\\]+/);
+    this.currentFileName = pathParts[pathParts.length - 1];
     this.existingFile = this.currentFileName;
     this.formTask.patchValue({ file: this.currentFileName });
   }
