@@ -179,7 +179,6 @@ export class FormTaskComponent implements OnInit {
   }
 
   private applyTaskData(data: Order): void {
-  console.log(data);
   const formattedDate = data.limitDate ? new Date(data.limitDate) : null;
   this.formTask.patchValue({
     name: data.name,
@@ -265,7 +264,6 @@ export class FormTaskComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.formTask);
     if (this.formTask.valid) {
       const formData = new FormData();
       Object.keys(this.formTask.value).forEach(key => {

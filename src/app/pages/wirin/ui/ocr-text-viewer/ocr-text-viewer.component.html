@@ -11,16 +11,16 @@
         <p-panel header="Texto Procesado por el OCR:" [style]="{ minHeight: '400px', maxHeight: '75vh' }"
             class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[400px] max-h-screen overflow-auto">
 
-            <div class="grid sm:grid-cols-1 lg:grid-cols-3 gap-4 text-center font-mono text-sm mb-4 flex-wrap">
-                <div class="p-3 border rounded shadow">
+            <div class="grid sm:grid-cols-1 lg:grid-cols-3 gap-4 text-center font-mono text-lg mb-4 flex-wrap">
+                <div class="p-3 border border-blue-500 rounded shadow">
                     <p><strong>Caracteres</strong></p>
                     <p>{{ getCurrentPage()?.characters }}</p>
                 </div>
-                <div class="p-3 border rounded shadow">
+                <div class="p-3 border border-blue-500 rounded shadow">
                     <p><strong>Confianza</strong></p>
                     <p>{{ getCurrentPage()?.confidence }}</p>
                 </div>
-                <div class="p-3 border rounded shadow">
+                <div class="p-3 border border-blue-500 rounded shadow">
                     <p><strong>Palabras</strong></p>
                     <p>{{ getCurrentPage()?.words }}</p>
                 </div>
