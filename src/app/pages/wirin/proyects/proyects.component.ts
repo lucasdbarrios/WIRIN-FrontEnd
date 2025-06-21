@@ -20,7 +20,7 @@ import { ProgressBar } from 'primeng/progressbar';
 import { DropdownModule } from 'primeng/dropdown';
 import { UserService } from '../../../services/user/user.service';
 import { ToastService } from '../../../services/toast/toast.service';
-import { StudentDelivery } from '../../../services/student-delivery/student-delivery.service';
+import { StudentDeliveryService } from '../../../services/student-delivery/student-delivery.service';
 
 @Component({
     selector: 'table-row-expansion-demo',
@@ -49,7 +49,7 @@ export class ProyectsComponent implements OnInit {
     constructor(private messageService: MessageService, 
         private orderDeliveryService: OrderDeliveryService,
         private toastService: ToastService,
-        private studentDeliveryService: StudentDelivery
+        private studentDeliveryService: StudentDeliveryService
     ) {}
 
     ngOnInit(): void {

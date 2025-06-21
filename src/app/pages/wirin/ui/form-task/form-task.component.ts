@@ -22,7 +22,7 @@ import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { OrderStatus } from '../../../../types/orderStatus.type';
-import { SubjectService } from '../../../../services/subject/student-delivery.service';
+import { SubjectService } from '../../../../services/subject/subject.service';
 
 @Component({
   standalone: true,

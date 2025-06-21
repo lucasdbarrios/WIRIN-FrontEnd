@@ -7,7 +7,7 @@ import { AuthService } from '../auth/auth.service';
     @Injectable({
     providedIn: 'root',
     })
-    export class StudentDelivery {
+    export class StudentDeliveryService {
     private apiUrl: string;
 
     constructor(private http: HttpClient, private envService: EnvService, private authService: AuthService) {
