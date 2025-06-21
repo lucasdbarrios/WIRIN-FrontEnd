@@ -133,9 +133,6 @@ export class TasksComponent implements OnInit, OnDestroy {
                 this.allTasks = data;
                 this.filteredTasksBase = this.filterTasksByExpirationDate(this.filterTasksByRole(data));
                 this.togglePriorityFilter();
-                this.tasks = [...data];
-                this.tasks = this.filterTasksByRole(data);
-                this.tasks = this.filterTasksByExpirationDate(this.tasks);
                 this.isLoading = false;
             },
             error: error => {
@@ -148,45 +145,52 @@ export class TasksComponent implements OnInit, OnDestroy {
         this.subscriptions.push(subscription);
     }
 
+    applyAllFilters(): void {
+        const filtradas = this.filterTasksByExpirationDate(
+            this.filterTasksByRole(this.allTasks)
+        );
+        this.filteredTasksBase = filtradas;
+        this.togglePriorityFilter();
+    }
+
     private filterTasksByExpirationDate(tasks: any[]): any[] {
-        const selectedDate = this.dropdownDate?.value;
-        if (!selectedDate) return tasks;
-    
-        const hoy = new Date();
-        const hoySinHora = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-    
-        return tasks.filter(task => {
-            if (!task.limitDate) {
-                return false;
-            }
-    
-            const vencimiento = new Date(task.limitDate);
-            const vencimientoSinHora = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), vencimiento.getDate());
-    
-            switch (selectedDate) {
-                case ExpirationDate.Hoy:
-                    return vencimientoSinHora.getTime() === hoySinHora.getTime();
-    
-                case ExpirationDate.Proximos7Dias:
-                    const limite = new Date(hoySinHora);
-                    limite.setDate(hoySinHora.getDate() + 7);
-                    return vencimientoSinHora >= hoySinHora && vencimientoSinHora <= limite;
-    
-                case ExpirationDate.EsteMes:
-                    return vencimiento.getMonth() === hoy.getMonth() && vencimiento.getFullYear() === hoy.getFullYear();
-    
-                case ExpirationDate.ProximoMes:
-                    const proximoMes = new Date(hoy);
-                    proximoMes.setMonth(hoy.getMonth() + 1);
-                    return vencimiento.getMonth() === proximoMes.getMonth() && vencimiento.getFullYear() === proximoMes.getFullYear();
-    
-                case ExpirationDate.Vencidas:
-                    return vencimientoSinHora < hoySinHora;
-    
-                default:
-                    return true;
-            }
-        });
+    const selectedDate = this.dropdownDate?.value;
+    if (!selectedDate) return tasks;
+
+    const hoy = new Date();
+    const hoySinHora = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+
+    const filtradas = tasks.filter(task => {
+        if (!task.limitDate) return false;
+
+        const vencimiento = new Date(task.limitDate);
+        const vencimientoSinHora = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), vencimiento.getDate());
+
+        switch (selectedDate) {
+        case ExpirationDate.Hoy:
+            return vencimientoSinHora.getTime() === hoySinHora.getTime();
+
+        case ExpirationDate.Proximos7Dias:
+            const limite = new Date(hoySinHora);
+            limite.setDate(hoySinHora.getDate() + 7);
+            return vencimientoSinHora >= hoySinHora && vencimientoSinHora <= limite;
+
+        case ExpirationDate.EsteMes:
+            return vencimiento.getMonth() === hoy.getMonth() && vencimiento.getFullYear() === hoy.getFullYear();
+
+        case ExpirationDate.ProximoMes:
+            const proximoMes = new Date(hoy);
+            proximoMes.setMonth(hoy.getMonth() + 1);
+            return vencimiento.getMonth() === proximoMes.getMonth() && vencimiento.getFullYear() === proximoMes.getFullYear();
+
+        case ExpirationDate.Vencidas:
+            return vencimientoSinHora < hoySinHora;
+
+        default:
+            return true;
+        }
+    });
+    return filtradas;
     }
 
     private filterTasksByRole(tasks: any[]): any[] {

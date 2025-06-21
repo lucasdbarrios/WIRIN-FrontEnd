@@ -117,8 +117,10 @@ export class TasksVoluntarioComponent implements OnInit{
 
     searchTasks(event: Event): void {
         const query = (event.target as HTMLInputElement).value.toLowerCase();
+
         this.tasks = this.allTasks.filter(task =>
-            task.name.toLowerCase().includes(query)
+            task.name.toLowerCase().includes(query) &&
+            this.canUserSeeTask(task)
         );
     }
 
@@ -150,5 +152,5 @@ export class TasksVoluntarioComponent implements OnInit{
     handleTaskDeletion(taskId: number): void {
         this.isTaskDetailOpen = false;
         this.tasks = this.tasks.filter(task => task.id !== taskId);
-      }
+    }
 }

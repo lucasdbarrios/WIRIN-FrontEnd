@@ -29,7 +29,7 @@
             <ng-template #start>
                 <ng-container>
                     <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
-                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()"
+                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasksWithAutoRefresh()"
                         *ngIf="isBibliotecario">
                     </p-select>
                 </ng-container>
@@ -38,7 +38,7 @@
             <ng-template #end>
                 <ng-container>
                     <p-select [(ngModel)]="dropdownDate" [options]="dropdownDates" optionLabel="name"
-                        placeholder="Filtrar por vencimiento" [showClear]="true" (onChange)="loadTasks()">
+                        placeholder="Filtrar por vencimiento" [showClear]="true" (onChange)="applyAllFilters()">
                     </p-select>
                 </ng-container>
             </ng-template>
