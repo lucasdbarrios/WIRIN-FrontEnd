@@ -22,6 +22,7 @@ import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { OrderStatus } from '../../../../types/orderStatus.type';
+import { SubjectService } from '../../../../services/subject/student-delivery.service';
 
 @Component({
   standalone: true,
@@ -50,27 +51,21 @@ export class FormTaskComponent implements OnInit {
   @Input() isEditMode: boolean = false;
   @Input() taskId: string | null = null;
   @Output() formSubmitted = new EventEmitter<FormData>();
-  
   formTask!: FormGroup;
   deliveryForm!: FormGroup;
   showNewDeliveryModal: boolean = false;
-  
   selectedFile: File | null = null;
   currentFileName: string = '';
   existingFile: string = '';
   orderDeliveries: OrderDelivery[] = [];
-  
-  subjects = ['Matemáticas', 'Historia', 'Ciencias', 'Lengua', 'Geografía', 'Arte', 'Educación Física'];
-
-  dropdownItemsSubjects: DropDown[] = this.subjects.map(subject => ({ name: subject, value: subject }));
-
+  dropdownItemsSubjects: DropDown[] = [];
   dropdownValue: OrderStatus | null = null;
-
   dropdownItems: { name: string; value: OrderStatus }[] = Object.values(OrderStatus).map(status => ({
     name: status,
     value: status
   }));
-  
+  private subjectsLoaded = false;
+  private pendingTaskData: Order | null = null;
   dropdownItemsUsers: DropDown[] = [];
 
   constructor(
@@ -79,6 +74,7 @@ export class FormTaskComponent implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private orderDeliveryService: OrderDeliveryService,
+    private subjectService: SubjectService,
   ) {
     this.initializeForms();
     this.loadUsers();
@@ -97,7 +93,7 @@ export class FormTaskComponent implements OnInit {
       limitDate: ['', Validators.required],
       alumnoId: ['', Validators.required],
       createdByUserId: [''],
-      orderDeliveryId: ['', Validators.required]
+      delivererId: ['', Validators.required]
     });
 
     this.deliveryForm = this.fb.group({
@@ -122,10 +118,32 @@ export class FormTaskComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadSubjects();
     this.initForm();
     this.markFormAsTouched(); // Marcar todos los campos como tocados al inicio
     this.setupFormValidation(); // Configurar validación en tiempo real
   }
+
+  private loadSubjects() {
+  this.subjectService.getAllSubjects().subscribe({
+    next: (response) => {
+      this.dropdownItemsSubjects = response.map((subject: any) => ({
+        name: subject.name,
+        value: subject.name
+      }));
+
+      this.subjectsLoaded = true;
+      if (this.pendingTaskData) {
+        this.applyTaskData(this.pendingTaskData);
+        this.pendingTaskData = null;
+      }
+    },
+    error: (error) => {
+      this.toastService.showError('Error al obtener los asuntos');
+      console.error('Error al obtener los asuntos:', error);
+    }
+  });
+}
 
   private initForm() {
     if (this.isEditMode) {
@@ -153,29 +171,37 @@ export class FormTaskComponent implements OnInit {
   }
 
   @Input() set taskData(data: Order) {
-    if (data) {
-      const formattedDate = data.limitDate ? new Date(data.limitDate) : null;
-      this.formTask.patchValue({
-        name: data.name,
-        subject: data.subject,
-        description: data.description,
-        authorName: data.authorName,
-        rangePage: data.rangePage,
-        isPriority: data.isPriority,
-        status: data.status || 'Pendiente',
-        limitDate: formattedDate,
-        alumnoId: data.alumnoId,
-        createdByUserId: data.createdByUserId,
-        orderDeliveryId: data.orderDeliveryId,
-      });
-
-      if (data.filePath) {
-        this.currentFileName = data.filePath.split('/').pop() || data.filePath.split('/').pop() || data.filePath;
-        this.existingFile = this.currentFileName;
-        this.formTask.patchValue({ file: this.currentFileName });
-      }
+    if (this.subjectsLoaded) {
+      this.applyTaskData(data);
+    } else {
+      this.pendingTaskData = data;
     }
   }
+
+  private applyTaskData(data: Order): void {
+  console.log(data);
+  const formattedDate = data.limitDate ? new Date(data.limitDate) : null;
+  this.formTask.patchValue({
+    name: data.name,
+    subject: data.subject,
+    description: data.description,
+    authorName: data.authorName,
+    rangePage: data.rangePage,
+    isPriority: data.isPriority,
+    status: data.status || 'Pendiente',
+    limitDate: formattedDate,
+    filePath: data.filePath,
+    alumnoId: data.alumnoId,
+    createdByUserId: data.createdByUserId,
+    delivererId: Number(data.delivererId),
+  });
+
+  if (data.filePath) {
+    this.currentFileName = data.filePath.split('/').pop() || data.filePath;
+    this.existingFile = this.currentFileName;
+    this.formTask.patchValue({ file: this.currentFileName });
+  }
+}
 
   onFileSelected(event: any) {
     if (event.files && event.files[0]) {
@@ -248,7 +274,7 @@ export class FormTaskComponent implements OnInit {
           formData.append(key, this.formTask.value[key]);
         }
       });
-
+      formData.set('delivererId', String(this.formTask.value.delivererId));
       if (this.selectedFile) {
         formData.append('file', this.selectedFile);
       }

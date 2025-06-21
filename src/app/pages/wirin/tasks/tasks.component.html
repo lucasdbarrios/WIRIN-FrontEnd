@@ -29,7 +29,8 @@
             <ng-template #start>
                 <ng-container>
                     <p-select [(ngModel)]="dropdownValue" [options]="dropdownValues" optionLabel="name"
-                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()">
+                        placeholder="Filtrar por estado" [showClear]="true" (onChange)="loadTasks()"
+                        *ngIf="isBibliotecario">
                     </p-select>
                 </ng-container>
             </ng-template>
@@ -53,7 +54,7 @@
             No hay tareas disponibles en este momento.
         </div>
 
-        <p-dataview [value]="tasks" [layout]="layout">
+        <p-dataview [value]="tasks" [layout]="layout" [paginator]="true" [rows]="9">
             <ng-template #list let-tasks>
                 <div class="grid grid-cols-12 gap-4 place-items: center;">
                     <div *ngFor="let task of tasks; let i = index" class="col-span-12 sm:col-span-6 lg:col-span-4 p-2">

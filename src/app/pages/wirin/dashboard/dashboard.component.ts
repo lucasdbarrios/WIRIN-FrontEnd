@@ -28,10 +28,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     taskStats = [
         { bgClass: 'bg-blue-100 dark:bg-blue-400/10', iconClass: 'pi pi-list text-blue-500 !text-xl' },
         { bgClass: 'bg-orange-100 dark:bg-orange-400/10', iconClass: 'pi pi-clock text-orange-500 !text-xl' },
-        { bgClass: 'bg-cyan-100 dark:bg-cyan-400/10', iconClass: 'pi pi-users text-cyan-500 !text-xl' },
-        { bgClass: 'bg-cyan-100 dark:bg-cyan-400/10', iconClass: 'pi pi-users text-cyan-500 !text-xl' },
-        { bgClass: 'bg-cyan-100 dark:bg-cyan-400/10', iconClass: 'pi pi-users text-cyan-500 !text-xl' },
-        { bgClass: 'bg-green-100 dark:bg-green-400/10', iconClass: 'pi pi-check-circle text-green-500 !text-xl' }
+        { bgClass: 'bg-yellow-100 dark:bg-yellow-400/10', iconClass: 'pi pi-spin pi-cog text-yellow-500 !text-xl' },
+        { bgClass: 'bg-purple-100 dark:bg-purple-400/10', iconClass: 'pi pi-search text-purple-500 !text-xl' },
+        { bgClass: 'bg-pink-100 dark:bg-pink-400/10', iconClass: 'pi pi-check-square text-pink-500 !text-xl' },
+        { bgClass: 'bg-green-100 dark:bg-green-400/10', iconClass: 'pi pi-check text-green-500 !text-xl' }
     ];
 
     // Suscripciones para gestionar la limpieza al destruir el componente
