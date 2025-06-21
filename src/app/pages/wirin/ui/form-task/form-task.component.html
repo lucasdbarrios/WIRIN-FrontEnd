@@ -134,16 +134,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div class="flex flex-col justify-start">
                     <label class="mb-4 font-bold">Archivo *</label>
-                    <p-fileUpload mode="basic" chooseLabel="Seleccionar archivo" class="file-upload-adjust"
-                        accept="application/pdf" [maxFileSize]="1000000" (onSelect)="onFileSelected($event)"
-                        [customUpload]="true">
 
-                        <ng-template pTemplate="content">
-                            <div class="text-sm text-gray-600 mt-2" *ngIf="formTask.get('file')?.value">
-                                Archivo seleccionado: {{ formTask.get('file')?.value }}
-                            </div>
-                        </ng-template>
+                    <p-fileUpload mode="basic" chooseLabel="Seleccionar archivo" class="file-upload-adjust"
+                        accept="application/pdf" [maxFileSize]="1000000" [customUpload]="true"
+                        (onSelect)="onFileSelected($event)">
                     </p-fileUpload>
+
+                    <div class="text-sm text-gray-600 mt-2" *ngIf="formTask.get('file')?.value">
+                        Archivo seleccionado:
+                        <span class="font-semibold">
+                            {{
+                            formTask.get('file')?.value?.name
+                            || formTask.get('file')?.value
+                            }}
+                        </span>
+                    </div>
+
                     <small class="text-red-500 mt-2"
                         *ngIf="formTask.get('file')?.hasError('required') && formTask.get('file')?.touched">
                         El archivo es requerido

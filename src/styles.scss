@@ -12,9 +12,8 @@
     padding: 0;
 }
 
-::ng-deep .p-fileupload.p-fileupload-basic .p-button {
-  justify-content: flex-start !important;
-  text-align: left !important;
+.p-fileupload-basic{
+    justify-content: start !important;
 }
 
 @media screen and (max-width: 1024px) {
