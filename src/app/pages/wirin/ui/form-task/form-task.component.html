@@ -188,7 +188,8 @@
         <div class="flex flex-col">
             <label for="deliveryStudentId" class="mb-4 font-bold">Seleccionar alumno</label>
             <p-dropdown id="deliveryStudentId" formControlName="deliveryStudentId" [options]="dropdownItemsUsers"
-                optionLabel="name" optionValue="value" placeholder="Selecciona el usuario" class="w-full">
+                optionLabel="name" optionValue="value" placeholder="Selecciona el usuario" class="w-full"
+                appendTo="body">
             </p-dropdown>
             <small class="text-red-500 mt-2"
                 *ngIf="deliveryForm.get('deliveryStudentId')?.hasError('required') && deliveryForm.get('deliveryStudentId')?.touched">
