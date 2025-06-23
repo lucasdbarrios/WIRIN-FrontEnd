@@ -16,7 +16,6 @@ import { LoginComponent } from './app/pages/wirin/login/login.component';
 import { ProfileComponent } from './app/pages/wirin/profile/profile.component';
 import { AddUserFormComponent } from './app/pages/wirin/form-add-user/form-add-user.component';
 import { EditUserComponent } from './app/pages/wirin/form-edit-user/form-edit-user.component';
-import { DeliveriesComponent } from './app/pages/wirin/deliveries/deliveries.component';
 import { TasksVoluntarioComponent } from './app/pages/wirin/tasks-voluntario/tasks-voluntario.component';
 import { ProyectsComponent } from './app/pages/wirin/proyects/proyects.component';
 import { AutoRefreshExampleComponent } from './app/pages/example/auto-refresh-example.component';
@@ -46,7 +45,6 @@ export const appRoutes: Routes = [
             { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
             { path: 'tasks', component: TasksComponent, canActivate: [AuthGuard] },
             { path: 'tasks-voluntario', component: TasksVoluntarioComponent, canActivate: [AuthGuard] },
-            { path: 'deliveries', component: DeliveriesComponent, canActivate: [AuthGuard] },
             { path: 'bibliographs', component: ProyectsComponent, canActivate: [AuthGuard] },
             { path: 'add-task-form', component: AddTaskFormComponent, canActivate: [AuthGuard] },
             { path: 'edit-task-form/:id', component: EditTaskComponent, canActivate: [AuthGuard] },

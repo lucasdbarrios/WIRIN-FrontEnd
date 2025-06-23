@@ -231,6 +231,7 @@ export class FormTaskComponent implements OnInit {
           this.orderDeliveries.push(createdDelivery);
           this.showNewDeliveryModal = false;
           this.loadOrderDeliveries();
+          this.toastService.showSuccess('Entrega creada exitosamente');
         },
         error: (error) => {
           this.toastService.showError('Error al crear la entrega');
