@@ -7,6 +7,7 @@ import { User } from "./user.interface";
     status: string;
     userId: string;
     deliveryDate: string;
+    createDate: string;
     title: string;
     orders: Order[];
     userName: string;

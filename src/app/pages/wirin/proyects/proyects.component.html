@@ -31,7 +31,7 @@
                 <th pSortableColumn="Status">Progreso <p-sortIcon field="Status" /></th>
                 <th pSortableColumn="StudentUserId">Alumno <p-sortIcon field="StudentUserId" /></th>
                 <th>Cantidad de tareas</th>
-                <th>Fecha de entrega</th>
+                <th>Fecha de inicio</th>
                 <th></th>
             </tr>
         </ng-template>
@@ -46,11 +46,13 @@
                 <td><p-progressbar [value]="getPercent(project)" /></td>
                 <td>{{ project.studentUserName }}</td>
                 <td>{{ project.orders.length }}</td>
-                <td>{{ project.deliveryDate | date:'dd/MM/yyyy' }}</td>
+                <td>{{ project.createDate | date:'dd/MM/yyyy' }}</td>
                 <td>
-                    <p-button icon="pi pi-sent" [disabled]="getPercent(project) != 100" label="Entregar"
+                    <p-button icon="pi pi-send" [disabled]="getPercent(project) != 100" label="Entregar"
                         severity="success" (click)="openDelivery(project)">
                     </p-button>
+                    <!-- <p-button icon="pi pi-trash" severity="danger" (click)="deleteOrderDelivery(project.id)">
+                    </p-button> -->
                 </td>
             </tr>
         </ng-template>

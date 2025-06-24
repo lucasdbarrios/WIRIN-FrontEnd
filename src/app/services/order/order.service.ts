@@ -48,17 +48,12 @@ export class OrderService extends BaseService {
   }
 
   createOrder(formData: FormData): Observable<any> {
-  console.log('📦 Contenido del FormData antes de enviar al backend:');
-  formData.forEach((value, key) => {
-    console.log(`• ${key}:`, value);
-  });
-
-  return this.http.post(this.apiUrl, formData, {
-    ...this.authService.getHeaders(),
-    reportProgress: true,
-    observe: 'events'
-  });
-}
+    return this.http.post(this.apiUrl, formData, {
+      ...this.authService.getHeaders(),
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
 
   downloadFile(id: number): Observable<Blob> {
     const downloadUrl = `${this.apiUrl}/download/${id}`;

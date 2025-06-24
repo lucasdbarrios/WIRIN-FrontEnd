@@ -61,6 +61,7 @@ export class ProyectsComponent implements OnInit {
         this.orderDeliveryService.getOrderDeliveriesWithOrders().subscribe({
             next: (data: OrderDelivery[]) => {
                 this.projects = data;
+                console.log(data)
                 this.isLoading = false;
             },
             error: (error: any) => {
@@ -152,5 +153,9 @@ export class ProyectsComponent implements OnInit {
             console.error('Error al crear entrega:', err);
           }
         });
+      }
+
+      deleteOrderDelivery(proyectId: number){
+        
       }
 }
