@@ -1,111 +1,63 @@
-.folder-link {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-  cursor: pointer;
-  color: var(--text-color);
-  text-decoration: none;
 
-  &:hover {
-    background-color: var(--surface-hover);
-  }
+.message-popup-dialog .p-dialog-content,.message-popup-container,.message-popup-header,.message-details-dialog .p-dialog-content,.email-view-container,.email-attachment,.email-technical-info details{background-color:var(--surface-card)}
+.message-text,.email-additional-info,.technical-details,.message-details pre{background-color:var(--surface-ground)}
+.email-header{border-color:var(--surface-border);background-color:var(--surface-section)}
+.meta-label,.attachment-label{color:var(--text-color-secondary)}
+.email-subject,.meta-value{color:var(--text-color)}
+.status-tag.responded{background-color:var(--green-100);color:var(--green-700)}
+.status-tag.draft{background-color:var(--yellow-100);color:var(--yellow-700)}
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr{cursor:pointer}
+.conversation-container{background-color:#f0f2f5}
+.message-bubble{position:relative;max-width:70%;width:fit-content;word-wrap:break-word}
+.message-bubble.ml-auto{border-radius:12px 0 12px 12px}
+.message-bubble.mr-auto{border-radius:0 12px 12px 12px}
+.max-w-30rem{max-width:30rem}
+.conversation-modal .p-dialog{max-width:95vw;max-height:90vh;margin:1rem}
+.conversation-modal .p-dialog-content{padding:0;display:flex;flex-direction:column;height:80vh;min-height:500px}
 
-  &.active {
-    background-color: var(--primary-color);
-    color: var(--primary-color-text);
-  }
+.conversation-header{color:white;padding:1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--primary-color)}
+.conversation-title{font-size:1rem;font-weight:600;margin:0}
+.conversation-count{font-size:0.875rem;opacity:0.9}
+.header-actions{display:flex;gap:0.5rem}
+.header-actions .p-button{color:white;padding:0.5rem;background:rgba(255,255,255,0.2)}
+.conversation-messages{flex:1;overflow-y:auto;padding:1rem;background:#f8f9fa}
+.date-separator{text-align:center;margin:1rem 0;position:sticky;top:0}
+.date-label{padding:0.5rem 1rem;font-size:0.875rem;background:rgba(255,255,255,0.95);color:var(--text-color-secondary)}
+.message-item{margin-bottom:1rem}
+.message-item .message-bubble{position:relative;word-wrap:break-word}
+.message-bubble.bg-primary{background:var(--primary-color)!important}
+.message-bubble.bg-white{background:white!important;border:1px solid var(--surface-border)}
+.user-avatar{width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1rem;flex-shrink:0}
+.user-avatar.bg-primary{color:white;background:var(--primary-color)}
+.user-avatar.bg-surface-200{background:var(--surface-200);color:var(--primary-color)}
 
-  .folder-icon {
-    margin-right: 0.75rem;
-  }
+.message-content{flex:1}
+.message-bubble{padding:0.5rem}
+.message-text{margin:0}
+.message-attachment{margin-top:0.5rem;padding:0.5rem;display:flex;align-items:center;gap:0.5rem;cursor:pointer;background:rgba(0,0,0,0.05)}
+.message-info{margin-top:0.25rem;display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--text-color-secondary)}
+.message-time{font-weight:500}
+.read-status{color:var(--primary-color)}
+.conversation-reply{padding:1rem;border-top:1px solid var(--surface-border);background:white}
+.reply-form{display:flex;gap:0.5rem;align-items:flex-end}
+.reply-input{flex:1;min-height:2.5rem;resize:none;border:1px solid var(--surface-border);padding:0.5rem;font-size:0.875rem;background:var(--surface-50)}
+.reply-input:focus{outline:none;border-color:var(--primary-color);background:white}
+.reply-actions{display:flex;gap:0.5rem}
+.reply-actions .p-button{padding:0.5rem}
+.p-button-success{background:var(--green-500)!important;color:white}
+.p-button-secondary{background:var(--surface-100)!important;color:var(--text-color)}
+.empty-conversation{text-align:center;padding:2rem;color:var(--text-color-secondary)}
+.empty-conversation i{font-size:2rem;margin-bottom:1rem}
+.empty-conversation h3{margin:0}
+.empty-conversation p{margin:0}
+@media (max-width: 768px) {
+  .conversation-modal .p-dialog{width:100%;height:100%;max-width:none;max-height:none;margin:0}
+  .conversation-modal .p-dialog-content{height:100vh}
+  .message-item .message-bubble{max-width:calc(100vw - 140px)}
+  .user-avatar{width:2.25rem;height:2.25rem}
 }
-
-/* Estilos para los botones de carpeta */
-.folder-buttons {
-  .p-button {
-    &.folder-active {
-      background-color: var(--primary-color);
-      color: var(--primary-color-text);
-      border-color: var(--primary-color);
-    }
-  }
-}
-
-/* Estilos para las burbujas de conversación */
-.message-bubble {
-  position: relative;
-  max-width: 85%;
-  
-  &.bg-primary-50 {
-    margin-left: auto;
-    border-top-right-radius: 0;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: -10px;
-      width: 0;
-      height: 0;
-      border: 10px solid transparent;
-      border-left-color: var(--primary-50);
-      border-right: 0;
-      border-top: 0;
-    }
-  }
-  
-  &.bg-gray-50 {
-    margin-right: auto;
-    border-top-left-radius: 0;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -10px;
-      width: 0;
-      height: 0;
-      border: 10px solid transparent;
-      border-right-color: var(--gray-50);
-      border-left: 0;
-      border-top: 0;
-    }
-  }
-}
-
-/* Estilos para el visor de mensajes */
-.message-popup-dialog {
-  .p-dialog-content {
-    padding: 0;
-  }
-}
-
-/* Estilos para el modal de respuesta */
-.reply-dialog {
-  .original-message {
-    border-left: 4px solid var(--primary-color);
-  }
-}
-
-/* Mejoras visuales para los botones de carpeta */
-.p-buttonset.folder-buttons {
-  .p-button {
-    font-weight: 500;
-    
-    &:first-child {
-      border-top-left-radius: 0.5rem;
-      border-bottom-left-radius: 0.5rem;
-    }
-    
-    &:last-child {
-      border-top-right-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
-    }
-    
-    .p-button-icon {
-      font-size: 1rem;
-    }
-  }
+@media (max-width: 480px) {
+  .message-item .message-bubble{max-width:calc(100vw - 110px)}
+  .user-avatar{width:2rem;height:2rem}
+  .reply-form{flex-direction:column}
 }
