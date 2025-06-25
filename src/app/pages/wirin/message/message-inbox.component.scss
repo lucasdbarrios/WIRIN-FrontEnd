@@ -1,15 +1,11 @@
 
-/* Estilos para el popup de mensajes */
+/* Estilos para el popup de mensajes - Optimizado con Tailwind */
     .message-popup-dialog .p-dialog-content {
-      padding: 0;
-      border-radius: 8px;
-      overflow: hidden;
+      @apply p-0 rounded-lg overflow-hidden;
     }
     
     .message-popup-container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
+      @apply flex flex-col h-full;
       background-color: var(--surface-card);
     }
     
@@ -19,18 +15,15 @@
     }
     
     .message-icon-container {
-      width: 40px;
-      height: 40px;
+      @apply w-10 h-10;
     }
     
     .sender-avatar {
-      width: 36px;
-      height: 36px;
+      @apply w-9 h-9;
     }
     
     .message-text {
-      max-height: 300px;
-      overflow-y: auto;
+      @apply max-h-80 overflow-y-auto;
       background-color: var(--surface-ground);
       scrollbar-width: thin;
       scrollbar-color: var(--primary-color) var(--surface-ground);
@@ -38,49 +31,38 @@
     
     /* Estilos para el diálogo de detalles del mensaje */
     .message-details-dialog .p-dialog-content {
-      max-width: 90vw;
-      max-height: 80vh;
-      overflow: auto;
-      padding: 0;
+      @apply max-w-[90vw] max-h-[80vh] overflow-auto p-0;
     }
     
     /* Estilos para la vista de correo electrónico */
     .email-view-container {
+      @apply rounded-lg overflow-hidden;
       font-family: var(--font-family);
       background-color: var(--surface-card);
-      border-radius: 8px;
-      overflow: hidden;
     }
     
     .email-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--surface-border);
+      @apply p-6 border-b;
+      border-color: var(--surface-border);
       background-color: var(--surface-section);
     }
     
     .email-subject {
-      font-size: 1.5rem;
-      font-weight: 700;
+      @apply text-2xl font-bold mb-4;
       color: var(--text-color);
-      margin-bottom: 1rem;
     }
     
     .email-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      @apply flex flex-col gap-2;
     }
     
     .email-sender, .email-recipient, .email-date {
-      display: flex;
-      align-items: baseline;
+      @apply flex items-baseline;
     }
     
     .meta-label {
-      font-weight: 600;
+      @apply font-semibold w-16 flex-shrink-0;
       color: var(--text-color-secondary);
-      width: 4rem;
-      flex-shrink: 0;
     }
     
     .meta-value {
@@ -88,30 +70,21 @@
     }
     
     .email-content {
-      padding: 1.5rem;
-      min-height: 150px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      border-bottom: 1px solid var(--surface-border);
+      @apply p-6 min-h-[150px] leading-relaxed whitespace-pre-wrap border-b;
+      border-color: var(--surface-border);
     }
     
     .email-additional-info {
-      padding: 1rem 1.5rem;
+      @apply p-4 px-6;
       background-color: var(--surface-ground);
     }
     
     .email-status {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      @apply flex gap-2 mb-4;
     }
     
     .status-tag {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-size: 0.875rem;
-      font-weight: 600;
+      @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
     }
     
     .status-tag.responded {
@@ -125,56 +98,40 @@
     }
     
     .email-attachment {
-      margin: 1rem 0;
-      padding: 0.75rem;
+      @apply my-4 p-3 rounded-md border border-dashed flex items-center gap-2;
       background-color: var(--surface-card);
-      border-radius: 6px;
-      border: 1px dashed var(--surface-border);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      border-color: var(--surface-border);
     }
     
     .attachment-label {
+      @apply font-semibold flex items-center gap-1;
       color: var(--text-color-secondary);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
     }
     
     .email-technical-info {
-      margin-top: 1rem;
+      @apply mt-4;
     }
     
     .email-technical-info details {
-      border: 1px solid var(--surface-border);
-      border-radius: 6px;
-      padding: 0.5rem;
+      @apply border rounded-md p-2;
+      border-color: var(--surface-border);
       background-color: var(--surface-card);
     }
     
     .email-technical-info summary {
-      cursor: pointer;
-      padding: 0.5rem;
-      font-weight: 600;
+      @apply cursor-pointer p-2 font-semibold;
       color: var(--primary-color);
     }
     
     .technical-details {
-      padding: 0.75rem;
-      font-size: 0.875rem;
+      @apply p-3 text-sm rounded mt-2;
       background-color: var(--surface-ground);
-      border-radius: 4px;
-      margin-top: 0.5rem;
     }
     
     .message-details pre {
-      font-family: monospace;
+      @apply font-mono p-4 rounded-md border;
       background-color: var(--surface-ground);
-      padding: 1rem;
-      border-radius: 6px;
-      border: 1px solid var(--surface-border);
+      border-color: var(--surface-border);
     }
     
     .message-text::-webkit-scrollbar {
@@ -192,7 +149,7 @@
     }
     
     .message-attachment {
-      transition: all 0.2s;
+      @apply transition-all duration-200;
     }
     
     .message-attachment:hover {
@@ -200,14 +157,11 @@
     }
     
     .reply-container {
-      max-height: 200px;
-      overflow-y: auto;
+      @apply max-h-48 overflow-y-auto;
     }
     
     .quick-reply-textarea {
-      min-height: 100px;
-      resize: vertical;
-      transition: all 0.3s ease;
+      @apply min-h-24 resize-y transition-all duration-300 ease-in-out;
     }
     
     .quick-reply-textarea:focus {
@@ -216,13 +170,12 @@
     
     /* Estilos para la tabla de mensajes */
     :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-      cursor: pointer;
-      transition: all 0.2s;
+      @apply cursor-pointer transition-all duration-200;
     }
     
     :host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+      @apply -translate-y-0.5;
       background-color: var(--surface-hover);
-      transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
     
@@ -248,11 +201,7 @@
     }
     
     .message-bubble {
-      position: relative;
-      max-width: 70%;
-      width: fit-content;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      word-wrap: break-word;
+      @apply relative max-w-[70%] w-fit shadow-sm break-words;
     }
     
     .message-bubble.ml-auto {
@@ -264,7 +213,7 @@
     }
     
     .max-w-30rem {
-      max-width: 30rem;
+      @apply max-w-[30rem];
     }
     
     /* Animación para el popup */
@@ -285,68 +234,45 @@
 /* Estilos mejorados para el historial de mensajes responsive */
 .conversation-modal {
   .p-dialog {
-    max-width: 95vw;
-    max-height: 90vh;
-    margin: 1rem;
+    @apply max-w-[95vw] max-h-[90vh] m-4;
   }
 
   .p-dialog-content {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 80vh;
-    min-height: 500px;
+    @apply p-0 flex flex-col h-[80vh] min-h-[500px];
   }
 }
 
 .conversation-header {
+  @apply text-white px-6 py-4 rounded-t-lg flex items-center justify-between flex-shrink-0 shadow-lg;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px 8px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   .conversation-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
+    @apply text-lg font-semibold m-0;
   }
 
   .conversation-count {
-    font-size: 0.9rem;
-    opacity: 0.9;
+    @apply text-sm opacity-90;
   }
 
   .header-actions {
-    display: flex;
-    gap: 0.5rem;
+    @apply flex gap-2;
 
     .p-button {
+      @apply text-white p-2 rounded-md transition-all duration-200;
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      padding: 0.5rem;
-      border-radius: 6px;
-      transition: all 0.2s;
 
       &:hover {
+        @apply -translate-y-0.5;
         background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-1px);
       }
     }
   }
 }
 
 .conversation-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+  @apply flex-1 overflow-y-auto p-4 relative;
   background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-  position: relative;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -369,33 +295,22 @@
 }
 
 .date-separator {
-  text-align: center;
-  margin: 1.5rem 0 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  @apply text-center my-6 mb-4 sticky top-0 z-10;
 
   .date-label {
+    @apply px-4 py-2 rounded-full text-sm font-medium shadow-lg border;
     background: rgba(255, 255, 255, 0.95);
     color: var(--text-color-secondary);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.05);
   }
 }
 
 .message-item {
-  margin-bottom: 1.5rem;
+  @apply mb-6;
   
   .message-bubble {
-    position: relative;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    transition: all 0.2s ease;
+    @apply relative break-words transition-all duration-200 ease-in-out;
     
     &:hover {
       transform: translateY(-1px);
@@ -417,28 +332,16 @@
 }
 
 .user-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 1rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 3px solid white;
-  transition: all 0.2s ease;
+  @apply w-12 h-12 rounded-full flex items-center justify-center font-semibold text-base flex-shrink-0 shadow-lg border-4 border-white transition-all duration-200 ease-in-out;
   
   &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    @apply scale-105 shadow-xl;
   }
   
   // Avatar para mensajes propios
   &.bg-primary {
+    @apply text-white;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
-    color: white;
   }
   
   // Avatar para mensajes de otros
@@ -449,38 +352,23 @@
 }
 
 .message-content {
-  flex: 1;
-  max-width: calc(100% - 60px);
+  @apply flex-1 max-w-[calc(100%-60px)];
 }
 
 .message-bubble {
-  padding: 0.75rem 1rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  position: relative;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  @apply px-4 py-3 shadow-lg transition-all duration-200 ease-in-out relative break-words;
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    @apply -translate-y-0.5 shadow-xl;
   }
 
   .message-text {
-    line-height: 1.4;
-    margin: 0;
+    @apply leading-snug m-0;
   }
 
   .message-attachment {
-    margin-top: 0.5rem;
-    padding: 0.5rem;
+    @apply mt-2 p-2 rounded-lg flex items-center gap-2 cursor-pointer transition-all duration-200;
     background: rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
 
     &:hover {
       background: rgba(0, 0, 0, 0.1);
@@ -493,48 +381,33 @@
 }
 
 .message-info {
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
+  @apply mt-1 flex items-center gap-2 text-xs;
   color: var(--text-color-secondary);
 
   .message-time {
-    font-weight: 500;
+    @apply font-medium;
   }
 
   .read-status {
+    @apply font-semibold;
     color: var(--primary-color);
-    font-weight: 600;
   }
 }
 
 .conversation-reply {
-  background: white;
-  border-top: 1px solid var(--surface-border);
-  padding: 1rem 1.5rem;
-  flex-shrink: 0;
+  @apply bg-white border-t px-6 py-4 flex-shrink-0;
+  border-color: var(--surface-border);
 
   .reply-form {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-end;
+    @apply flex gap-3 items-end;
   }
 
   .reply-input {
-    flex: 1;
-    min-height: 40px;
-    max-height: 120px;
-    resize: none;
-    border-radius: 20px;
-    border: 1px solid var(--surface-border);
-    padding: 0.75rem 1rem;
-    font-family: inherit;
-    transition: all 0.2s;
+    @apply flex-1 min-h-10 max-h-30 resize-none rounded-full border px-4 py-3 font-inherit transition-all duration-200;
+    border-color: var(--surface-border);
 
     &:focus {
-      outline: none;
+      @apply outline-none;
       border-color: var(--primary-color);
       box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
     }
@@ -545,22 +418,13 @@
   }
 
   .reply-actions {
-    display: flex;
-    gap: 0.5rem;
+    @apply flex gap-2;
 
     .p-button {
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
+      @apply rounded-full w-10 h-10 p-0 flex items-center justify-center transition-all duration-200;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        @apply -translate-y-0.5 shadow-lg;
       }
 
       &.p-button-success {
@@ -578,29 +442,19 @@
 }
 
 .empty-conversation {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  @apply flex flex-col items-center justify-center h-full text-center p-8;
   color: var(--text-color-secondary);
-  text-align: center;
-  padding: 2rem;
 
   i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
+    @apply text-5xl mb-4 opacity-50;
   }
 
   h3 {
-    margin: 0 0 0.5rem;
-    font-weight: 600;
+    @apply m-0 mb-2 font-semibold;
   }
 
   p {
-    margin: 0;
-    opacity: 0.8;
+    @apply m-0 opacity-80;
   }
 }
 
@@ -608,53 +462,42 @@
 @media (max-width: 768px) {
   .conversation-modal {
     .p-dialog {
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: none;
-      max-height: none;
-      margin: 0;
-      border-radius: 0;
+      @apply w-screen h-screen max-w-none max-h-none m-0 rounded-none !important;
     }
 
     .p-dialog-content {
-      height: 100vh;
-      border-radius: 0;
+      @apply h-screen rounded-none;
     }
   }
 
   .conversation-header {
-    border-radius: 0;
-    padding: 1rem;
+    @apply rounded-none p-4;
 
     .conversation-title {
-      font-size: 1rem;
+      @apply text-base;
     }
 
     .header-actions {
       .p-button {
-        padding: 0.4rem;
+        @apply p-1.5;
       }
     }
   }
 
   .message-item {
-    margin-bottom: 1rem;
+    @apply mb-4;
     
     .message-bubble {
-      max-width: calc(100vw - 140px);
-      padding: 0.75rem 1rem;
+      @apply max-w-[calc(100vw-140px)] px-4 py-3;
     }
   }
 
   .user-avatar {
-    width: 36px;
-    height: 36px;
-    font-size: 0.85rem;
-    border: 2px solid white;
+    @apply w-9 h-9 text-sm border-2;
   }
 
   .conversation-reply {
-    padding: 0.75rem 1rem;
+    @apply px-4 py-3;
 
     .reply-input {
       font-size: 16px; /* Prevents zoom on iOS */
@@ -662,8 +505,7 @@
 
     .reply-actions {
       .p-button {
-        width: 36px;
-        height: 36px;
+        @apply w-9 h-9;
       }
     }
   }
@@ -671,36 +513,29 @@
 
 @media (max-width: 480px) {
   .message-item {
-    margin-bottom: 0.75rem;
+    @apply mb-3;
     
     .message-bubble {
-      max-width: calc(100vw - 110px);
-      padding: 0.6rem 0.8rem;
-      font-size: 0.9rem;
+      @apply max-w-[calc(100vw-110px)] px-3 py-2.5 text-sm;
     }
   }
 
   .date-separator {
-    margin: 1rem 0 0.5rem;
+    @apply my-4 mb-2;
 
     .date-label {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem;
+      @apply px-3 py-1.5 text-xs;
     }
   }
 
   .user-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 0.75rem;
-    border: 2px solid white;
+    @apply w-8 h-8 text-xs border-2;
   }
 
   .conversation-reply {
     .reply-actions {
       .p-button {
-        width: 32px;
-        height: 32px;
+        @apply w-8 h-8;
       }
     }
   }
