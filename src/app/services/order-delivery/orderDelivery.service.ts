@@ -39,10 +39,6 @@ export class OrderDeliveryService extends BaseService {
     return this.http.get(`${this.apiUrl}`, this.authService.getHeaders());
   }
 
-  /**
-   * Obtiene las entregas con actualización automática cada minuto
-   * @returns Observable que emite las entregas actualizadas cada minuto
-   */
   getDeliveriesWithAutoRefresh(): Observable<any> {
     return this.createAutoRefreshObservable(() => this.getDeliveries());
   }
@@ -51,10 +47,6 @@ export class OrderDeliveryService extends BaseService {
     return this.http.get(`${this.apiUrl}/WithOrders`, this.authService.getHeaders());
   }
 
-  /**
-   * Obtiene las entregas con órdenes con actualización automática cada minuto
-   * @returns Observable que emite las entregas con órdenes actualizadas cada minuto
-   */
   getOrderDeliveriesWithOrdersWithAutoRefresh(): Observable<any> {
     return this.createAutoRefreshObservable(() => this.getOrderDeliveriesWithOrders());
   }
