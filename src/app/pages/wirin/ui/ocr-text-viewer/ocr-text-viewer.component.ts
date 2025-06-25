@@ -18,6 +18,8 @@ import { AuthService } from '../../../../services/auth/auth.service';
 import { Annotation } from '../../../../types/annotation.interface';
 import { ParagraphAnnotationService } from '../../../../services/paragraph-annotation/paragraphAnnotation.service';
 import { ToastService } from '../../../../services/toast/toast.service';
+import { OrderService } from '../../../../services/order/order.service';
+import { saveAs } from 'file-saver';
 
 @Component({
     selector: 'app-ocr-text-viewer',
@@ -33,6 +35,7 @@ export class OcrTextViewerComponent {
     @Input() isEditing: boolean = false;
     @Input() editingText: string = '';
     @Input() showPdfPreview: boolean = false;
+    @Input() taskId: number = 0; // Añadir esta propiedad para recibir el ID de la tarea
     @Output() showPdfPreviewChange = new EventEmitter<boolean>();
     @Output() editClicked = new EventEmitter<void>();
     @Output() cancelEditing = new EventEmitter<void>();
@@ -88,7 +91,8 @@ export class OcrTextViewerComponent {
         private route: ActivatedRoute,
         private authService: AuthService,
         private paragraphAnnotationService: ParagraphAnnotationService,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private orderService: OrderService // Añadir el servicio OrderService
     ){}
 
     ngOnInit() {
@@ -120,6 +124,32 @@ export class OcrTextViewerComponent {
         if (!this.ocrData) return undefined;
         var ocr = this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
         return ocr;
+    }
+
+    checkLowConfidence(): boolean {
+        const currentPage = this.getCurrentPage();
+        return currentPage ? currentPage.confidence < 70 : false;
+    }
+    
+    downloadPdf(): void {
+        if (!this.taskId || this.taskId <= 0) {
+            this.toastService.showError('ID de tarea inválido. No se puede descargar el archivo.');
+            return;
+        }
+
+        // Obtener el nombre del archivo desde los metadatos del OCR si está disponible
+        const fileName = this.ocrData?.metadata?.fileName.split("\\").pop() || 'documento.pdf';
+
+        this.orderService.downloadFile(this.taskId).subscribe({
+            next: (blob) => {
+                saveAs(blob, fileName);
+                this.toastService.showSuccess('Archivo descargado correctamente');
+            },
+            error: (error) => {
+                this.toastService.showError('Error al descargar el archivo');
+                console.error('Error al descargar el archivo:', error);
+            }
+        });
     }
 
     onStartEditing(): void {
