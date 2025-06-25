@@ -147,15 +147,15 @@
     styleClass="viewer-dialog shadow-lg border-round-xl message-popup-dialog" [dismissableMask]="true"
     [draggable]="false" [resizable]="false" [baseZIndex]="1000" [showHeader]="false"
     [transitionOptions]="'300ms cubic-bezier(0.25, 0.8, 0.25, 1)'">
-    <div class="message-popup-container">
+    <div class="message-popup-container flex flex-col h-full">
 
       <div
         class="message-popup-header p-3 border-bottom-1 border-gray-200 flex justify-content-between align-items-center">
         <div class="flex align-items-center gap-2">
           <div
-            class="message-icon-container flex align-items-center justify-content-center border-circle bg-primary-100 p-2">
-            <i class="pi pi-envelope-open text-primary text-xl"></i>
-          </div>
+          class="message-icon-container w-10 h-10 flex align-items-center justify-content-center border-circle bg-primary-100 p-2">
+          <i class="pi pi-envelope-open text-primary text-xl"></i>
+        </div>
           <h2 class="text-xl font-medium m-0 text-900">{{ selectedMessage.subject }}</h2>
         </div>
         <div class="flex gap-2">
@@ -198,10 +198,9 @@
                             </ng-template>
                             <div class="p-3 flex align-items-center">
                               <div
-                                class="sender-avatar mr-3 flex align-items-center justify-content-center border-circle bg-blue-100"
-                                style="width: 64px; height: 64px;">
-                                <i class="pi pi-user text-blue-500 text-4xl"></i>
-                              </div>
+                              class="sender-avatar w-16 h-16 mr-3 flex align-items-center justify-content-center border-circle bg-blue-100">
+                              <i class="pi pi-user text-blue-500 text-4xl"></i>
+                            </div>
                               <div>
                                 <h4 class="text-lg font-medium text-900 m-0">{{ senderInfo?.fullName ||
                                   selectedMessage.senderName || selectedMessage.sender }}</h4>
