@@ -403,7 +403,7 @@
   }
 
   .reply-input {
-    @apply flex-1 min-h-10 max-h-30 resize-none rounded-full border px-4 py-3 font-inherit transition-all duration-200;
+    @apply flex-1 min-h-10 max-h-32 resize-none rounded-full border px-4 py-3 font-inherit transition-all duration-200;
     border-color: var(--surface-border);
 
     &:focus {
