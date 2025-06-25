@@ -1,111 +1,707 @@
-.folder-link {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-  cursor: pointer;
-  color: var(--text-color);
-  text-decoration: none;
 
-  &:hover {
-    background-color: var(--surface-hover);
-  }
-
-  &.active {
-    background-color: var(--primary-color);
-    color: var(--primary-color-text);
-  }
-
-  .folder-icon {
-    margin-right: 0.75rem;
-  }
-}
-
-/* Estilos para los botones de carpeta */
-.folder-buttons {
-  .p-button {
-    &.folder-active {
+/* Estilos para el popup de mensajes */
+    .message-popup-dialog .p-dialog-content {
+      padding: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .message-popup-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: var(--surface-card);
+    }
+    
+    .message-popup-header {
+      background-color: var(--surface-card);
+      border-bottom: 1px solid var(--surface-border);
+    }
+    
+    .message-icon-container {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .sender-avatar {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .message-text {
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: var(--surface-ground);
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-color) var(--surface-ground);
+    }
+    
+    /* Estilos para el diálogo de detalles del mensaje */
+    .message-details-dialog .p-dialog-content {
+      max-width: 90vw;
+      max-height: 80vh;
+      overflow: auto;
+      padding: 0;
+    }
+    
+    /* Estilos para la vista de correo electrónico */
+    .email-view-container {
+      font-family: var(--font-family);
+      background-color: var(--surface-card);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .email-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--surface-border);
+      background-color: var(--surface-section);
+    }
+    
+    .email-subject {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 1rem;
+    }
+    
+    .email-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .email-sender, .email-recipient, .email-date {
+      display: flex;
+      align-items: baseline;
+    }
+    
+    .meta-label {
+      font-weight: 600;
+      color: var(--text-color-secondary);
+      width: 4rem;
+      flex-shrink: 0;
+    }
+    
+    .meta-value {
+      color: var(--text-color);
+    }
+    
+    .email-content {
+      padding: 1.5rem;
+      min-height: 150px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    
+    .email-additional-info {
+      padding: 1rem 1.5rem;
+      background-color: var(--surface-ground);
+    }
+    
+    .email-status {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .status-tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .status-tag.responded {
+      background-color: var(--green-100);
+      color: var(--green-700);
+    }
+    
+    .status-tag.draft {
+      background-color: var(--yellow-100);
+      color: var(--yellow-700);
+    }
+    
+    .email-attachment {
+      margin: 1rem 0;
+      padding: 0.75rem;
+      background-color: var(--surface-card);
+      border-radius: 6px;
+      border: 1px dashed var(--surface-border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .attachment-label {
+      color: var(--text-color-secondary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .email-technical-info {
+      margin-top: 1rem;
+    }
+    
+    .email-technical-info details {
+      border: 1px solid var(--surface-border);
+      border-radius: 6px;
+      padding: 0.5rem;
+      background-color: var(--surface-card);
+    }
+    
+    .email-technical-info summary {
+      cursor: pointer;
+      padding: 0.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .technical-details {
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      background-color: var(--surface-ground);
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+    
+    .message-details pre {
+      font-family: monospace;
+      background-color: var(--surface-ground);
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--surface-border);
+    }
+    
+    .message-text::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .message-text::-webkit-scrollbar-track {
+      background: var(--surface-ground);
+      border-radius: 4px;
+    }
+    
+    .message-text::-webkit-scrollbar-thumb {
       background-color: var(--primary-color);
-      color: var(--primary-color-text);
-      border-color: var(--primary-color);
+      border-radius: 4px;
     }
-  }
+    
+    .message-attachment {
+      transition: all 0.2s;
+    }
+    
+    .message-attachment:hover {
+      background-color: var(--surface-hover);
+    }
+    
+    .reply-container {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .quick-reply-textarea {
+      min-height: 100px;
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-reply-textarea:focus {
+      box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    }
+    
+    /* Estilos para la tabla de mensajes */
+    :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    :host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+      background-color: var(--surface-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Estilos para el modal de conversación estilo WhatsApp */
+    .conversation-container {
+      background-color: #f0f2f5;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-color) #f0f2f5;
+    }
+    
+    .conversation-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .conversation-container::-webkit-scrollbar-track {
+      background: #f0f2f5;
+      border-radius: 4px;
+    }
+    
+    .conversation-container::-webkit-scrollbar-thumb {
+      background-color: var(--primary-color);
+      border-radius: 4px;
+    }
+    
+    .message-bubble {
+      position: relative;
+      max-width: 70%;
+      width: fit-content;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      word-wrap: break-word;
+    }
+    
+    .message-bubble.ml-auto {
+      border-radius: 12px 0 12px 12px;
+    }
+    
+    .message-bubble.mr-auto {
+      border-radius: 0 12px 12px 12px;
+    }
+    
+    .max-w-30rem {
+      max-width: 30rem;
+    }
+    
+    /* Animación para el popup */
+.p-dialog-enter {
+  animation: fadeIn 0.2s, slideDown 0.3s;
 }
 
-/* Estilos para las burbujas de conversación */
-.message-bubble {
-  position: relative;
-  max-width: 85%;
-  
-  &.bg-primary-50 {
-    margin-left: auto;
-    border-top-right-radius: 0;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: -10px;
-      width: 0;
-      height: 0;
-      border: 10px solid transparent;
-      border-left-color: var(--primary-50);
-      border-right: 0;
-      border-top: 0;
-    }
-  }
-  
-  &.bg-gray-50 {
-    margin-right: auto;
-    border-top-left-radius: 0;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -10px;
-      width: 0;
-      height: 0;
-      border: 10px solid transparent;
-      border-right-color: var(--gray-50);
-      border-left: 0;
-      border-top: 0;
-    }
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Estilos para el visor de mensajes */
-.message-popup-dialog {
+@keyframes slideDown {
+  from { transform: translateY(-20px); }
+  to { transform: translateY(0); }
+}
+
+/* Estilos mejorados para el historial de mensajes responsive */
+.conversation-modal {
+  .p-dialog {
+    max-width: 95vw;
+    max-height: 90vh;
+    margin: 1rem;
+  }
+
   .p-dialog-content {
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    min-height: 500px;
   }
 }
 
-/* Estilos para el modal de respuesta */
-.reply-dialog {
-  .original-message {
-    border-left: 4px solid var(--primary-color);
+.conversation-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .conversation-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .conversation-count {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.5rem;
+
+    .p-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+    }
   }
 }
 
-/* Mejoras visuales para los botones de carpeta */
-.p-buttonset.folder-buttons {
-  .p-button {
+.conversation-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  position: relative;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.date-separator {
+  text-align: center;
+  margin: 1.5rem 0 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  .date-label {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--text-color-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
     font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+.message-item {
+  margin-bottom: 1.5rem;
+  
+  .message-bubble {
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    transition: all 0.2s ease;
     
-    &:first-child {
-      border-top-left-radius: 0.5rem;
-      border-bottom-left-radius: 0.5rem;
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
     }
     
-    &:last-child {
-      border-top-right-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
+    // Mejores bordes redondeados para burbujas
+    &.bg-primary {
+      border-radius: 20px 20px 5px 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark)) !important;
     }
     
-    .p-button-icon {
+    &.bg-white {
+      border-radius: 20px 20px 20px 5px;
+      background: white !important;
+      border: 1px solid var(--surface-border);
+    }
+  }
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 3px solid white;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  // Avatar para mensajes propios
+  &.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+    color: white;
+  }
+  
+  // Avatar para mensajes de otros
+  &.bg-surface-200 {
+    background: var(--surface-200);
+    color: var(--primary-color);
+  }
+}
+
+.message-content {
+  flex: 1;
+  max-width: calc(100% - 60px);
+}
+
+.message-bubble {
+  padding: 0.75rem 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .message-text {
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .message-attachment {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.message-info {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+
+  .message-time {
+    font-weight: 500;
+  }
+
+  .read-status {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+}
+
+.conversation-reply {
+  background: white;
+  border-top: 1px solid var(--surface-border);
+  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+
+  .reply-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .reply-input {
+    flex: 1;
+    min-height: 40px;
+    max-height: 120px;
+    resize: none;
+    border-radius: 20px;
+    border: 1px solid var(--surface-border);
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+    }
+
+    &::placeholder {
+      color: var(--text-color-secondary);
+    }
+  }
+
+  .reply-actions {
+    display: flex;
+    gap: 0.5rem;
+
+    .p-button {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      &.p-button-success {
+        background: var(--green-500);
+        border-color: var(--green-500);
+      }
+
+      &.p-button-secondary {
+        background: var(--surface-200);
+        border-color: var(--surface-200);
+        color: var(--text-color);
+      }
+    }
+  }
+}
+
+.empty-conversation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-color-secondary);
+  text-align: center;
+  padding: 2rem;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    opacity: 0.8;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .conversation-modal {
+    .p-dialog {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      border-radius: 0;
+    }
+
+    .p-dialog-content {
+      height: 100vh;
+      border-radius: 0;
+    }
+  }
+
+  .conversation-header {
+    border-radius: 0;
+    padding: 1rem;
+
+    .conversation-title {
       font-size: 1rem;
+    }
+
+    .header-actions {
+      .p-button {
+        padding: 0.4rem;
+      }
+    }
+  }
+
+  .message-item {
+    margin-bottom: 1rem;
+    
+    .message-bubble {
+      max-width: calc(100vw - 140px);
+      padding: 0.75rem 1rem;
+    }
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+    border: 2px solid white;
+  }
+
+  .conversation-reply {
+    padding: 0.75rem 1rem;
+
+    .reply-input {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .reply-actions {
+      .p-button {
+        width: 36px;
+        height: 36px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .message-item {
+    margin-bottom: 0.75rem;
+    
+    .message-bubble {
+      max-width: calc(100vw - 110px);
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  .date-separator {
+    margin: 1rem 0 0.5rem;
+
+    .date-label {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+    border: 2px solid white;
+  }
+
+  .conversation-reply {
+    .reply-actions {
+      .p-button {
+        width: 32px;
+        height: 32px;
+      }
     }
   }
 }
