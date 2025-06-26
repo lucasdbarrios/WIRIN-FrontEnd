@@ -27,11 +27,6 @@ export class UserService extends BaseService {
     return this.http.get(`${this.apiUrl}/${id}`, this.authService.getHeaders());
   }
 
-  /**
-   * Obtiene un usuario por ID con actualización automática cada minuto
-   * @param id ID del usuario
-   * @returns Observable que emite el usuario actualizado cada minuto
-   */
   getUserByIdWithAutoRefresh(id: string): Observable<any> {
     return this.createAutoRefreshObservable(() => this.getUserById(id));
   }
@@ -40,10 +35,6 @@ export class UserService extends BaseService {
     return this.http.get<any[]>(this.apiUrl, this.authService.getHeaders());
   }
 
-  /**
-   * Obtiene todos los usuarios con actualización automática cada minuto
-   * @returns Observable que emite todos los usuarios actualizados cada minuto
-   */
   getAllWithAutoRefresh(): Observable<any[]> {
     return this.createAutoRefreshObservable(() => this.getAll());
   }
@@ -54,10 +45,6 @@ export class UserService extends BaseService {
     return this.http.get<any[]>(url, this.authService.getHeaders());
   }
 
-  /**
-   * Obtiene todos los estudiantes con actualización automática cada minuto
-   * @returns Observable que emite todos los estudiantes actualizados cada minuto
-   */
   getAllStudentsWithAutoRefresh(): Observable<any[]> {
     return this.createAutoRefreshObservable(() => this.getAllStudents());
   }
@@ -67,11 +54,6 @@ export class UserService extends BaseService {
     return this.http.get<any[]>(url, this.authService.getHeaders());
   }
 
-  /**
-   * Obtiene usuarios por rol con actualización automática cada minuto
-   * @param role Rol de los usuarios a obtener
-   * @returns Observable que emite los usuarios por rol actualizados cada minuto
-   */
   getUsersByRoleWithAutoRefresh(role: string): Observable<any[]> {
     return this.createAutoRefreshObservable(() => this.getUsersByRole(role));
   }

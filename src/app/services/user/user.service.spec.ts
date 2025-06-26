@@ -12,8 +12,8 @@ describe('UserService', () => {
   let envSpy: jasmine.SpyObj<EnvService>;
   let authSpy: jasmine.SpyObj<AuthService>;
 
-  const fakeHeaders = { headers: { Authorization: 'Bearer token' } };
-  const mockUrl = 'http://localhost/api/User';
+  const encabezadosMock = { headers: { Authorization: 'Bearer token' } };
+  const urlBase = 'http://localhost/api/User';
 
   beforeEach(() => {
     httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'put', 'delete']);
@@ -21,7 +21,7 @@ describe('UserService', () => {
     authSpy = jasmine.createSpyObj('AuthService', ['getHeaders']);
 
     envSpy.getApiUrl.and.returnValue('http://localhost/api');
-    authSpy.getHeaders.and.returnValue(fakeHeaders);
+    authSpy.getHeaders.and.returnValue(encabezadosMock);
 
     TestBed.configureTestingModule({
       providers: [
@@ -35,70 +35,85 @@ describe('UserService', () => {
     service = TestBed.inject(UserService);
   });
 
-  it('should retrieve user by ID', () => {
-    const mockUser = { id: '123', fullName: 'Juan Pérez' };
-    httpSpy.get.and.returnValue(of(mockUser));
+  it('debería obtener un usuario por ID', () => {
+    const usuarioMock = { id: '123', fullName: 'Juan Pérez' };
+    httpSpy.get.and.returnValue(of(usuarioMock));
 
     service.getUserById('123').subscribe(user => {
-      expect(user).toEqual(mockUser);
-      expect(httpSpy.get).toHaveBeenCalledWith(`${mockUrl}/123`, fakeHeaders);
+      expect(user).toEqual(usuarioMock);
+      expect(httpSpy.get).toHaveBeenCalledWith(`${urlBase}/123`, encabezadosMock);
     });
   });
 
-  it('should retrieve all users', () => {
+  it('debería obtener todos los usuarios', () => {
     httpSpy.get.and.returnValue(of([]));
-    service.getAll().subscribe(data => {
-      expect(data).toEqual([]);
-      expect(httpSpy.get).toHaveBeenCalledWith(mockUrl, fakeHeaders);
+    service.getAll().subscribe(usuarios => {
+      expect(usuarios).toEqual([]);
+      expect(httpSpy.get).toHaveBeenCalledWith(urlBase, encabezadosMock);
     });
   });
 
-  it('should retrieve users by role', () => {
-    const role = 'Alumno';
+  it('debería obtener todos los estudiantes', () => {
+    const estudiantesMock = [
+      { id: '1', fullName: 'Lucía' },
+      { id: '2', fullName: 'Martín' }
+    ];
+
+    httpSpy.get.and.returnValue(of(estudiantesMock));
+
+    service.getAllStudents().subscribe(data => {
+      expect(data).toEqual(estudiantesMock);
+      expect(httpSpy.get).toHaveBeenCalledWith(`${urlBase}/students`, encabezadosMock);
+    });
+  });
+
+  it('debería obtener usuarios por rol', () => {
+    const rol = 'Alumno';
     httpSpy.get.and.returnValue(of([{ id: '1', fullName: 'Ana' }]));
 
-    service.getUsersByRole(role).subscribe(data => {
-      expect(httpSpy.get).toHaveBeenCalledWith(`${mockUrl}/by-role/${role}`, fakeHeaders);
+    service.getUsersByRole(rol).subscribe(() => {
+      expect(httpSpy.get).toHaveBeenCalledWith(`${urlBase}/by-role/${rol}`, encabezadosMock);
     });
   });
 
-  it('should update a user', () => {
-    const user: User = {
+  it('debería actualizar un usuario', () => {
+    const usuario: User = {
       id: '1',
-      fullName: 'Test User',
-      userName: 'testuser',
-      email: 'test@example.com',
+      fullName: 'Usuario de Prueba',
+      userName: 'usuarioprueba',
+      email: 'test@ejemplo.com',
       phoneNumber: '1234567890',
       roles: ['Alumno']
     };
-  
-    httpSpy.put.and.returnValue(of(user));
-  
-    service.updateUser('1', user).subscribe(data => {
-      expect(httpSpy.put).toHaveBeenCalledWith(`${mockUrl}/1`, user, jasmine.any(Object));
+
+    httpSpy.put.and.returnValue(of(usuario));
+
+    service.updateUser('1', usuario).subscribe(data => {
+      expect(httpSpy.put).toHaveBeenCalledWith(`${urlBase}/1`, usuario, jasmine.any(Object));
     });
   });
 
-  it('should delete a user', () => {
+  it('debería eliminar un usuario', () => {
     httpSpy.delete.and.returnValue(of('OK'));
-    service.deleteUser('9').subscribe(res => {
-      expect(res).toBe('OK');
-      expect(httpSpy.delete).toHaveBeenCalled();
+
+    service.deleteUser('9').subscribe(respuesta => {
+      expect(respuesta).toBe('OK');
+      expect(httpSpy.delete).toHaveBeenCalledWith(`${urlBase}/9`, jasmine.any(Object));
     });
   });
 
-  it('should resolve full name with getUserName', async () => {
-    const mockUser = { fullName: 'Carlos' };
-    httpSpy.get.and.returnValue(of(mockUser));
+  it('debería resolver el nombre completo con getUserName', async () => {
+    const usuarioMock = { fullName: 'Carlos' };
+    httpSpy.get.and.returnValue(of(usuarioMock));
 
-    const name = await service.getUserName('7');
-    expect(name).toBe('Carlos');
+    const nombre = await service.getUserName('7');
+    expect(nombre).toBe('Carlos');
   });
 
-  it('should resolve fallback name on error in getUserName', async () => {
-    httpSpy.get.and.returnValue(throwError(() => new Error('not found')));
+  it('debería devolver "Usuario no asignado" si hay error en getUserName', async () => {
+    httpSpy.get.and.returnValue(throwError(() => new Error('No encontrado')));
 
-    const name = await service.getUserName('999');
-    expect(name).toBe('Usuario no asignado');
+    const nombre = await service.getUserName('999');
+    expect(nombre).toBe('Usuario no asignado');
   });
 });
