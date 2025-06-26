@@ -27,11 +27,11 @@
         <ng-template #header>
             <tr>
                 <th style="width: 5rem"></th>
-                <th pSortableColumn="Title">Titulo <p-sortIcon field="Title" /></th>
-                <th pSortableColumn="Status">Progreso <p-sortIcon field="Status" /></th>
-                <th pSortableColumn="StudentUserId">Alumno <p-sortIcon field="StudentUserId" /></th>
+                <th pSortableColumn="title">Titulo <p-sortIcon field="title" /></th>
+                <th>Progreso</th>
+                <th pSortableColumn="studentUserName">Alumno <p-sortIcon field="studentUserName" /></th>
                 <th>Cantidad de tareas</th>
-                <th>Fecha de inicio</th>
+                <th pSortableColumn="createDate">Fecha de inicio <p-sortIcon field="createDate" /></th>
                 <th></th>
             </tr>
         </ng-template>
@@ -47,12 +47,13 @@
                 <td>{{ project.studentUserName }}</td>
                 <td>{{ project.orders.length }}</td>
                 <td>{{ project.createDate | date:'dd/MM/yyyy' }}</td>
-                <td>
-                    <p-button icon="pi pi-send" [disabled]="getPercent(project) != 100" label="Entregar"
-                        severity="success" (click)="openDelivery(project)">
-                    </p-button>
-                    <!-- <p-button icon="pi pi-trash" severity="danger" (click)="deleteOrderDelivery(project.id)">
-                    </p-button> -->
+                <td class="flex gap-2">
+                    <p-button icon="pi pi-pencil" label="Editar" (click)="confirmEditProject(project.id, $event)"
+                        styleClass="p-button-secondary" />
+                    <p-button icon="pi pi-trash" label="Eliminar" (click)="deleteOrderDelivery(project.id)"
+                        styleClass="p-button-danger" />
+                    <p-button icon="pi pi-send" label="Entregar" severity="success"
+                        [disabled]="getPercent(project) != 100" (click)="confirmDeleteProject(project.id, $event)" />
                 </td>
             </tr>
         </ng-template>
@@ -64,11 +65,11 @@
                         <p-table [value]="project.orders" dataKey="id">
                             <ng-template #header>
             <tr>
-                <th pSortableColumn="Name">Nombre <p-sortIcon field="Name" /></th>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name" /></th>
                 <th>Descripción</th>
-                <th pSortableColumn="Status">Estado <p-sortIcon field="Status" /></th>
-                <th>Fecha de creación</th>
-                <th>Vencimiento</th>
+                <th pSortableColumn="status">Estado <p-sortIcon field="status" /></th>
+                <th pSortableColumn="creationDate">Fecha de creación <p-sortIcon field="creationDate" /></th>
+                <th pSortableColumn="limitDate">Vencimiento <p-sortIcon field="limitDate" /></th>
 
             </tr>
         </ng-template>
@@ -109,4 +110,40 @@
                 [disabled]="!selectedStudent"></p-button>
         </div>
     </div>
+</p-dialog>
+
+<app-popup [isVisible]="showConfirmPopup" title="Eliminar bibliografía"
+    question="Si eliminas la bibliografía todas sus tareas quedaran sueltas" primaryActionText="Aceptar"
+    secondaryActionText="Cancelar" (primaryAction)="deleteOrderDelivery(proyectId)"
+    (secondaryAction)="showConfirmPopup = false">
+</app-popup>
+
+<p-dialog header="Editar bibliografía" [(visible)]="showNewDeliveryModal" [modal]="true" [style]="{width: '450px'}">
+    <form [formGroup]="deliveryForm" (ngSubmit)="updateOrderDelivery()" class="flex flex-col gap-4">
+        <div class="flex flex-col">
+            <label for="deliveryName" class="mb-4 font-bold">Nombre de la bibliografía</label>
+            <input pInputText id="deliveryName" type="text" formControlName="title"
+                placeholder="Ingresa el nuevo nombre" />
+            <small class="text-red-500 mt-2"
+                *ngIf="deliveryForm.get('title')?.invalid && deliveryForm.get('title')?.touched">
+                El nombre es requerido
+            </small>
+        </div>
+        <div class="flex flex-col">
+            <label for="deliveryStudentId" class="mb-4 font-bold">Seleccionar alumno</label>
+            <p-dropdown id="deliveryStudentId" formControlName="deliveryStudentId" [options]="dropdownItemsUsers"
+                optionLabel="name" optionValue="value" placeholder="Selecciona el nuevo usuario" class="w-full"
+                appendTo="body">
+            </p-dropdown>
+            <small class="text-red-500 mt-2"
+                *ngIf="deliveryForm.get('deliveryStudentId')?.hasError('required') && deliveryForm.get('deliveryStudentId')?.touched">
+                El usuario es requerido
+            </small>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+            <p-button type="button" label="Cancelar" (click)="showNewDeliveryModal = false"
+                styleClass="p-button-text"></p-button>
+            <p-button type="submit" label="Guardar"></p-button>
+        </div>
+    </form>
 </p-dialog>

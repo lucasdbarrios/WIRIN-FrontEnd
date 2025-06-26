@@ -144,4 +144,39 @@ describe('OrderDeliveryService', () => {
         expect(req.request.method).toBe('GET');
         req.flush(mockResponse);
     });
+
+    it('debería eliminar una entrega por ID', (done) => {
+        const deliveryId = 42;
+        const mockResponse = { message: 'Eliminado correctamente' };
+
+        service.deleteOrderDelivery(deliveryId).subscribe(response => {
+            expect(response).toEqual(mockResponse);
+            done();
+        });
+
+        const req = httpMock.expectOne(`${envService.getApiUrl()}/orderdelivery/${deliveryId}`);
+        expect(req.request.method).toBe('DELETE');
+        expect(req.request.headers.get('Authorization')).toBe('Bearer testToken');
+        req.flush(mockResponse);
+    });
+
+    it('debería actualizar una entrega existente', (done) => {
+        const deliveryId = 99;
+        const formData = new FormData();
+        formData.append('Title', 'Bibliografía actualizada');
+        formData.append('StudentId', 'student999');
+        formData.append('Status', 'Revisado');
+
+        const mockResponse = { success: true };
+
+        service.updateOrderDelivery(deliveryId, formData).subscribe(response => {
+            expect(response).toEqual(mockResponse);
+            done();
+        });
+
+        const req = httpMock.expectOne(`${envService.getApiUrl()}/orderdelivery/${deliveryId}`);
+        expect(req.request.method).toBe('PUT');
+        expect(req.request.body instanceof FormData).toBeTrue();
+        req.flush(mockResponse);
+    });
 });

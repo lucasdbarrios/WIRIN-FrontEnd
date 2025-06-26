@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators, ReactiveFormsModule  } from '@angular/forms';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -18,9 +18,11 @@ import { DialogModule } from 'primeng/dialog';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { ProgressBar } from 'primeng/progressbar';
 import { DropdownModule } from 'primeng/dropdown';
-import { UserService } from '../../../services/user/user.service';
 import { ToastService } from '../../../services/toast/toast.service';
 import { StudentDeliveryService } from '../../../services/student-delivery/student-delivery.service';
+import { PopupComponent } from '../ui/popup/popup.component';
+import { DropDown } from '../../../types/dropDown';
+import { UserService } from '../../../services/user/user.service';
 
 @Component({
     selector: 'table-row-expansion-demo',
@@ -28,7 +30,7 @@ import { StudentDeliveryService } from '../../../services/student-delivery/stude
     standalone: true,
     imports: [TableModule, TagModule, ToastModule, RatingModule, ButtonModule, CommonModule, 
         FormsModule, IconFieldModule, InputIconModule, InputTextModule, DialogModule, 
-        TaskDetailComponent, ProgressBar, DropdownModule],
+        TaskDetailComponent, ProgressBar, DropdownModule, PopupComponent, ReactiveFormsModule],
     providers: [ MessageService, InputIconModule]
 })
 
@@ -45,12 +47,23 @@ export class ProyectsComponent implements OnInit {
     selectedStudent: any = null;
     students: any[] = [];
     orderDeliveryIdSelected: number = 0;
+    proyectId: number = 0;
+    showConfirmPopup: boolean = false;
+    showNewDeliveryModal: boolean = false;
+    deliveryForm!: FormGroup;
+    dropdownItemsUsers: DropDown[] = [];
+    private originalStatus: string = '';
 
     constructor(private messageService: MessageService, 
         private orderDeliveryService: OrderDeliveryService,
         private toastService: ToastService,
-        private studentDeliveryService: StudentDeliveryService
-    ) {}
+        private studentDeliveryService: StudentDeliveryService,
+        private fb: FormBuilder,
+        private userService: UserService,
+    ) {
+        this.initializeForms();
+        this.loadUsers();
+    }
 
     ngOnInit(): void {
         this.loadTasksDelivered();
@@ -114,13 +127,14 @@ export class ProyectsComponent implements OnInit {
         this.isDeliveryOpen = true;
     }
 
-    getPercent(project: OrderDelivery): number{
-        if (project.orders.length !== 0) {
-            const tasksCompleted = project.orders.filter(order => order.status === "Completada").length;
-            return Number(((tasksCompleted * 100) / project.orders.length).toFixed(0));
-        }
-        return 0;
+    getPercent(project: OrderDelivery): number {
+    const orders = project.orders;
+    if (orders && orders.length > 0) {
+        const tasksCompleted = orders.filter(order => order.status === "Completada").length;
+        return Number(((tasksCompleted * 100) / orders.length).toFixed(0));
     }
+    return 0;
+}
 
     async loadStudents(projectId: number): Promise<void> {
         this.studentDeliveryService.getUsersWithoutOrderDelivery(projectId).subscribe({
@@ -155,7 +169,85 @@ export class ProyectsComponent implements OnInit {
         });
       }
 
-      deleteOrderDelivery(proyectId: number){
-        
-      }
+      confirmDeleteProject(proyectId: number, event: Event) {
+            event.stopPropagation();
+            this.proyectId = proyectId;
+            this.showConfirmPopup = true;
+        }
+
+    deleteOrderDelivery(proyectId: number){
+        this.orderDeliveryService.deleteOrderDelivery(proyectId).subscribe({
+            next: () => {
+                this.toastService.showSuccess('Entrega eliminada');
+                this.showConfirmPopup = false;
+                this.loadTasksDelivered();
+            },
+            error: (err) => {
+                this.toastService.showError('Error al eliminar entrega');
+                console.error('Error al eliminar entrega:', err);
+            }
+        });
+        this.showConfirmPopup = false;
+    }
+
+    private loadUsers() {
+    this.userService.getAllStudents().subscribe({
+        next: (response) => {
+            this.dropdownItemsUsers = response.map((user: any) => ({
+            name: user.fullName,
+            value: user.id
+            }));
+        },
+        error: (error) => {
+            this.toastService.showError('Error al obtener los usuarios');
+            console.error('Error al obtener los usuarios:', error);
+        }
+        });
+    }
+
+    confirmEditProject(proyectId: number, event: Event) {
+        event.stopPropagation();
+        this.proyectId = proyectId;
+        const projectToEdit = this.projects.find(p => p.id === proyectId);
+
+        if (projectToEdit) {
+            this.deliveryForm.patchValue({
+            title: projectToEdit.title,
+            deliveryStudentId: projectToEdit.studentId
+            });
+
+            this.originalStatus = projectToEdit.status;
+        }
+
+        this.showNewDeliveryModal = true;
+    }
+
+
+    private initializeForms() {
+        this.deliveryForm = this.fb.group({
+            title: ['', [Validators.required, Validators.minLength(3)]],
+            deliveryStudentId: ['', Validators.required]
+        });
+    }
+
+    updateOrderDelivery(): void {
+        if (this.deliveryForm.valid) {
+            const formData = new FormData();
+            formData.append('Title', this.deliveryForm.get('title')?.value);
+            formData.append('StudentId', this.deliveryForm.get('deliveryStudentId')?.value);
+            formData.append('Status', this.originalStatus);
+
+            this.orderDeliveryService.updateOrderDelivery(this.proyectId, formData).subscribe({
+            next: () => {
+                this.toastService.showSuccess('Entrega actualizada correctamente');
+                this.showNewDeliveryModal = false;
+                this.loadTasksDelivered();
+            },
+            error: (error) => {
+                this.toastService.showError('Error al actualizar la entrega');
+                console.error('Error al actualizar la entrega:', error);
+            }
+            });
+        }
+    }
 }

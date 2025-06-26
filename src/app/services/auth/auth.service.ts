@@ -62,6 +62,10 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<{ token: string; userId: string; role?: string }> {
+    console.log("login", credentials);
+    console.log("apiUrl", this.apiUrl);
+    console.log("credentials", credentials);
+    console.log("request", `${this.apiUrl}/auth/login`);
     return this.http.post<{ token: string; userId: string; role?: string }>(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
         tap(response => {

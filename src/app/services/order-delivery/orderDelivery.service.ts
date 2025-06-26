@@ -51,4 +51,17 @@ export class OrderDeliveryService extends BaseService {
     return this.createAutoRefreshObservable(() => this.getOrderDeliveriesWithOrders());
   }
 
+  deleteOrderDelivery(orderDeliveryId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${orderDeliveryId}`, this.authService.getHeaders());
+  }
+
+  updateOrderDelivery(id: number, body: any): Observable<any> {
+  console.log('🚀 Actualizando entrega:', {
+    url: `${this.apiUrl}/${id}`,
+    payload: body
+  });
+
+  return this.http.put(`${this.apiUrl}/${id}`, body, this.authService.getHeaders());
+}
+
 }
