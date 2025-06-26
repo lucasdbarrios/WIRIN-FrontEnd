@@ -31,9 +31,14 @@ export class OrderDeliveryService extends BaseService {
     }, this.authService.getHeaders());
   }
 
-  createDelivery(deliveryData: OrderDelivery): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create`, deliveryData, this.authService.getHeaders());
+  getOrderDeliveryById(orderDeliveryId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${orderDeliveryId}`, this.authService.getHeaders());
   }
+
+  createDelivery(deliveryData: OrderDelivery): Observable<any> {
+  console.log('📦 Datos recibidos en createDelivery:', deliveryData);
+  return this.http.post(`${this.apiUrl}/create`, deliveryData, this.authService.getHeaders());
+}
 
   getDeliveries(): Observable<any> {
     return this.http.get(`${this.apiUrl}`, this.authService.getHeaders());

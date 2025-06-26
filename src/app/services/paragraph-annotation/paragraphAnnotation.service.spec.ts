@@ -5,49 +5,48 @@ import { EnvService } from '../env/env.service';
 import { of } from 'rxjs';
 import { Annotation } from '../../types/annotation.interface';
 
-describe('ParagraphAnnotationService', () => {
-  let service: ParagraphAnnotationService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
-  let envSpy: jasmine.SpyObj<EnvService>;
+describe('Servicio ParagraphAnnotation', () => {
+  let servicio: ParagraphAnnotationService;
+  let httpEspia: jasmine.SpyObj<HttpClient>;
+  let envEspia: jasmine.SpyObj<EnvService>;
 
-  const mockAnnotation: Annotation = {
+  const anotacionMock: Annotation = {
     annotationText: 'Error de ortografía',
     paragraphId: 123,
     userId: 'user-001',
     orderId: 456,
-    // opcionales:
     id: 1,
     creationDate: new Date()
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    envSpy = jasmine.createSpyObj('EnvService', ['getApiUrl']);
+    httpEspia = jasmine.createSpyObj('HttpClient', ['post']);
+    envEspia = jasmine.createSpyObj('EnvService', ['getApiUrl']);
 
-    envSpy.getApiUrl.and.returnValue('http://fake-api.com/api');
+    envEspia.getApiUrl.and.returnValue('http://fake-api.com/api');
 
     TestBed.configureTestingModule({
       providers: [
         ParagraphAnnotationService,
-        { provide: HttpClient, useValue: httpSpy },
-        { provide: EnvService, useValue: envSpy }
+        { provide: HttpClient, useValue: httpEspia },
+        { provide: EnvService, useValue: envEspia }
       ]
     });
 
-    service = TestBed.inject(ParagraphAnnotationService);
+    servicio = TestBed.inject(ParagraphAnnotationService);
     localStorage.setItem('auth_token', 'test-token');
   });
 
-  it('should call HttpClient.post with correct URL, body and headers', () => {
-    httpSpy.post.and.returnValue(of('ok'));
+  it('debería llamar a HttpClient.post con la URL, el cuerpo y los headers correctos', () => {
+    httpEspia.post.and.returnValue(of('ok'));
 
-    service.saveErrorMessageParagraph(mockAnnotation).subscribe((result: string) => {
-        expect(result).toBe('ok');
-      });
+    servicio.saveErrorMessageParagraph(anotacionMock).subscribe((resultado: string) => {
+      expect(resultado).toBe('ok');
+    });
 
-    expect(httpSpy.post).toHaveBeenCalledWith(
+    expect(httpEspia.post).toHaveBeenCalledWith(
       'http://fake-api.com/api/ParagraphAnnotation',
-      { paragraphAnnotation: mockAnnotation },
+      { paragraphAnnotation: anotacionMock },
       jasmine.objectContaining({
         headers: jasmine.objectContaining({
           Authorization: 'Bearer test-token',

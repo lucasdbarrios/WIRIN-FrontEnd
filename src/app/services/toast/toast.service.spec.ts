@@ -3,45 +3,45 @@ import { ToastService } from './toast.service';
 import { MessageService } from 'primeng/api';
 
 describe('ToastService', () => {
-  let service: ToastService;
-  let messageServiceSpy: jasmine.SpyObj<MessageService>;
+  let servicio: ToastService;
+  let espiaMessageService: jasmine.SpyObj<MessageService>;
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj('MessageService', ['add']);
+    const espia = jasmine.createSpyObj('MessageService', ['add']);
 
     TestBed.configureTestingModule({
       providers: [
         ToastService,
-        { provide: MessageService, useValue: spy }
+        { provide: MessageService, useValue: espia }
       ]
     });
 
-    service = TestBed.inject(ToastService);
-    messageServiceSpy = TestBed.inject(MessageService) as jasmine.SpyObj<MessageService>;
+    servicio = TestBed.inject(ToastService);
+    espiaMessageService = TestBed.inject(MessageService) as jasmine.SpyObj<MessageService>;
   });
 
-  it('should show a success message', () => {
-    const message = 'Todo salió bien';
+  it('debería mostrar un mensaje de éxito', () => {
+    const mensaje = 'Todo salió bien';
 
-    service.showSuccess(message);
+    servicio.showSuccess(mensaje);
 
-    expect(messageServiceSpy.add).toHaveBeenCalledWith({
+    expect(espiaMessageService.add).toHaveBeenCalledWith({
       severity: 'success',
       summary: 'Éxito',
-      detail: message,
+      detail: mensaje,
       life: 3000
     });
   });
 
-  it('should show an error message', () => {
-    const message = 'Algo salió mal';
+  it('debería mostrar un mensaje de error', () => {
+    const mensaje = 'Algo salió mal';
 
-    service.showError(message);
+    servicio.showError(mensaje);
 
-    expect(messageServiceSpy.add).toHaveBeenCalledWith({
+    expect(espiaMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
-      detail: message,
+      detail: mensaje,
       life: 3000
     });
   });
