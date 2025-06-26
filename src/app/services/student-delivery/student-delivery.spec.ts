@@ -5,28 +5,28 @@ import { EnvService } from '../env/env.service';
 import { AuthService } from '../auth/auth.service';
 import { provideHttpClient } from '@angular/common/http';
 
-describe('StudentDeliveryService', () => {
-  let service: StudentDeliveryService;
+describe('Servicio StudentDelivery', () => {
+  let servicio: StudentDeliveryService;
   let httpMock: HttpTestingController;
 
-  const envServiceSpy = jasmine.createSpyObj('EnvService', ['getApiUrl']);
-  const authServiceSpy = jasmine.createSpyObj('AuthService', ['getHeaders']);
+  const envServiceEspia = jasmine.createSpyObj('EnvService', ['getApiUrl']);
+  const authServiceEspia = jasmine.createSpyObj('AuthService', ['getHeaders']);
 
   beforeEach(() => {
-    envServiceSpy.getApiUrl.and.returnValue('https://mockapi.com');
-    authServiceSpy.getHeaders.and.returnValue({ headers: { Authorization: 'Bearer token' } });
+    envServiceEspia.getApiUrl.and.returnValue('https://mockapi.com');
+    authServiceEspia.getHeaders.and.returnValue({ headers: { Authorization: 'Bearer token' } });
 
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         StudentDeliveryService,
-        { provide: EnvService, useValue: envServiceSpy },
-        { provide: AuthService, useValue: authServiceSpy }
+        { provide: EnvService, useValue: envServiceEspia },
+        { provide: AuthService, useValue: authServiceEspia }
       ]
     });
 
-    service = TestBed.inject(StudentDeliveryService);
+    servicio = TestBed.inject(StudentDeliveryService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -34,32 +34,32 @@ describe('StudentDeliveryService', () => {
     httpMock.verify();
   });
 
-  it('should create student delivery', () => {
-    const mockRequest = { studentId: 'abc', orderDeliveryId: 42 };
-    const mockResponse = { id: 1, ...mockRequest };
+  it('debería crear una entrega de estudiante', () => {
+    const solicitudMock = { studentId: 'abc', orderDeliveryId: 42 };
+    const respuestaMock = { id: 1, ...solicitudMock };
 
-    service.createStudentDelivery(mockRequest).subscribe(res => {
-      expect(res).toEqual(mockResponse);
+    servicio.createStudentDelivery(solicitudMock).subscribe(respuesta => {
+      expect(respuesta).toEqual(respuestaMock);
     });
 
     const req = httpMock.expectOne('https://mockapi.com/StudentDelivery');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(mockRequest);
+    expect(req.request.body).toEqual(solicitudMock);
     expect(req.request.headers.get('Authorization')).toBe('Bearer token');
-    req.flush(mockResponse);
+    req.flush(respuestaMock);
   });
 
-  it('should get users without delivery', () => {
+  it('debería obtener usuarios sin entrega asignada', () => {
     const deliveryId = 42;
-    const mockUsers = [{ id: 1, name: 'Martina' }];
+    const usuariosMock = [{ id: 1, name: 'Martina' }];
 
-    service.getUsersWithoutOrderDelivery(deliveryId).subscribe(users => {
-      expect(users).toEqual(mockUsers);
+    servicio.getUsersWithoutOrderDelivery(deliveryId).subscribe(usuarios => {
+      expect(usuarios).toEqual(usuariosMock);
     });
 
     const req = httpMock.expectOne(`https://mockapi.com/StudentDelivery/${deliveryId}`);
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toBe('Bearer token');
-    req.flush(mockUsers);
+    req.flush(usuariosMock);
   });
 });

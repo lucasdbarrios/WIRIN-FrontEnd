@@ -78,44 +78,31 @@
                     </small>
                 </div>
                 <div class="flex flex-col">
-                    <label for="alumnoId" class="mb-4 font-bold">Usuario *</label>
-                    <p-dropdown id="alumnoId" formControlName="alumnoId" [options]="dropdownItemsUsers"
-                        optionLabel="name" optionValue="value" placeholder="Selecciona el usuario" class="w-full"
-                        [ngClass]="{'ng-invalid ng-dirty': formTask.get('alumnoId')?.invalid && (formTask.get('alumnoId')?.dirty || formTask.get('alumnoId')?.touched)}">
-                    </p-dropdown>
-                    <small class="text-red-500 mt-2"
-                        *ngIf="formTask.get('alumnoId')?.hasError('required') && formTask.get('alumnoId')?.touched">
-                        El usuario es requerido
-                    </small>
-                </div>
-            </div>
-
-            <!-- Quinta fila: Entrega -->
-            <div class="flex flex-col mt-6">
-                <label for="delivererId" class="mb-4 font-bold">Entrega *</label>
-                <div class="flex gap-2">
-                    <p-dropdown id="delivererId" formControlName="delivererId" [options]="orderDeliveries"
-                        optionLabel="title" optionValue="id" [filter]="true" filterBy="title"
-                        placeholder="Selecciona una entrega" [showClear]="true" class="w-full" [ngClass]="{
+                    <label for="delivererId" class="mb-4 font-bold">Entrega *</label>
+                    <div class="flex gap-2">
+                        <p-dropdown id="delivererId" formControlName="delivererId" [options]="orderDeliveries"
+                            optionLabel="title" optionValue="id" [filter]="true" filterBy="title"
+                            placeholder="Selecciona una entrega" [showClear]="true" class="w-full" [ngClass]="{
                             'ng-invalid ng-dirty':
                             formTask.get('delivererId')?.invalid &&
                             (formTask.get('delivererId')?.dirty || formTask.get('delivererId')?.touched)
                         }">
-                        <ng-template pTemplate="emptyfilter">
-                            <div class="p-2 text-center">
-                                <p>No se encontraron entregas</p>
-                                <button type="button" (click)="openNewDeliveryModal()"
-                                    class="mt-2 p-button p-button-success">
-                                    <i class="pi pi-plus mr-2"></i>Crear nueva entrega
-                                </button>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
+                            <ng-template pTemplate="emptyfilter">
+                                <div class="p-2 text-center">
+                                    <p>No se encontraron entregas</p>
+                                    <button type="button" (click)="openNewDeliveryModal()"
+                                        class="mt-2 p-button p-button-success">
+                                        <i class="pi pi-plus mr-2"></i>Crear nueva entrega
+                                    </button>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </div>
+                    <small class="text-red-500 mt-2"
+                        *ngIf="formTask.get('delivererId')?.invalid && formTask.get('delivererId')?.touched">
+                        {{ getErrorMessage('delivererId') }}
+                    </small>
                 </div>
-                <small class="text-red-500 mt-2"
-                    *ngIf="formTask.get('delivererId')?.invalid && formTask.get('delivererId')?.touched">
-                    {{ getErrorMessage('delivererId') }}
-                </small>
             </div>
 
             <!-- Sexta fila: Estado (solo en modo edición) -->

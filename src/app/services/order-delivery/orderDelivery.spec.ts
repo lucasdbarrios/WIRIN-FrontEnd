@@ -179,4 +179,37 @@ describe('OrderDeliveryService', () => {
         expect(req.request.body instanceof FormData).toBeTrue();
         req.flush(mockResponse);
     });
+
+    it('debería obtener una entrega por ID', (done) => {
+        const deliveryId = 77;
+        const mockResponse: OrderDelivery = {
+            id: deliveryId,
+            title: 'Entrega parcial',
+            studentId: 'est789',
+            status: 'En proceso',
+            deliveryDate: new Date(),
+            orderQuantity: 1,
+            orders: [],
+            user: {
+            id: 'est789',
+            userName: 'lucia',
+            email: 'lucia@test.com',
+            fullName: 'Lucía González',
+            phoneNumber: '111222333',
+            password: '',
+            roles: ['alumno']
+            }
+        };
+
+        service.getOrderDeliveryById(deliveryId).subscribe(response => {
+            expect(response).toEqual(mockResponse);
+            done();
+        });
+
+        const req = httpMock.expectOne(`${envService.getApiUrl()}/orderdelivery/${deliveryId}`);
+        expect(req.request.method).toBe('GET');
+        expect(req.request.headers.get('Authorization')).toBe('Bearer testToken');
+        req.flush(mockResponse);
+    });
+    
 });

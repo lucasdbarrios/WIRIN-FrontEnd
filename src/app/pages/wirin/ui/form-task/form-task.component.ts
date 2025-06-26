@@ -67,6 +67,7 @@ export class FormTaskComponent implements OnInit {
   private subjectsLoaded = false;
   private pendingTaskData: Order | null = null;
   dropdownItemsUsers: DropDown[] = [];
+  private studentIdSelected: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -190,7 +191,6 @@ export class FormTaskComponent implements OnInit {
     status: data.status || 'Pendiente',
     limitDate: formattedDate,
     filePath: data.filePath,
-    alumnoId: data.alumnoId,
     createdByUserId: data.createdByUserId,
     delivererId: Number(data.delivererId),
   });
@@ -264,31 +264,75 @@ export class FormTaskComponent implements OnInit {
     }
   }
 
-  onSubmit(): void {
-    if (this.formTask.valid) {
-      const formData = new FormData();
-      Object.keys(this.formTask.value).forEach(key => {
-        if (key === 'limitDate' && this.formTask.value[key]) {
-          formData.append(key, this.formTask.value[key].toISOString());
-        } else {
-          formData.append(key, this.formTask.value[key]);
-        }
-      });
-      formData.set('delivererId', String(this.formTask.value.delivererId));
-      if (this.selectedFile) {
-        formData.append('file', this.selectedFile);
+  private getOrderDelivery(id: number){
+    this.orderDeliveryService.getOrderDeliveryById(id).subscribe({
+      next: (delivery) => {
+        console.log(delivery);
+        this.formTask.patchValue({      
+          alumnoId: delivery.studentId,
+        });
+      },
+      error: (error) => {
+        this.toastService.showError('Error al obtener la entrega');
+        console.error('Error al obtener la entrega:', error);
       }
-      formData.append('status', 'Pendiente');
-      this.formSubmitted.emit(formData);
-    } else {
-      Object.keys(this.formTask.controls).forEach(key => {
-        const control = this.formTask.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
-        }
-      });
-    }
+    });
   }
+
+  onSubmit(): void {
+  const delivererId = this.formTask.value.delivererId;
+
+  console.log('📥 Iniciando envío de formulario...');
+  console.log('🎯 ID de entrega seleccionado (delivererId):', delivererId);
+
+  this.orderDeliveryService.getOrderDeliveryById(delivererId).subscribe({
+    next: (delivery) => {
+      console.log('📦 Datos de la entrega recibidos:', delivery);
+      
+      this.formTask.patchValue({ alumnoId: delivery.studentId });
+
+      const alumnoId = this.formTask.get('alumnoId')?.value;
+      console.log('👤 alumnoId seteado en el formulario:', alumnoId);
+
+      if (this.formTask.valid) {
+        const formData = new FormData();
+
+        Object.keys(this.formTask.value).forEach(key => {
+          const value = this.formTask.value[key];
+          if (key === 'limitDate' && value) {
+            formData.append(key, value.toISOString());
+          } else {
+            formData.append(key, value);
+          }
+        });
+
+        if (this.selectedFile) {
+          console.log('📎 Archivo seleccionado:', this.selectedFile.name);
+          formData.append('file', this.selectedFile);
+        }
+
+        formData.set('delivererId', String(delivererId));
+        formData.append('status', 'Pendiente');
+
+        console.log('🚀 FormData listo para enviar:', Array.from(formData.entries()));
+        this.formSubmitted.emit(formData);
+      } else {
+        console.warn('❌ Formulario inválido. Campos con errores:');
+        Object.keys(this.formTask.controls).forEach(key => {
+          const control = this.formTask.get(key);
+          if (control?.invalid) {
+            console.warn(`- ${key}`);
+            control.markAsTouched();
+          }
+        });
+      }
+    },
+    error: (error) => {
+      this.toastService.showError('Error al obtener la entrega');
+      console.error('💥 Error al obtener la entrega:', error);
+    }
+  });
+}
 
   private markFormAsTouched() {
     Object.keys(this.formTask.controls).forEach(key => {
