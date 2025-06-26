@@ -51,22 +51,62 @@ export class OcrTextViewerComponent {
     activeUserId: string = '';
     isVoluntario: boolean = false;
 
-    tinyMceConfig = {
+    // Configuración de TinyMCE para modo visualización (solo lectura)
+    tinyMceViewConfig = {
         base_url: '/tinymce',
         suffix: '.min',
-        plugins: 'lists link image table code help wordcount visualblocks visualchars charmap',
-        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help | visualblocks | visualchars | charmap',
-        height: 350,
+        plugins: '',
+        toolbar: false,
         menubar: false,
+        height: 250,
+        readonly: true,
         content_style: `
             body { 
                 font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; 
                 font-size: 14px; 
                 padding: 0.5rem;
                 color: #374151;
+                background-color: #f3f4f6 !important; /* Fondo gris para modo visualización */
             }
             body.dark-mode { 
-                background-color: #1F2937; 
+                background-color: #374151 !important; 
+                color: #E5E7EB; 
+            }
+            p:after {
+                content: '';
+                color: #999;
+                margin-left: 5px;
+            }
+        `,
+        skin: document.body.classList.contains('app-dark') ? 'oxide-dark' : 'oxide',
+        content_css: document.body.classList.contains('app-dark') ? 'dark' : 'default',
+        promotion: false,
+        browser_spellcheck: false,
+        language: 'es',
+        language_url: '/tinymce/langs/es.js',
+        visualblocks_default_state: true,
+        visualchars_default_state: true
+    };
+
+    // Configuración de TinyMCE para modo edición
+    tinyMceConfig = {
+        base_url: '/tinymce',
+        suffix: '.min',
+        plugins: 'lists link image table code help wordcount visualchars charmap',
+        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help | visualblocks | visualchars | charmap',
+        height: 250,
+        menubar: false,
+        readonly: false,
+        content_style: `
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; 
+                font-size: 14px; 
+                padding: 0.5rem;
+                color: #374151;
+                background-color: #ffffff !important; /* Fondo blanco para modo edición */
+            }
+            body.dark-mode { 
+                background-color: #1F2937 !important; 
                 color: #E5E7EB; 
             }
             p:after {
@@ -264,5 +304,10 @@ export class OcrTextViewerComponent {
         this.showPdfPreviewChange.emit(this.showPdfPreview);
     }
     
+    // Getter para obtener el texto de la página actual para visualización
+    get currentPageText(): string {
+        return this.getCurrentPage()?.text || '';
+    }
 }
 
+   
