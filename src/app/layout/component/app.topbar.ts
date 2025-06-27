@@ -71,7 +71,7 @@ import { TagModule } from 'primeng/tag';
     <p-overlayPanel #calendarOverlay>
         <div class="calendar-container" style="width: 400px; padding: 1rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h4 style="margin: 0; color: #333;">Calendario de Tareas</h4>
+                <h4 style="margin: 0; color: #333;">Tareas del mes</h4>
                 <button type="button" 
                         class="p-button-text p-button-plain" 
                         style="border: none; background: none; cursor: pointer; padding: 0.25rem;"
