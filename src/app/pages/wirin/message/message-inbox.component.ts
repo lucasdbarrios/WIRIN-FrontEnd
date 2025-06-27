@@ -140,7 +140,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     
     messages.forEach(message => {
       const recipientId = message.userToId || '';
-      const recipientName = message.recipientName || 'Usuario desconocido';
+      const recipientName = message.recipientName || 'Cargando...';
       
       if (!grouped.has(recipientId)) {
         grouped.set(recipientId, {
@@ -150,6 +150,12 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
           lastMessageDate: new Date(message?.date || ''),
           messageCount: 0
         });
+      } else {
+        // Actualizar el nombre si ahora tenemos uno mejor
+        const group = grouped.get(recipientId)!;
+        if (recipientName !== 'Cargando...' && recipientName !== 'Usuario desconocido') {
+          group.recipientName = recipientName;
+        }
       }
       
       const group = grouped.get(recipientId)!;
@@ -198,6 +204,10 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
             if (user?.fullName) {
               msg.recipientName = user.fullName;
               msg.loadingRecipientInfo = false;
+              // Reagrupar mensajes después de cargar la información del usuario
+              if (this.activeFolder === 'sent') {
+                this.groupedSentMessages = this.groupSentMessagesByRecipient(this.messages);
+              }
             }
           },
           error: () => {
