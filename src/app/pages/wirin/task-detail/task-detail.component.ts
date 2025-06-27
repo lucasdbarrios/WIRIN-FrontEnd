@@ -78,7 +78,6 @@ export class TaskDetailComponent implements OnInit, OnChanges, OnDestroy  {
     this.isLibrarian = this.authService.hasRole('Admin') || this.authService.hasRole('Bibliotecario');
     this.isAlumno = this.authService.hasRole('Alumno');
     this.loadTaskDetails();
-    this.getStatus();
   }
 
   formatFecha(fecha: Date): string {
@@ -99,58 +98,52 @@ export class TaskDetailComponent implements OnInit, OnChanges, OnDestroy  {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  getStatus(): void {
-    const subscription = this.orderService.getTaskByIdWithAutoRefresh(this.taskId).subscribe({
-      next: (task) => {
-        this.statusTask = task.status;
-        if (this.statusTask === 'Completada' || this.statusTask === 'Entregada') {
-          this.changeStateTask(this.statusTask);
-        }
-  
-        this.isEarring = this.statusTask === 'Pendiente';
-        this.isProcess = this.statusTask === 'En Proceso';
-        this.isRevision = this.statusTask === 'En Revisión';
-        this.isApproved = this.statusTask === 'Aprobada';
-        this.isDenegated = this.statusTask === 'Denegada';
-        this.isCompleted = this.statusTask === 'Completada';
-      },
-      error: (err) => {
-        this.toastService.showError('Error al obtener la tarea');
-        console.error('Error al obtener la tarea:', err);
-      }
-    });
-  }
-
   loadTaskDetails(): void {
-    if (!this.taskId) {
-      this.errorMessage = 'ID de tarea no válido';
-      this.isLoading = false;
-      return;
-    }
-
-    const subscription = this.orderService.getTaskByIdWithAutoRefresh(this.taskId).subscribe({
-      next: async (data: any) => { 
-          this.task = {
-              ...data,
-              fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
-          };
-          
-          this.creatorName = await this.userService.getUserName(data.createdByUserId);
-          this.requesterName = data.voluntarioId ? await this.userService.getUserName(data.voluntarioId)
-          : "Usuario no asignado";
-          this.alumnoName = await this.userService.getUserName(data.alumnoId);
-
-  
-          this.isLoading = false;
-      },
-      error: (error) => {
-          console.error('Error al cargar los detalles de la tarea:', error);
-          this.errorMessage = 'No se pudo cargar los detalles de la tarea';
-          this.isLoading = false;
-      }
-  });
-  this.subscriptions.push(subscription);
+  if (!this.taskId) {
+    this.errorMessage = 'ID de tarea no válido';
+    this.isLoading = false;
+    return;
   }
+
+  const subscription = this.orderService.getTaskByIdWithAutoRefresh(this.taskId).subscribe({
+    next: async (data: any) => {
+      try {
+        this.creatorName = await this.userService.getUserName(data.createdByUserId);
+        this.requesterName = data.voluntarioId
+          ? await this.userService.getUserName(data.voluntarioId)
+          : "Usuario no asignado";
+        this.alumnoName = await this.userService.getUserName(data.alumnoId);
+
+        this.task = {
+          ...data,
+          fileName: data.filePath ? data.filePath.split(/[\\/]/).pop() : null
+        };
+
+        this.statusTask = data.status;
+        this.isEarring = data.status === 'Pendiente';
+        this.isProcess = data.status === 'En Proceso';
+        this.isRevision = data.status === 'En Revisión';
+        this.isApproved = data.status === 'Aprobada';
+        this.isDenegated = data.status === 'Denegada';
+        this.isCompleted = data.status === 'Completada';
+
+      } catch (err) {
+        console.error('Error al cargar datos adicionales de usuario:', err);
+        this.toastService.showError('No se pudieron cargar los datos del usuario.');
+      } finally {
+        this.isLoading = false;
+        console.log('✅ Todo cargado, renderizado listo.');
+      }
+    },
+    error: (error) => {
+      console.error('Error al cargar los detalles de la tarea:', error);
+      this.errorMessage = 'No se pudo cargar los detalles de la tarea';
+      this.isLoading = false;
+    }
+  });
+
+  this.subscriptions.push(subscription);
+}
 
   downloadFile(taskId: number, fileName: string | null): void {
     if (!taskId || taskId <= 0) {
