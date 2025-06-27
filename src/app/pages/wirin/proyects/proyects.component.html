@@ -50,10 +50,10 @@
                 <td class="flex gap-2">
                     <p-button icon="pi pi-pencil" label="Editar" (click)="confirmEditProject(project.id, $event)"
                         styleClass="p-button-secondary" />
-                    <p-button icon="pi pi-trash" label="Eliminar" (click)="deleteOrderDelivery(project.id)"
+                    <p-button icon="pi pi-trash" label="Eliminar" (click)="confirmDeleteProject(project.id, $event)"
                         styleClass="p-button-danger" />
                     <p-button icon="pi pi-send" label="Entregar" severity="success"
-                        [disabled]="getPercent(project) != 100" (click)="confirmDeleteProject(project.id, $event)" />
+                        [disabled]="getPercent(project) != 100" (click)="openDelivery(project)" />
                 </td>
             </tr>
         </ng-template>
