@@ -4,6 +4,5 @@ export enum OrderStatus {
   EnRevision = 'En Revisión',
   Denegada = 'Denegada',
   Aprobada = 'Aprobada',
-  Completada = 'Completada',
-  Entregado = 'Entregado'
+  Completada = 'Completada'
 }

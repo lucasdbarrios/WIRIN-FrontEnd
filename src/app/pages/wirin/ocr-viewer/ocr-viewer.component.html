@@ -4,7 +4,7 @@
     <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
 
     <div *ngIf="state != 'En Revisión' && state != 'Aprobada'" class="flex gap-4">
-      <p-button label="Finalizar proceso" styleClass="p-button-primary" (click)="finalizarProceso()">
+      <p-button label="Finalizar proceso" severity="success" (click)="finalizarProceso()">
       </p-button>
     </div>
   </div>
