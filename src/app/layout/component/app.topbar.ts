@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -70,14 +70,24 @@ import { TagModule } from 'primeng/tag';
     <!-- Overlay Panel para el calendario -->
     <p-overlayPanel #calendarOverlay>
         <div class="calendar-container" style="width: 400px; padding: 1rem;">
+            <!-- En el template, dentro del calendario container -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h4 style="margin: 0; color: #333;">Tareas del mes</h4>
-                <button type="button" 
-                        class="p-button-text p-button-plain" 
-                        style="border: none; background: none; cursor: pointer; padding: 0.25rem;"
-                        (click)="calendarOverlay.hide()">
-                    <i class="pi pi-times" style="font-size: 1.2rem; color: #666;"></i>
-                </button>
+                <h4 style="margin: 0; color: #333;">Calendario de Tareas</h4>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="button" 
+                            class="p-button-text p-button-plain" 
+                            style="border: none; background: none; cursor: pointer; padding: 0.25rem;"
+                            (click)="refreshTasksFromAPI()"
+                            title="Actualizar datos">
+                        <i class="pi pi-refresh" style="font-size: 1rem; color: #666;"></i>
+                    </button>
+                    <button type="button" 
+                            class="p-button-text p-button-plain" 
+                            style="border: none; background: none; cursor: pointer; padding: 0.25rem;"
+                            (click)="calendarOverlay.hide()">
+                        <i class="pi pi-times" style="font-size: 1.2rem; color: #666;"></i>
+                    </button>
+                </div>
             </div>
             
             <!-- Calendario con indicadores personalizados -->
@@ -200,7 +210,7 @@ import { TagModule } from 'primeng/tag';
         </div>
     </p-overlayPanel>`
 })
-export class AppTopbar {
+export class AppTopbar implements OnDestroy {
     items!: MenuItem[];
     userRoles: string[] = [];
     selectedDate: Date | null = null;
@@ -208,9 +218,19 @@ export class AppTopbar {
     currentCalendarMonth: number = new Date().getMonth();
     currentCalendarYear: number = new Date().getFullYear();
     
-    // Agregar las nuevas propiedades para la optimización
+    // Propiedades para la optimización
     private updateTimeout: any = null;
     private isUpdating = false;
+    
+    // Propiedades para caché de tareas
+    private readonly TASKS_CACHE_KEY = 'wirin_tasks_cache';
+    private readonly CACHE_EXPIRY_KEY = 'wirin_cache_expiry';
+    private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+    
+    // Propiedades para caché de indicadores
+    private taskIndicatorsCache: Map<string, number> = new Map();
+    private readonly INDICATORS_CACHE_KEY = 'wirin_calendar_indicators';
+    private calendarObserver?: MutationObserver;
     
     // Configuración de idioma español para el calendario
     esLocale = {
@@ -241,22 +261,108 @@ export class AppTopbar {
     goToProfile() {
         this.router.navigate(['/wirin/profile']);
     }
-
-    logout(): void {
-        this.authService.logout();
-    }
     
     loadTasks() {
+        // Primero intentar cargar desde localStorage
+        const cachedTasks = this.loadTasksFromCache();
+        if (cachedTasks) {
+            console.log('Cargando tareas desde caché');
+            this.tasks = cachedTasks;
+            this.scheduleIndicatorUpdateOptimized();
+            return;
+        }
+        
+        // Si no hay caché válido, cargar desde API
+        console.log('Cargando tareas desde API');
         this.orderService.getOrdersWithAutoRefresh().subscribe({
             next: (tasks) => {
                 this.tasks = tasks.filter(task => task.limitDate);
-                // Usar el método optimizado
+                // Guardar en localStorage
+                this.saveTasksToCache(this.tasks);
                 this.scheduleIndicatorUpdateOptimized();
             },
             error: (error) => {
                 console.error('Error al cargar tareas:', error);
+                // En caso de error, intentar usar caché expirado como fallback
+                const expiredCache = this.loadTasksFromCache(true);
+                if (expiredCache) {
+                    console.log('Usando caché expirado como fallback');
+                    this.tasks = expiredCache;
+                    this.scheduleIndicatorUpdateOptimized();
+                }
             }
         });
+    }
+    
+    private saveTasksToCache(tasks: any[]): void {
+        try {
+            const now = new Date().getTime();
+            const expiryTime = now + this.CACHE_DURATION;
+            
+            localStorage.setItem(this.TASKS_CACHE_KEY, JSON.stringify(tasks));
+            localStorage.setItem(this.CACHE_EXPIRY_KEY, expiryTime.toString());
+            
+            console.log(`Tareas guardadas en caché. Expira en ${this.CACHE_DURATION / 60000} minutos`);
+        } catch (error) {
+            console.warn('Error al guardar tareas en localStorage:', error);
+        }
+    }
+    
+    private loadTasksFromCache(ignoreExpiry: boolean = false): any[] | null {
+        try {
+            const cachedTasks = localStorage.getItem(this.TASKS_CACHE_KEY);
+            const expiryTime = localStorage.getItem(this.CACHE_EXPIRY_KEY);
+            
+            if (!cachedTasks || (!ignoreExpiry && !expiryTime)) {
+                return null;
+            }
+            
+            // Verificar si el caché ha expirado
+            if (!ignoreExpiry && expiryTime) {
+                const now = new Date().getTime();
+                const expiry = parseInt(expiryTime);
+                
+                if (now > expiry) {
+                    console.log('Caché de tareas expirado');
+                    this.clearTasksCache();
+                    return null;
+                }
+            }
+            
+            const tasks = JSON.parse(cachedTasks);
+            console.log(`Tareas cargadas desde caché: ${tasks.length} elementos`);
+            return tasks;
+            
+        } catch (error) {
+            console.warn('Error al cargar tareas desde localStorage:', error);
+            this.clearTasksCache();
+            return null;
+        }
+    }
+    
+    private clearTasksCache(): void {
+        try {
+            localStorage.removeItem(this.TASKS_CACHE_KEY);
+            localStorage.removeItem(this.CACHE_EXPIRY_KEY);
+            console.log('Caché de tareas limpiado');
+        } catch (error) {
+            console.warn('Error al limpiar caché:', error);
+        }
+    }
+    
+    // Método para forzar actualización desde API (útil para botón de refresh)
+    refreshTasksFromAPI(): void {
+        console.log('Forzando actualización desde API');
+        this.clearTasksCache();
+        this.loadTasks();
+    }
+    
+    // Método para limpiar caché cuando el usuario hace logout
+    logout(): void {
+        this.clearTasksCache();
+        localStorage.removeItem(this.INDICATORS_CACHE_KEY);
+        this.taskIndicatorsCache.clear();
+        this.authService.logout();
     }
     
     private scheduleIndicatorUpdateOptimized() {
@@ -291,7 +397,8 @@ export class AppTopbar {
     
     onDateSelect(date: Date) {
         this.selectedDate = date;
-        // No necesitamos actualizar indicadores al seleccionar fecha
+        // Guardar los indicadores antes de que se pueda perder el estado
+        this.saveCurrentIndicators();
     }
     
     updateTaskIndicatorsOptimized() {
@@ -315,6 +422,9 @@ export class AppTopbar {
                 return;
             }
             
+            // Limpiar caché de indicadores para el mes actual
+            this.taskIndicatorsCache.clear();
+            
             calendarCells.forEach((cell, index) => {
                 const dayElement = cell.querySelector('span');
                 if (dayElement && dayElement.textContent) {
@@ -323,9 +433,16 @@ export class AppTopbar {
                         const currentDate = new Date(this.currentCalendarYear, this.currentCalendarMonth, day);
                         const taskCount = this.getTaskCountForDate(currentDate);
                         
+                        // Crear clave única para el día
+                        const dayKey = `${this.currentCalendarYear}-${this.currentCalendarMonth}-${day}`;
+                        
                         console.log(`Día ${day}: ${taskCount} tareas`);
                         
                         if (taskCount > 0) {
+                            // Guardar en caché
+                            this.taskIndicatorsCache.set(dayKey, taskCount);
+                            
+                            // Aplicar indicador
                             cell.classList.add('has-tasks');
                             cell.setAttribute('data-task-count', taskCount.toString());
                             console.log(`Agregando indicador para día ${day} con ${taskCount} tareas`);
@@ -336,14 +453,87 @@ export class AppTopbar {
                     }
                 }
             });
+            
+            // Guardar indicadores en localStorage
+            this.saveIndicatorsToLocalStorage();
+            
         } finally {
             this.isUpdating = false;
         }
     }
     
+    private saveCurrentIndicators(): void {
+        const calendarCells = document.querySelectorAll('.custom-calendar .p-datepicker-calendar td.has-tasks');
+        
+        calendarCells.forEach(cell => {
+            const dayElement = cell.querySelector('span');
+            const taskCount = cell.getAttribute('data-task-count');
+            
+            if (dayElement && dayElement.textContent && taskCount) {
+                const day = parseInt(dayElement.textContent);
+                if (!isNaN(day)) {
+                    const dayKey = `${this.currentCalendarYear}-${this.currentCalendarMonth}-${day}`;
+                    this.taskIndicatorsCache.set(dayKey, parseInt(taskCount));
+                }
+            }
+        });
+        
+        this.saveIndicatorsToLocalStorage();
+    }
+    
+    private restoreTaskIndicators(): void {
+        // Cargar indicadores desde localStorage si no están en memoria
+        if (this.taskIndicatorsCache.size === 0) {
+            this.loadIndicatorsFromLocalStorage();
+        }
+        
+        const calendarCells = document.querySelectorAll('.custom-calendar .p-datepicker-calendar td');
+        
+        calendarCells.forEach(cell => {
+            const dayElement = cell.querySelector('span');
+            if (dayElement && dayElement.textContent) {
+                const day = parseInt(dayElement.textContent);
+                if (!isNaN(day)) {
+                    const dayKey = `${this.currentCalendarYear}-${this.currentCalendarMonth}-${day}`;
+                    const taskCount = this.taskIndicatorsCache.get(dayKey);
+                    
+                    if (taskCount && taskCount > 0) {
+                        cell.classList.add('has-tasks');
+                        cell.setAttribute('data-task-count', taskCount.toString());
+                        console.log(`Restaurando indicador para día ${day} con ${taskCount} tareas`);
+                    }
+                }
+            }
+        });
+    }
+    
+    private saveIndicatorsToLocalStorage(): void {
+        try {
+            const indicatorsObj = Object.fromEntries(this.taskIndicatorsCache);
+            localStorage.setItem(this.INDICATORS_CACHE_KEY, JSON.stringify(indicatorsObj));
+            console.log('Indicadores guardados en localStorage');
+        } catch (error) {
+            console.warn('Error al guardar indicadores en localStorage:', error);
+        }
+    }
+    
+    private loadIndicatorsFromLocalStorage(): void {
+        try {
+            const stored = localStorage.getItem(this.INDICATORS_CACHE_KEY);
+            if (stored) {
+                const indicatorsObj = JSON.parse(stored);
+                this.taskIndicatorsCache = new Map(Object.entries(indicatorsObj).map(([key, value]) => [key, Number(value)]));
+                console.log('Indicadores cargados desde localStorage');
+            }
+        } catch (error) {
+            console.warn('Error al cargar indicadores desde localStorage:', error);
+            this.taskIndicatorsCache.clear();
+        }
+    }
+    
     getTaskCountForDate(date: Date): number {
         if (!date || !this.tasks) {
-            console.log('No hay fecha o tareas'); // Debug
+            console.log('No hay fecha o tareas');
             return 0;
         }
         
@@ -353,11 +543,9 @@ export class AppTopbar {
         const count = this.tasks.filter(task => {
             if (!task.limitDate) return false;
             
-            // Mejorar el parsing de la fecha
             let taskDate;
             try {
                 taskDate = new Date(task.limitDate);
-                // Verificar si la fecha es válida
                 if (isNaN(taskDate.getTime())) {
                     console.warn('Fecha inválida en tarea:', task.limitDate);
                     return false;
@@ -371,7 +559,7 @@ export class AppTopbar {
             
             const matches = taskDate.getTime() === targetDate.getTime();
             if (matches) {
-                console.log(`Tarea encontrada para ${targetDate.toDateString()}:`, task.name); // Debug
+                console.log(`Tarea encontrada para ${targetDate.toDateString()}:`, task.name);
             }
             
             return matches;
@@ -406,6 +594,10 @@ export class AppTopbar {
     
     clearSelectedDate() {
         this.selectedDate = null;
+        // Asegurar que los indicadores se mantengan después de cerrar el detalle
+        setTimeout(() => {
+            this.restoreTaskIndicators();
+        }, 100);
     }
     
     formatDate(date: Date): string {
@@ -414,5 +606,49 @@ export class AppTopbar {
             month: 'long', 
             year: 'numeric' 
         }).format(date);
+    }
+    
+    private setupCalendarObserver(): void {
+        const calendarContainer = document.querySelector('.custom-calendar');
+        
+        if (calendarContainer && !this.calendarObserver) {
+            this.calendarObserver = new MutationObserver((mutations) => {
+                let shouldRestore = false;
+                
+                mutations.forEach(mutation => {
+                    // Fix: Remove the invalid 'subtree' comparison
+                    if (mutation.type === 'childList') {
+                        const addedNodes = Array.from(mutation.addedNodes);
+                        if (addedNodes.some(node => 
+                            node.nodeType === Node.ELEMENT_NODE && 
+                            (node as Element).querySelector('.p-datepicker-calendar')
+                        )) {
+                            shouldRestore = true;
+                        }
+                    }
+                });
+                
+                if (shouldRestore) {
+                    setTimeout(() => this.restoreTaskIndicators(), 100);
+                }
+            });
+            
+            this.calendarObserver.observe(calendarContainer, {
+                childList: true,
+                subtree: true
+            });
+        }
+    }
+    
+    ngAfterViewInit() {
+        setTimeout(() => {
+            this.setupCalendarObserver();
+        }, 1000);
+    }
+    
+    ngOnDestroy() {
+        if (this.calendarObserver) {
+            this.calendarObserver.disconnect();
+        }
     }
 }
