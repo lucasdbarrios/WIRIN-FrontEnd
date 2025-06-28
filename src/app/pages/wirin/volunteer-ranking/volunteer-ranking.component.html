@@ -42,6 +42,75 @@
     </p-card>
   </div>
 
+   <!-- Summary Cards -->
+   <div class="col-span-12" *ngIf="!isLoading && volunteers.length > 0">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Top Performer -->
+      <p-card *ngIf="volunteers[0]">
+        <div class="text-center">
+          <i class="pi pi-trophy text-yellow-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Mejor Voluntario
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            {{ volunteers[0].fullName }}
+          </p>
+          <p class="text-2xl font-bold text-yellow-600">
+            {{ volunteers[0].successRate }}% éxito
+          </p>
+        </div>
+      </p-card>
+
+      <!-- Most Active -->
+      <p-card>
+        <div class="text-center">
+          <i class="pi pi-chart-line text-blue-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Más Activo
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            {{ getMostActiveVolunteer()?.fullName || 'N/A' }}
+          </p>
+          <p class="text-2xl font-bold text-blue-600">
+            {{ getMostActiveVolunteer()?.totalTasks || 0 }} tareas
+          </p>
+        </div>
+      </p-card>
+
+      <!-- Average Success Rate -->
+      <p-card>
+        <div class="text-center">
+          <i class="pi pi-percentage text-green-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Promedio General
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            Tasa de éxito
+          </p>
+          <p class="text-2xl font-bold text-green-600">
+            {{ getAverageSuccessRate() | number:'1.1-1' }}%
+          </p>
+        </div>
+      </p-card>
+
+      <!-- Total Volunteers -->
+      <p-card>
+        <div class="text-center">
+          <i class="pi pi-users text-purple-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Total Voluntarios
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            Activos
+          </p>
+          <p class="text-2xl font-bold text-purple-600">
+            {{ volunteers.length }}
+          </p>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
   <!-- Ranking Table -->
   <div class="col-span-12" *ngIf="!isLoading && !errorMessage">
     <p-card>
@@ -91,10 +160,7 @@
                 <div>
                   <div class="font-medium text-surface-900 dark:text-surface-0">
                     {{ volunteer.fullName }}
-                  </div>
-                  <div class="text-sm text-surface-500 dark:text-surface-400">
-                    ID: {{ volunteer.id }}
-                  </div>
+                  </div>                  
                 </div>
               </div>
             </td>
@@ -194,72 +260,6 @@
     </p-card>
   </div>
 
-  <!-- Summary Cards -->
-  <div class="col-span-12" *ngIf="!isLoading && volunteers.length > 0">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Top Performer -->
-      <p-card *ngIf="volunteers[0]">
-        <div class="text-center">
-          <i class="pi pi-trophy text-yellow-500 text-3xl mb-3"></i>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
-            Mejor Voluntario
-          </h3>
-          <p class="text-surface-600 dark:text-surface-400 mb-1">
-            {{ volunteers[0].fullName }}
-          </p>
-          <p class="text-2xl font-bold text-yellow-600">
-            {{ volunteers[0].successRate }}% éxito
-          </p>
-        </div>
-      </p-card>
-
-      <!-- Most Active -->
-      <p-card>
-        <div class="text-center">
-          <i class="pi pi-chart-line text-blue-500 text-3xl mb-3"></i>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
-            Más Activo
-          </h3>
-          <p class="text-surface-600 dark:text-surface-400 mb-1">
-            {{ getMostActiveVolunteer()?.fullName || 'N/A' }}
-          </p>
-          <p class="text-2xl font-bold text-blue-600">
-            {{ getMostActiveVolunteer()?.totalTasks || 0 }} tareas
-          </p>
-        </div>
-      </p-card>
-
-      <!-- Average Success Rate -->
-      <p-card>
-        <div class="text-center">
-          <i class="pi pi-percentage text-green-500 text-3xl mb-3"></i>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
-            Promedio General
-          </h3>
-          <p class="text-surface-600 dark:text-surface-400 mb-1">
-            Tasa de éxito
-          </p>
-          <p class="text-2xl font-bold text-green-600">
-            {{ getAverageSuccessRate() | number:'1.1-1' }}%
-          </p>
-        </div>
-      </p-card>
-
-      <!-- Total Volunteers -->
-      <p-card>
-        <div class="text-center">
-          <i class="pi pi-users text-purple-500 text-3xl mb-3"></i>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
-            Total Voluntarios
-          </h3>
-          <p class="text-surface-600 dark:text-surface-400 mb-1">
-            Activos
-          </p>
-          <p class="text-2xl font-bold text-purple-600">
-            {{ volunteers.length }}
-          </p>
-        </div>
-      </p-card>
-    </div>
-  </div>
+ 
+ 
 </div>
