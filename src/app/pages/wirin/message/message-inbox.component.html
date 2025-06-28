@@ -34,58 +34,47 @@
       </div>
     </div>
 
-    <!-- Tabla de mensajes recibidos -->
+    <!-- Tabla de mensajes recibidos - Vista simple estilo Gmail -->
     <div class="card shadow-sm border-round-lg overflow-hidden" *ngIf="activeFolder === 'inbox'">
-      <p-table [value]="messages" [paginator]="true" [rows]="10" styleClass="p-datatable-hoverable-rows p-datatable-sm"
-        [tableStyle]="{ minWidth: '100%' }" selectionMode="single" [(selection)]="selectedMessage"
-        (onRowSelect)="viewConversation($event.data)" [loading]="isLoading" [rowHover]="true" responsiveLayout="scroll">
+      <p-table [value]="messages" [paginator]="true" [rows]="10"
+        styleClass="p-datatable-hoverable-rows p-datatable-sm" [tableStyle]="{ minWidth: '100%' }" [loading]="isLoading"
+        [rowHover]="true" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr class="surface-100">
-            <th style="width: 30%" class="text-900 font-medium">Asunto</th>
-            <th style="width: 20%" class="text-900 font-medium">Remitente</th>
+            <th style="width: 40%" class="text-900 font-medium">Asunto</th>
+            <th style="width: 25%" class="text-900 font-medium">Remitente</th>
             <th style="width: 15%" class="text-900 font-medium">Fecha</th>
-            <th style="width: 15%" class="text-900 font-medium">Estado</th>
-            <th style="width: 20%" class="text-900 font-medium text-center">Acciones</th>
+            <th style="width: 10%" class="text-900 font-medium text-center">Estado</th>
+            <th style="width: 10%" class="text-900 font-medium text-center">Acciones</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-msg>
-          <tr
-            [ngClass]="{'font-semibold': !msg.isRead, 'cursor-pointer': true, 'transition-colors transition-duration-200': true}"
-            class="hover:surface-hover">
+          <tr class="cursor-pointer hover:surface-hover transition-colors transition-duration-200"
+              (click)="viewMessage(msg)"
+              [ngClass]="{'font-semibold': !msg.isRead}">
             <td>
               <div class="flex align-items-center gap-2">
-                <i *ngIf="msg.filePath" class="pi pi-paperclip text-primary"></i>
-                <span [ngClass]="{'text-primary': !msg.isRead}">{{ msg.subject }}</span>
+                <i class="pi pi-envelope text-primary"></i>
+                <i *ngIf="msg.filePath" class="pi pi-paperclip text-gray-500"></i>
+                <span class="font-medium" [ngClass]="{'text-primary': !msg.isRead}">{{ msg.subject }}</span>
               </div>
             </td>
             <td>
               <div class="flex align-items-center gap-2">
-                <i *ngIf="msg.loadingSenderInfo" class="pi pi-spin pi-spinner text-primary text-sm"></i>
-                <span>{{ msg.senderName || 'Cargando...' }}</span>
+                <i class="pi pi-user text-gray-500"></i>
+                <span>{{ msg.senderName || 'Remitente desconocido' }}</span>
               </div>
             </td>
             <td>{{ msg.date | date: 'short' }}</td>
-            <td>
-              <div class="flex align-items-center gap-2 flex-wrap">
-                <p-tag [value]="msg.userFromRole === 'alumno' ? 'Alumno' : 'Interno'"
-                  [severity]="msg.userFromRole === 'alumno' ? 'info' : 'success'" [rounded]="true"
-                  styleClass="text-xs"></p-tag>
-                <p-tag *ngIf="!msg.isRead" value="No leído" severity="warning" [rounded]="true"
-                  styleClass="text-xs"></p-tag>
-                <p-tag *ngIf="msg.responded" value="Respondido" severity="success" [rounded]="true"
-                  styleClass="text-xs"></p-tag>
-              </div>
+            <td class="text-center">
+              <p-tag [value]="msg.isRead ? 'Leído' : 'No leído'" 
+                [severity]="msg.isRead ? 'success' : 'warning'" [rounded]="true"></p-tag>
             </td>
             <td class="text-center">
-              <div class="flex gap-2 justify-content-center">
-                <button pButton type="button" icon="pi pi-reply"
-                  class="p-button-rounded p-button-outlined p-button-success p-button-sm"
-                  (click)="$event.stopPropagation(); replyToMessageFromTable(msg)"
-                  pTooltip="Responder mensaje"></button>
-                <button pButton type="button" icon="pi pi-info-circle"
-                  class="p-button-rounded p-button-outlined p-button-info p-button-sm"
-                  (click)="$event.stopPropagation(); showMessageDetails(msg)" pTooltip="Ver detalles técnicos"></button>
-              </div>
+              <button pButton type="button" icon="pi pi-eye"
+                class="p-button-rounded p-button-outlined p-button-info p-button-sm"
+                (click)="viewMessage(msg); $event.stopPropagation()" 
+                pTooltip="Ver mensaje"></button>
             </td>
           </tr>
         </ng-template>
@@ -98,36 +87,47 @@
       </p-table>
     </div>
 
-    <!-- Tabla de mensajes enviados agrupados -->
+    <!-- Tabla de mensajes enviados - Vista simple estilo Gmail -->
     <div class="card shadow-sm border-round-lg overflow-hidden" *ngIf="activeFolder === 'sent'">
-      <p-table [value]="groupedSentMessages" [paginator]="true" [rows]="10"
+      <p-table [value]="messages" [paginator]="true" [rows]="10"
         styleClass="p-datatable-hoverable-rows p-datatable-sm" [tableStyle]="{ minWidth: '100%' }" [loading]="isLoading"
         [rowHover]="true" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr class="surface-100">
-            <th style="width: 40%" class="text-900 font-medium">Destinatario</th>
-            <th style="width: 20%" class="text-900 font-medium">Cantidad de mensajes</th>
-            <th style="width: 20%" class="text-900 font-medium">Último mensaje</th>
-            <th style="width: 20%" class="text-900 font-medium text-center">Acciones</th>
+            <th style="width: 40%" class="text-900 font-medium">Asunto</th>
+            <th style="width: 25%" class="text-900 font-medium">Destinatario</th>
+            <th style="width: 15%" class="text-900 font-medium">Fecha</th>
+            <th style="width: 10%" class="text-900 font-medium text-center">Estado</th>
+            <th style="width: 10%" class="text-900 font-medium text-center">Acciones</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-group>
-          <tr class="cursor-pointer hover:surface-hover transition-colors transition-duration-200">
+        <ng-template pTemplate="body" let-msg>
+          <tr class="cursor-pointer hover:surface-hover transition-colors transition-duration-200"
+              (click)="viewMessage(msg)"
+              [ngClass]="{'font-semibold': !msg.isRead}">
             <td>
               <div class="flex align-items-center gap-2">
-                <i class="pi pi-user text-primary"></i>
-                <span class="font-medium">{{ group.recipientName }}</span>
+                <i class="pi pi-envelope text-primary"></i>
+                <i *ngIf="msg.filePath" class="pi pi-paperclip text-gray-500"></i>
+                <span class="font-medium" [ngClass]="{'text-primary': !msg.isRead}">{{ msg.subject }}</span>
               </div>
             </td>
             <td>
-              <p-tag [value]="group.messageCount + ' mensaje' + (group.messageCount > 1 ? 's' : '')" severity="info"
-                [rounded]="true"></p-tag>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-user text-gray-500"></i>
+                <span>{{ msg.recipientName || 'Destinatario desconocido' }}</span>
+              </div>
             </td>
-            <td>{{ group.lastMessageDate | date: 'short' }}</td>
+            <td>{{ msg.date | date: 'short' }}</td>
+            <td class="text-center">
+              <p-tag [value]="msg.isRead ? 'Leído' : 'No leído'" 
+                [severity]="msg.isRead ? 'success' : 'warning'" [rounded]="true"></p-tag>
+            </td>
             <td class="text-center">
               <button pButton type="button" icon="pi pi-eye"
                 class="p-button-rounded p-button-outlined p-button-info p-button-sm"
-                (click)="viewConversation(group.messages[0])" pTooltip="Ver conversación"></button>
+                (click)="viewMessage(msg); $event.stopPropagation()" 
+                pTooltip="Ver mensaje"></button>
             </td>
           </tr>
         </ng-template>
@@ -141,274 +141,89 @@
     </div>
   </div>
 
-  <!-- Visor de mensajes (Popup mejorado) -->
-  <p-dialog [(visible)]="showViewer" modal [style]="{ width: '85vw', maxWidth: '1000px' }" *ngIf="selectedMessage"
+  <!-- Visor de mensajes (Diseño minimalista) -->
+  <p-dialog [(visible)]="showViewer" modal [style]="{ width: '80vw', maxWidth: '800px' }" *ngIf="selectedMessage"
     [closable]="true" [closeOnEscape]="true" (onHide)="onCloseViewer()"
-    styleClass="viewer-dialog shadow-lg border-round-xl message-popup-dialog" [dismissableMask]="true"
-    [draggable]="false" [resizable]="false" [baseZIndex]="1000" [showHeader]="false"
-    [transitionOptions]="'300ms cubic-bezier(0.25, 0.8, 0.25, 1)'">
-    <div class="message-popup-container flex flex-col h-full">
-
-      <div
-        class="message-popup-header p-3 border-bottom-1 border-gray-200 flex justify-content-between align-items-center">
-        <div class="flex align-items-center gap-2">
-          <div
-          class="message-icon-container w-10 h-10 flex align-items-center justify-content-center border-circle bg-primary-100 p-2">
-          <i class="pi pi-envelope-open text-primary text-xl"></i>
-        </div>
-          <h2 class="text-xl font-medium m-0 text-900">{{ selectedMessage.subject }}</h2>
+    styleClass="message-viewer-dialog" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" [baseZIndex]="1000" [showHeader]="false">
+    
+    <!-- Header minimalista -->
+    <div class="message-header p-4 border-bottom-1 surface-border">
+      <div class="flex justify-content-between align-items-start">
+        <div class="flex-1">
+          <h2 class="text-xl font-semibold m-0 mb-2 text-900">{{ selectedMessage.subject }}</h2>
+          <div class="flex align-items-center gap-3 text-sm text-600">
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-user"></i>
+              {{ senderInfo?.fullName || selectedMessage.senderName || selectedMessage.sender }}
+            </span>
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-calendar"></i>
+              {{ selectedMessage.date | date: 'medium' }}
+            </span>
+            <p-tag *ngIf="!selectedMessage.isRead && activeFolder === 'inbox'" 
+              value="No leído" severity="warning" [rounded]="true"></p-tag>
+          </div>
         </div>
         <div class="flex gap-2">
-          <p-button icon="pi pi-arrow-left" pTooltip="Volver a la lista" tooltipPosition="bottom"
-            class="p-button-rounded p-button-outlined p-button-secondary" (click)="showViewer = false"></p-button>
-
-          <p-button icon="pi pi-check" pTooltip="Marcar como leído" tooltipPosition="bottom"
-            class="p-button-rounded p-button-outlined" (click)="markAsRead(selectedMessage.id)"
+          <p-button icon="pi pi-check" [text]="true" size="small"
+            (click)="markAsRead(selectedMessage.id)" pTooltip="Marcar como leído"
             *ngIf="!selectedMessage.isRead && activeFolder === 'inbox'"></p-button>
-          <p-button icon="pi pi-comments" pTooltip="Ver conversación" tooltipPosition="bottom"
-            class="p-button-rounded p-button-outlined p-button-info" (click)="showConversationModal = true"></p-button>
-          <p-button icon="pi pi-trash" pTooltip="Eliminar mensaje" tooltipPosition="bottom"
-            class="p-button-rounded p-button-outlined p-button-danger"
-            (click)="confirmDeleteMessage(selectedMessage)"></p-button>
-        </div>
-      </div>
-
-      <div class="message-popup-content p-4">
-        <p-tabView>
-          <p-tabPanel header="Mensaje">
-            <div class="message-details">
-              <div class="grid">
-                <div class="col-12 mb-3">
-                  <p-card styleClass="shadow-1">
-                    <ng-template pTemplate="header">
-                      <div class="bg-primary-50 p-2 flex align-items-center">
-                        <i class="pi pi-envelope text-primary mr-2"></i>
-                        <span class="font-medium">Detalles del mensaje</span>
-                      </div>
-                    </ng-template>
-                    <div class="p-3">
-                      <div class="grid">
-                        <div class="col-12 md:col-6 mb-3">
-                          <p-card styleClass="shadow-1">
-                            <ng-template pTemplate="header">
-                              <div class="bg-blue-50 p-2 flex align-items-center">
-                                <i class="pi pi-user text-blue-500 mr-2"></i>
-                                <span class="font-medium">Remitente</span>
-                              </div>
-                            </ng-template>
-                            <div class="p-3 flex align-items-center">
-                              <div
-                              class="sender-avatar w-16 h-16 mr-3 flex align-items-center justify-content-center border-circle bg-blue-100">
-                              <i class="pi pi-user text-blue-500 text-4xl"></i>
-                            </div>
-                              <div>
-                                <h4 class="text-lg font-medium text-900 m-0">{{ senderInfo?.fullName ||
-                                  selectedMessage.senderName || selectedMessage.sender }}</h4>
-                                <p class="text-600 m-0">{{ senderInfo?.email || 'Email no disponible' }}</p>
-                                <p-tag *ngIf="selectedMessage.userFromRole"
-                                  [value]="selectedMessage.userFromRole | titlecase"
-                                  [severity]="selectedMessage.userFromRole === 'alumno' ? 'info' : 'success'"
-                                  [rounded]="true" styleClass="mt-2"></p-tag>
-                              </div>
-                            </div>
-                          </p-card>
-                        </div>
-
-                        <!-- <div class="col-12 md:col-6 mb-3">
-                          <p-card styleClass="shadow-1">
-                            <ng-template pTemplate="header">
-                              <div class="bg-green-50 p-2 flex align-items-center">
-                                <i class="pi pi-user text-green-500 mr-2"></i>
-                                <span class="font-medium">Destinatario</span>
-                              </div>
-                            </ng-template>
-                            <div class="p-3 flex align-items-center">
-                              <div class="recipient-avatar mr-3 flex align-items-center justify-content-center border-circle bg-green-100" style="width: 64px; height: 64px;">
-                                <i class="pi pi-user text-green-500 text-4xl"></i>
-                              </div>
-                              <div>
-                                <h4 class="text-lg font-medium text-900 m-0">{{ recipientInfo?.fullName || selectedMessage.recipientName || selectedMessage['recipient'] }}</h4>
-                                <p class="text-600 m-0">{{ recipientInfo?.email || 'Email no disponible' }}</p>
-                                <p-tag *ngIf="selectedMessage.userToRole" [value]="selectedMessage.userToRole | titlecase" 
-                                  [severity]="selectedMessage.userToRole === 'alumno' ? 'info' : 'success'" 
-                                  [rounded]="true" styleClass="mt-2"></p-tag>
-                              </div>
-                            </div>
-                          </p-card>
-                        </div> -->
-
-                        <div class="col-12 mb-3">
-                          <p-card styleClass="shadow-1">
-                            <ng-template pTemplate="header">
-                              <div class="bg-yellow-50 p-2 flex align-items-center">
-                                <i class="pi pi-calendar text-yellow-500 mr-2"></i>
-                                <span class="font-medium">Fecha y hora</span>
-                              </div>
-                            </ng-template>
-                            <div class="p-3 flex align-items-center">
-                              <div
-                                class="date-icon mr-3 flex align-items-center justify-content-center border-circle bg-yellow-100"
-                                style="width: 48px; height: 48px;">
-                                <i class="pi pi-calendar text-yellow-500 text-xl"></i>
-                              </div>
-                              <div>
-                                <h4 class="text-lg font-medium text-900 m-0">{{ selectedMessage.date | date: 'fullDate'
-                                  }}</h4>
-                                <p class="text-600 m-0">{{ selectedMessage.date | date: 'shortTime' }}</p>
-                              </div>
-                            </div>
-                          </p-card>
-                        </div>
-                      </div>
-                    </div>
-                  </p-card>
-                </div>
-              </div>
-              <!-- Etiquetas del mensaje -->
-              <div class="col-12 mb-3">
-                <p-card styleClass="shadow-1">
-                  <ng-template pTemplate="header">
-                    <div class="bg-purple-50 p-2 flex align-items-center">
-                      <i class="pi pi-tags text-purple-500 mr-2"></i>
-                      <span class="font-medium">Etiquetas</span>
-                    </div>
-                  </ng-template>
-                  <div class="p-3 flex flex-wrap gap-2">
-                    <p-tag *ngIf="selectedMessage.userFromRole === 'alumno'" value="Alumno" severity="info"
-                      [rounded]="true" styleClass="shadow-1"></p-tag>
-                    <p-tag *ngIf="!selectedMessage.isRead" value="No leído" severity="warning" [rounded]="true"
-                      styleClass="shadow-1"></p-tag>
-                    <p-tag *ngIf="selectedMessage.responded" value="Respondido" severity="success" [rounded]="true"
-                      styleClass="shadow-1"></p-tag>
-                    <p-tag *ngIf="selectedMessage.filePath" value="Con adjunto" severity="primary" [rounded]="true"
-                      styleClass="shadow-1"></p-tag>
-                    <p-tag *ngIf="!selectedMessage['tags'] || selectedMessage['tags'].length === 0"
-                      value="Sin etiquetas adicionales" severity="secondary" [rounded]="true"
-                      styleClass="shadow-1"></p-tag>
-                  </div>
-                </p-card>
-              </div>
-
-              <!-- Contenido del mensaje -->
-              <p-card styleClass="shadow-2 mb-4">
-                <ng-template pTemplate="header">
-                  <div class="p-3 bg-teal-50 flex align-items-center">
-                    <i class="pi pi-file-edit text-teal-500 text-xl mr-2"></i>
-                    <h3 class="font-medium text-900 m-0">Contenido del mensaje</h3>
-                  </div>
-                </ng-template>
-                <div class="message-text p-4 border-round-lg"
-                  style="max-height: 450px; overflow-y: auto; font-size: 1.1rem; line-height: 1.6;">
-                  <p class="whitespace-pre-line text-900 line-height-3 text-lg">{{ selectedMessage.content }}</p>
-                </div>
-              </p-card>
-
-              <!-- Archivo adjunto si existe -->
-              <div *ngIf="selectedMessage.filePath">
-                <p-card styleClass="shadow-2 mb-4">
-                  <ng-template pTemplate="header">
-                    <div class="p-3 bg-orange-50 flex align-items-center justify-content-between">
-                      <div class="flex align-items-center gap-2">
-                        <i class="pi pi-paperclip text-orange-500 text-xl mr-2"></i>
-                        <h3 class="font-medium text-900 m-0">Archivo adjunto</h3>
-                      </div>
-                      <p-tag severity="warning" value="Documento" icon="pi pi-file" [rounded]="true"></p-tag>
-                    </div>
-                  </ng-template>
-                  <div class="p-4 flex align-items-center justify-content-between">
-                    <div class="flex align-items-center gap-3">
-                      <div
-                        class="file-icon flex align-items-center justify-content-center border-circle bg-orange-100 p-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="pi pi-file-pdf text-orange-500 text-xl"></i>
-                      </div>
-                      <div>
-                        <h4 class="text-lg font-medium text-900 m-0">Documento adjunto</h4>
-                        <p class="text-600 m-0">Haga clic en el botón para descargar</p>
-                      </div>
-                    </div>
-                    <p-button label="Descargar archivo" icon="pi pi-download" styleClass="p-button-raised"
-                      (click)="downloadAttachment(selectedMessage.id)"></p-button>
-                  </div>
-                </p-card>
-              </div>
-
-              <div class="message-details-button mt-4">
-                <p-button label="Ver detalles" icon="pi pi-info-circle" styleClass="p-button-outlined p-button-info"
-                  (click)="showMessageDetails()"></p-button>
-              </div>
-            </div>
-          </p-tabPanel>
-
-          <p-tabPanel header="Historial de conversación">
-            <p-card styleClass="shadow-2 mb-4">
-              <ng-template pTemplate="header">
-                <div class="p-3 bg-primary-50 flex align-items-center justify-content-between">
-                  <div class="flex align-items-center gap-2">
-                    <i class="pi pi-comments text-primary text-xl"></i>
-                    <h4 class="font-medium text-900 m-0">Historial de mensajes con {{ senderInfo?.fullName ||
-                      selectedMessage.senderName || selectedMessage.sender }}</h4>
-                  </div>
-                  <p-tag [value]="getConversationHistory(selectedMessage).length + ' mensajes'" severity="info"
-                    [rounded]="true"></p-tag>
-                </div>
-              </ng-template>
-
-              <div class="conversation-messages p-3" style="max-height: 450px; overflow-y: auto;">
-                <div *ngFor="let msg of getConversationHistory(selectedMessage)" class="mb-4">
-                  <div class="message-bubble p-3 border-round-lg shadow-1 bg-red-600" [ngClass]="{
-                      'ml-auto bg-black text-primary-900 max-w-30rem': msg.userFromId === userId,
-                      'mr-auto bg-gray-100 text-gray-900 max-w-30rem': msg.userFromId !== userId
-                    }">
-                    <div class="flex justify-content-between align-items-center mb-2">
-                      <div class="flex align-items-center gap-2">
-                        <div class="avatar flex align-items-center justify-content-center border-circle"
-                          [ngClass]="msg.userFromId === userId ? 'bg-primary-50' : 'bg-gray-200'"
-                          style="width: 32px; height: 32px;">
-                          <i class="pi pi-user"
-                            [ngClass]="msg.userFromId === userId ? 'text-primary' : 'text-gray-700'"></i>
-                          <span class="font-medium text-900">{{ msg.userFromId === userId ? 'Tú' : (msg.senderName ||
-                            msg.sender) }}</span>
-                        </div>
-                      </div>
-                      <span class="text-sm text-600">{{ msg.date | date: 'short' }}</span>
-                    </div>
-                    <p class="whitespace-pre-line text-900 line-height-3 m-0 text-lg">{{ msg.content }}</p>
-
-                    <div *ngIf="msg.filePath" class="mt-3 pt-2 border-top-1 border-gray-200">
-                      <div class="flex align-items-center justify-content-between">
-                        <div class="flex align-items-center gap-2">
-                          <i class="pi pi-paperclip text-primary"></i>
-                          <span class="text-primary">Archivo adjunto</span>
-                        </div>
-                        <p-button icon="pi pi-download" styleClass="p-button-sm p-button-outlined"
-                          (click)="downloadAttachment(msg.id)"></p-button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div *ngIf="getConversationHistory(selectedMessage).length === 0" class="text-center p-5">
-                  <i class="pi pi-comments text-gray-400 text-5xl mb-3"></i>
-                  <p class="text-gray-500 text-lg">No hay mensajes previos en esta conversación</p>
-                </div>
-              </div>
-            </p-card>
-          </p-tabPanel>
-        </p-tabView>
-
-        <div class="message-actions p-3 flex justify-content-between gap-3 border-top-1 border-gray-200 pt-4 mt-4">
-          <div>
-            <p-button icon="pi pi-trash" label="Eliminar" pTooltip="Eliminar mensaje" tooltipPosition="bottom"
-              class="p-button-outlined p-button-danger" (click)="confirmDeleteMessage(selectedMessage)"></p-button>
-          </div>
-          <div class="flex gap-3" *ngIf="!selectedMessage.isDraft">
-            <p-button label="Responder" icon="pi pi-reply" class="p-button-outlined p-button-secondary"
-              (click)="showReplyDialog = true"></p-button>
-          </div>
+          <p-button icon="pi pi-comments" [text]="true" size="small"
+            (click)="showConversationModal = true" pTooltip="Ver conversación"></p-button>
+          <p-button icon="pi pi-trash" [text]="true" size="small" severity="danger"
+            (click)="confirmDeleteMessage(selectedMessage)" pTooltip="Eliminar"></p-button>
+          <p-button icon="pi pi-times" [text]="true" size="small"
+            (click)="showViewer = false" pTooltip="Cerrar"></p-button>
         </div>
       </div>
     </div>
+
+    <!-- Contenido del mensaje -->
+    <div class="message-content p-4">
+      <!-- Contenido principal -->
+      <div class="message-body mb-4">
+        <div class="message-text p-3 surface-50 border-round" 
+             style="max-height: 400px; overflow-y: auto; line-height: 1.6;">
+          <p class="whitespace-pre-line text-900 m-0">{{ selectedMessage.content }}</p>
+        </div>
+      </div>
+
+      <!-- Archivo adjunto (si existe) -->
+      <div *ngIf="selectedMessage.filePath" class="attachment-section mb-4">
+        <div class="flex align-items-center justify-content-between p-3 surface-100 border-round">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-paperclip text-600"></i>
+            <span class="text-900 font-medium">Archivo adjunto</span>
+          </div>
+          <p-button label="Descargar" icon="pi pi-download" size="small" 
+            (click)="downloadAttachment(selectedMessage.id)"></p-button>
+        </div>
+      </div>
+
+      <!-- Etiquetas simples -->
+      <div class="tags-section mb-4" *ngIf="selectedMessage.userFromRole || !selectedMessage.isRead || selectedMessage.responded">
+        <div class="flex flex-wrap gap-2">
+          <p-tag *ngIf="selectedMessage.userFromRole" 
+            [value]="selectedMessage.userFromRole | titlecase" 
+            [severity]="selectedMessage.userFromRole === 'alumno' ? 'info' : 'success'" 
+            [rounded]="true"></p-tag>
+          <p-tag *ngIf="selectedMessage.responded" 
+            value="Respondido" severity="success" [rounded]="true"></p-tag>
+          <p-tag *ngIf="selectedMessage.filePath" 
+            value="Con adjunto" severity="primary" [rounded]="true"></p-tag>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="actions-section flex justify-content-between pt-3 border-top-1 surface-border">
+        <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [outlined]="true"
+          (click)="confirmDeleteMessage(selectedMessage)"></p-button>
+        <p-button label="Responder" icon="pi pi-reply" [outlined]="true"
+          (click)="showReplyDialog = true" *ngIf="!selectedMessage.isDraft"></p-button>
+      </div>
+    </div>
+
   </p-dialog>
 
   <!-- Modal de conversación interactivo -->

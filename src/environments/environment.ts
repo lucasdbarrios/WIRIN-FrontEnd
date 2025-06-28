@@ -4,5 +4,5 @@
 
 export const environment = {
     production: false,
-    apiUrl: 'https://api.wirinadapta.com.ar/api'
+    apiUrl: 'https://localhost:44342/api'
   };

@@ -1,9 +1,30 @@
 
-.message-popup-dialog .p-dialog-content,.message-popup-container,.message-popup-header,.message-details-dialog .p-dialog-content,.email-view-container,.email-attachment,.email-technical-info details{background-color:var(--surface-card)}
-.message-text,.email-additional-info,.technical-details,.message-details pre{background-color:var(--surface-ground)}
-.email-header{border-color:var(--surface-border);background-color:var(--surface-section)}
-.meta-label,.attachment-label{color:var(--text-color-secondary)}
-.email-subject,.meta-value{color:var(--text-color)}
+// Estilos para el modal de mensajes minimalista
+.message-viewer-dialog {
+  .p-dialog-content {
+    padding: 0;
+    background-color: var(--surface-card);
+  }
+  
+  .message-header {
+    background-color: var(--surface-card);
+  }
+  
+  .message-content {
+    background-color: var(--surface-card);
+  }
+  
+  .message-text {
+    background-color: var(--surface-ground);
+    border: 1px solid var(--surface-border);
+  }
+  
+  .attachment-section {
+    background-color: var(--surface-100);
+    border: 1px solid var(--surface-border);
+  }
+}
+
 .status-tag.responded{background-color:var(--green-100);color:var(--green-700)}
 .status-tag.draft{background-color:var(--yellow-100);color:var(--yellow-700)}
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr{cursor:pointer}

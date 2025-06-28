@@ -173,6 +173,8 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     );
   }
 
+
+
   private loadUserInfo(userId: string, type: 'sender' | 'recipient', message?: Message): void {
     this.userService.getUserById(userId).subscribe({
       next: (user) => {
@@ -643,9 +645,24 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     
     this.messageService.updateMessageStatus(messageId, MessageUpdateType.READ).subscribe({
       next: () => {
+        // Actualizar el mensaje seleccionado
         if (this.selectedMessage && this.selectedMessage.id === messageId) {
           this.selectedMessage.isRead = true;
         }
+        
+        // Actualizar el mensaje en el array de mensajes
+        const messageIndex = this.messages.findIndex(msg => msg.id === messageId);
+        if (messageIndex !== -1) {
+          this.messages[messageIndex].isRead = true;
+        }
+        
+        // Actualizar también en allMessages si es diferente
+        const allMessageIndex = this.allMessages.findIndex(msg => msg.id === messageId);
+        if (allMessageIndex !== -1) {
+          this.allMessages[allMessageIndex].isRead = true;
+        }
+        
+        // Recargar mensajes para sincronizar con el servidor
         this.loadMessages();
       },
       error: (err) => {
@@ -1231,5 +1248,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     
     return message.sender || 'Usuario';
   }
+
+
 
 }
