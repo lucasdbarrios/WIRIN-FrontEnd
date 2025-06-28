@@ -1,0 +1,265 @@
+<div class="grid grid-cols-12 gap-6">
+  <!-- Header -->
+  <div class="col-span-12">
+    <p-card>
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-2">
+            🏆 Ranking de Voluntarios
+          </h2>
+          <p class="text-surface-600 dark:text-surface-400">
+            Clasificación basada en tareas completadas exitosamente y tasa de éxito
+          </p>
+        </div>
+        <p-button 
+          label="Actualizar" 
+          icon="pi pi-refresh" 
+          (click)="refreshRanking()"
+          [loading]="isLoading"
+          severity="info">
+        </p-button>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Error Message -->
+  <div class="col-span-12" *ngIf="errorMessage">
+    <p-card>
+      <div class="text-red-500 text-center">
+        <i class="pi pi-exclamation-triangle mr-2"></i>
+        {{ errorMessage }}
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Loading State -->
+  <div class="col-span-12" *ngIf="isLoading">
+    <p-card>
+      <div class="text-center py-8">
+        <i class="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4"></i>
+        <p class="text-surface-600 dark:text-surface-400">Cargando ranking de voluntarios...</p>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Ranking Table -->
+  <div class="col-span-12" *ngIf="!isLoading && !errorMessage">
+    <p-card>
+      <p-table 
+        [value]="volunteers" 
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} voluntarios"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        styleClass="p-datatable-striped">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center" style="width: 80px">
+              <i class="pi pi-trophy mr-2"></i>Ranking
+            </th>
+            <th>Voluntario</th>
+            <th class="text-center">Tareas Totales</th>
+            <th class="text-center">Completadas</th>
+            <th class="text-center">Aprobadas</th>
+            <th class="text-center">Denegadas</th>
+            <th class="text-center">En Proceso</th>
+            <th class="text-center">Tasa de Éxito</th>
+            <th class="text-center">Tareas Prioritarias</th>
+            <th class="text-center">Tiempo Promedio (días)</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-volunteer>
+          <tr class="hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors">
+            <!-- Ranking -->
+            <td class="text-center">
+              <span 
+                class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
+                [ngClass]="getRankingBadgeClass(volunteer.ranking)">
+                {{ volunteer.ranking }}
+              </span>
+            </td>
+            
+            <!-- Nombre del Voluntario -->
+            <td>
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
+                  <i class="pi pi-user text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <div>
+                  <div class="font-medium text-surface-900 dark:text-surface-0">
+                    {{ volunteer.fullName }}
+                  </div>
+                  <div class="text-sm text-surface-500 dark:text-surface-400">
+                    ID: {{ volunteer.id }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            
+            <!-- Tareas Totales -->
+            <td class="text-center">
+              <span class="font-semibold text-surface-900 dark:text-surface-0">
+                {{ volunteer.totalTasks }}
+              </span>
+            </td>
+            
+            <!-- Completadas -->
+            <td class="text-center">
+              <p-tag 
+                [value]="volunteer.tasksCompleted.toString()" 
+                severity="success" 
+                [rounded]="true">
+              </p-tag>
+            </td>
+            
+            <!-- Aprobadas -->
+            <td class="text-center">
+              <p-tag 
+                [value]="volunteer.tasksApproved.toString()" 
+                severity="info" 
+                [rounded]="true">
+              </p-tag>
+            </td>
+            
+            <!-- Denegadas -->
+            <td class="text-center">
+              <p-tag 
+                [value]="volunteer.tasksDenied.toString()" 
+                severity="danger" 
+                [rounded]="true">
+              </p-tag>
+            </td>
+            
+            <!-- En Proceso -->
+            <td class="text-center">
+              <p-tag 
+                [value]="volunteer.tasksInProgress.toString()" 
+                severity="warning" 
+                [rounded]="true">
+              </p-tag>
+            </td>
+            
+            <!-- Tasa de Éxito -->
+            <td class="text-center">
+              <div class="flex flex-col items-center">
+                <p-tag 
+                  [value]="volunteer.successRate + '%'" 
+                  [severity]="getSuccessRateSeverity(volunteer.successRate)" 
+                  [rounded]="true">
+                </p-tag>
+                <div class="w-full mt-2">
+                  <p-progressBar 
+                    [value]="volunteer.successRate" 
+                    [style]="{'height': '6px'}"
+                    [showValue]="false">
+                  </p-progressBar>
+                </div>
+              </div>
+            </td>
+            
+            <!-- Tareas Prioritarias -->
+            <td class="text-center">
+              <div class="flex items-center justify-center">
+                <i class="pi pi-star-fill text-yellow-500 mr-1" *ngIf="volunteer.priorityTasksCompleted > 0"></i>
+                <span class="font-medium">
+                  {{ volunteer.priorityTasksCompleted }}
+                </span>
+              </div>
+            </td>
+            
+            <!-- Tiempo Promedio -->
+            <td class="text-center">
+              <span class="text-surface-700 dark:text-surface-300">
+                {{ volunteer.averageCompletionTime | number:'1.1-1' }}
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10" class="text-center py-8">
+              <div class="text-surface-500 dark:text-surface-400">
+                <i class="pi pi-info-circle text-4xl mb-4 block"></i>
+                <p class="text-lg mb-2">No hay voluntarios registrados</p>
+                <p class="text-sm">Los voluntarios aparecerán aquí una vez que tengan tareas asignadas</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="col-span-12" *ngIf="!isLoading && volunteers.length > 0">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Top Performer -->
+      <p-card *ngIf="volunteers[0]">
+        <div class="text-center">
+          <i class="pi pi-trophy text-yellow-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Mejor Voluntario
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            {{ volunteers[0].fullName }}
+          </p>
+          <p class="text-2xl font-bold text-yellow-600">
+            {{ volunteers[0].successRate }}% éxito
+          </p>
+        </div>
+      </p-card>
+
+      <!-- Most Active -->
+      <p-card>
+        <div class="text-center">
+          <i class="pi pi-chart-line text-blue-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Más Activo
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            {{ getMostActiveVolunteer()?.fullName || 'N/A' }}
+          </p>
+          <p class="text-2xl font-bold text-blue-600">
+            {{ getMostActiveVolunteer()?.totalTasks || 0 }} tareas
+          </p>
+        </div>
+      </p-card>
+
+      <!-- Average Success Rate -->
+      <p-card>
+        <div class="text-center">
+          <i class="pi pi-percentage text-green-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Promedio General
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            Tasa de éxito
+          </p>
+          <p class="text-2xl font-bold text-green-600">
+            {{ getAverageSuccessRate() | number:'1.1-1' }}%
+          </p>
+        </div>
+      </p-card>
+
+      <!-- Total Volunteers -->
+      <p-card>
+        <div class="text-center">
+          <i class="pi pi-users text-purple-500 text-3xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-2">
+            Total Voluntarios
+          </h3>
+          <p class="text-surface-600 dark:text-surface-400 mb-1">
+            Activos
+          </p>
+          <p class="text-2xl font-bold text-purple-600">
+            {{ volunteers.length }}
+          </p>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

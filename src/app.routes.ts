@@ -21,6 +21,7 @@ import { ProyectsComponent } from './app/pages/wirin/proyects/proyects.component
 import { AutoRefreshExampleComponent } from './app/pages/example/auto-refresh-example.component';
 import { DashboardComponent } from './app/pages/wirin/dashboard/dashboard.component';
 import { GmailStyleComponent } from './app/pages/wirin/message/message-inbox.component';
+import { VolunteerRankingComponent } from './app/pages/wirin/volunteer-ranking/volunteer-ranking.component';
 
 export const appRoutes: Routes = [
     {
@@ -57,6 +58,7 @@ export const appRoutes: Routes = [
             { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
             { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
             { path: 'messages', component: GmailStyleComponent, canActivate: [AuthGuard] },
+            { path: 'volunteer-ranking', component: VolunteerRankingComponent, canActivate: [AuthGuard] },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

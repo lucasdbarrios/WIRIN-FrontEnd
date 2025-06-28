@@ -35,6 +35,7 @@ export class AppMenu {
                     ...(this.isBibliotecario ? [{ label: 'Dashboard', icon: 'pi pi-briefcase', routerLink: ['/wirin/dashboard'] }] : []),
                         { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] },
                     ...(this.isBibliotecario ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] }] : []),
+                    ...(this.isBibliotecario ? [{ label: 'Ranking Voluntarios', icon: 'pi pi-fw pi-chart-line', routerLink: ['/wirin/volunteer-ranking'] }] : []),
                     ...(this.isVoluntario ? [{ label: 'Mis tareas', icon: 'pi pi-fw pi-clipboard', routerLink: ['/wirin/tasks-voluntario'] }] : []),
                     // ...(this.isBibliotecario ? [{ label: 'Entregas', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/deliveries'] }] : []),
                     ...(this.isBibliotecario ? [{ label: 'Bibliografias', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/proyects'] }] : [])
