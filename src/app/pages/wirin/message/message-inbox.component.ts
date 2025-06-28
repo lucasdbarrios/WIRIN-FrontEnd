@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MessageService, MessageFolder, MessageUpdateType } from '../../../services/message/message.service';
 import { Message } from '../../../types/message.interface';
 import { User } from '../../../types/user.interface';
 import { MessageService as PrimeToastService } from 'primeng/api';
+import { combineLatest } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
@@ -22,6 +23,7 @@ import { CardModule } from 'primeng/card';
 import { AutoRefreshService } from '../../../services/auto-refresh/auto-refresh.service';
 import { Observable, Subscription, finalize } from 'rxjs';
 import { UserService } from '../../../services/user/user.service';
+import { UserCacheService } from '../../../services/user-cache/user-cache.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { AuthService } from '../../../services/auth/auth.service';
@@ -68,8 +70,16 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   userId: string = '';
   messages: Message[] = [];
   allMessages: Message[] = [];
+  conversationMessages: Message[] = [];
   groupedSentMessages: GroupedMessage[] = [];
   activeFolder: 'inbox' | 'sent' = 'inbox';
+  isLoadingConversation = false;
+  
+  // Sistema de caché y polling
+  private messagesCache: { sent: Message[], received: Message[] } | null = null;
+  private lastCacheUpdate: number = 0;
+  private readonly CACHE_DURATION = 60000; // 1 minuto en milisegundos
+  private pollingInterval: any = null;
   
   folderOptions = [
     { label: 'Recibidos', value: 'inbox', icon: 'pi pi-inbox' },
@@ -176,19 +186,20 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
 
 
   private loadUserInfo(userId: string, type: 'sender' | 'recipient', message?: Message): void {
-    this.userService.getUserById(userId).subscribe({
+    this.userCacheService.getUserById(userId).subscribe({
       next: (user) => {
-        console.log(`Información del ${type} obtenida:`, user);
-        if (type === 'sender') {
-          this.senderInfo = user;
-          if (message && user?.fullName) {
-            message.sender = user.fullName;
-            message.senderName = user.fullName;
-          }
-        } else {
-          this.recipientInfo = user;
-          if (message && user?.fullName) {
-            message.recipientName = user.fullName;
+          if (user) {
+            if (type === 'sender') {
+            this.senderInfo = user;
+            if (message && user?.fullName) {
+              message.sender = user.fullName;
+              message.senderName = user.fullName;
+            }
+          } else {
+            this.recipientInfo = user;
+            if (message && user?.fullName) {
+              message.recipientName = user.fullName;
+            }
           }
         }
       },
@@ -199,37 +210,52 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   }
 
   private loadUserInfoForMessages(messages: Message[]): void {
+    // Recopilar todos los IDs de usuarios únicos
+    const userIds = new Set<string>();
+    
     messages.forEach(msg => {
       if (this.activeFolder === 'sent' && msg.userToId) {
-        this.userService.getUserById(msg.userToId).subscribe({
-          next: (user) => {
-            if (user?.fullName) {
-              msg.recipientName = user.fullName;
-              msg.loadingRecipientInfo = false;
-              // Reagrupar mensajes después de cargar la información del usuario
-              if (this.activeFolder === 'sent') {
-                this.groupedSentMessages = this.groupSentMessagesByRecipient(this.messages);
-              }
-            }
-          },
-          error: () => {
-            msg.loadingRecipientInfo = false;
-          }
-        });
+        userIds.add(msg.userToId);
       } else if (this.activeFolder === 'inbox' && msg.userFromId) {
-        this.userService.getUserById(msg.userFromId).subscribe({
-          next: (user) => {
-            if (user?.fullName) {
-              msg.senderName = user.fullName;
-              msg.loadingSenderInfo = false;
-            }
-          },
-          error: () => {
-            msg.loadingSenderInfo = false;
-          }
-        });
+        userIds.add(msg.userFromId);
       }
     });
+
+    // Cargar usuarios en lote usando el cache
+    if (userIds.size > 0) {
+      this.userCacheService.getUsersByIds(Array.from(userIds)).subscribe({
+        next: (usersMap) => {
+          messages.forEach(msg => {
+            if (this.activeFolder === 'sent' && msg.userToId) {
+              const user = usersMap.get(msg.userToId);
+              if (user?.fullName) {
+                msg.recipientName = user.fullName;
+                msg.loadingRecipientInfo = false;
+              }
+            } else if (this.activeFolder === 'inbox' && msg.userFromId) {
+              const user = usersMap.get(msg.userFromId);
+              if (user?.fullName) {
+                msg.senderName = user.fullName;
+                msg.loadingSenderInfo = false;
+              }
+            }
+          });
+          
+          // Reagrupar mensajes después de cargar la información del usuario
+          if (this.activeFolder === 'sent') {
+            this.groupedSentMessages = this.groupSentMessagesByRecipient(this.messages);
+          }
+        },
+        error: (err) => {
+          console.error('Error loading users info:', err);
+          // Marcar como no cargando en caso de error
+          messages.forEach(msg => {
+            msg.loadingRecipientInfo = false;
+            msg.loadingSenderInfo = false;
+          });
+        }
+      });
+    }
   }
 
   private loadUserInfoForMessage(message: Message): void {
@@ -256,6 +282,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     private autoRefreshService: AutoRefreshService,
     private confirmationService: ConfirmationService,
     private userService: UserService,
+    private userCacheService: UserCacheService,
     private authService: AuthService
   ) {}
 
@@ -264,8 +291,8 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
       next: (user) => {
         if (user && user.id) {
           this.userId = user.id;
-          console.log('Usuario ID inicializado:', this.userId);
-          this.setupAutoRefresh();
+          // Usuario ID inicializado
+          this.refreshMessages();
           this.loadDraft();
         } else {
           console.error('No se pudo obtener el ID del usuario');
@@ -310,60 +337,27 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.messagesSubscription) {
       this.messagesSubscription.unsubscribe();
-      console.log('Suscripción a mensajes cancelada');
+      // Suscripción a mensajes cancelada
     }
     
     if (this.autosaveInterval) {
       clearInterval(this.autosaveInterval);
     }
     
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+    
     if (this.showComposer && (this.newMessage.subject || this.newMessage.content || this.newMessage.userToId)) {
       const key = `message_draft_${this.userId}`;
       localStorage.setItem(key, JSON.stringify(this.newMessage));
-      console.log('Borrador guardado al salir');
+      // Borrador guardado al salir
     }
   }
   
   setupAutoRefresh(): void {
-    this.messages$ = this.autoRefreshService.createAutoRefreshObservable(
-      () => {
-        this.isLoading = true;
-        return this.messageService.getMessagesByFolder(this.getMessageFolderEnum()).pipe(
-          finalize(() => this.isLoading = false)
-        );
-      },
-      30000
-    );
-    
-    this.messagesSubscription = this.messages$.subscribe({
-      next: (msgs) => {
-          msgs.forEach(msg => {
-            msg.recipientName = null;
-            msg.loadingRecipientInfo = false;
-            msg.senderName = null;
-            msg.loadingSenderInfo = false;
-          });
-          
-          this.allMessages = msgs;
-          this.messages = msgs;
-          
-          if (this.activeFolder === 'sent') {
-            this.groupedSentMessages = this.groupSentMessagesByRecipient(msgs);
-          }
-          
-          this.loadUserInfoForMessages(msgs);
-        },
-      error: (err) => {
-        console.error('Error al cargar mensajes', err);
-        this.isLoading = false;
-        this.toast.add({ 
-          severity: 'error', 
-          summary: 'Error', 
-          detail: 'No se pudieron cargar los mensajes. Intente nuevamente.', 
-          life: 3000 
-        });
-      }
-    });
+    // Método simplificado - solo carga inicial de mensajes
+    this.refreshMessages();
   }
   
   refreshMessages(): void {
@@ -372,7 +366,8 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     this.senderInfo = null;
     this.recipientInfo = null;
     
-    this.messageService.getMessagesByFolder(this.getMessageFolderEnum())
+    // Usar únicamente el endpoint de conversaciones
+    this.messageService.getAllConversations()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (msgs) => {
@@ -383,14 +378,25 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
             msg.loadingSenderInfo = false;
           });
           
+          // Actualizar caché
+          const sentMessages = msgs.filter(m => m.userFromId === this.userId);
+          const receivedMessages = msgs.filter(m => m.userToId === this.userId);
+          
+          this.messagesCache = {
+            sent: sentMessages || [],
+            received: receivedMessages || []
+          };
+          this.lastCacheUpdate = Date.now();
+          
           this.allMessages = msgs;
-          this.messages = msgs;
+          const filteredMessages = this.filterByFolder(msgs);
+          this.messages = filteredMessages;
           
           if (this.activeFolder === 'sent') {
-            this.groupedSentMessages = this.groupSentMessagesByRecipient(msgs);
+            this.groupedSentMessages = this.groupSentMessagesByRecipient(filteredMessages);
           }
           
-          this.loadUserInfoForMessages(msgs);
+          this.loadUserInfoForMessages(filteredMessages);
         },
         error: (err) => {
           console.error('Error al cargar mensajes', err);
@@ -407,41 +413,135 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
 
   loadMessages(): void {
     this.isLoading = true;
+    this.resetUserInfo();
+    
+    // Verificar si tenemos caché válido
+    const now = Date.now();
+    if (this.messagesCache && (now - this.lastCacheUpdate) < this.CACHE_DURATION) {
+      // Usar caché
+      const allMessages = [...(this.messagesCache.sent || []), ...(this.messagesCache.received || [])];
+      this.allMessages = allMessages;
+      const filteredMessages = this.filterByFolder(allMessages);
+      this.processLoadedMessages(filteredMessages);
+      this.isLoading = false;
+      return;
+    }
+    
+    // Cargar desde API optimizado usando endpoint de conversaciones
+     this.loadConversationsFromAPI();
+   }
+  
+  private startPolling(): void {
+    // Desactivar polling automático para evitar llamadas excesivas
+    // El usuario puede refrescar manualmente cuando sea necesario
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+    }
+  }
+  
+  private stopPolling(): void {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+    }
+  }
+  
+  private refreshMessagesFromAPI(): void {
+    // Solo actualizar si no hay una carga en progreso
+    if (this.isLoading) {
+      return;
+    }
+    
+    // Actualizar caché sin mostrar loading usando endpoint optimizado
+    this.messageService.getAllConversations().subscribe({
+      next: (messages) => {
+        // Separar mensajes por tipo para mantener compatibilidad con caché
+        const sentMessages = messages.filter(m => m.userFromId === this.userId);
+        const receivedMessages = messages.filter(m => m.userToId === this.userId);
+        
+        // Actualizar caché
+        this.messagesCache = {
+          sent: sentMessages || [],
+          received: receivedMessages || []
+        };
+        this.lastCacheUpdate = Date.now();
+        
+        // Actualizar vista actual si es necesario
+        this.allMessages = messages;
+        const filteredMessages = this.filterByFolder(messages);
+        this.messages = filteredMessages;
+        
+        if (this.activeFolder === 'sent') {
+          this.groupedSentMessages = this.groupSentMessagesByRecipient(filteredMessages);
+        }
+      },
+      error: (err) => {
+        console.error('Error en polling de mensajes:', err);
+      }
+    });
+  }
+  
+  private loadConversationsFromAPI(): void {
+     this.messageService.getAllConversations().pipe(
+       finalize(() => this.isLoading = false)
+     ).subscribe({
+      next: (messages) => {
+        // Separar mensajes por tipo para mantener compatibilidad con caché
+        const sentMessages = messages.filter(m => m.userFromId === this.userId);
+        const receivedMessages = messages.filter(m => m.userToId === this.userId);
+        
+        // Actualizar caché
+        this.messagesCache = {
+          sent: sentMessages || [],
+          received: receivedMessages || []
+        };
+        this.lastCacheUpdate = Date.now();
+        
+        this.allMessages = messages;
+        
+        // Filtrar mensajes para la vista actual
+        const filteredMessages = this.filterByFolder(messages);
+        this.processLoadedMessages(filteredMessages);
+      },
+      error: (err) => this.handleLoadError(err)
+    });
+  }
+
+  private resetUserInfo(): void {
     this.senderInfo = null;
     this.recipientInfo = null;
+  }
+
+  private processLoadedMessages(msgs: Message[]): void {
+    this.resetMessageInfo(msgs);
+    this.allMessages = msgs;
+    this.messages = msgs;
     
-    this.getMessagesByActiveFolder()
-      .pipe(finalize(() => this.isLoading = false))
-      .subscribe({
-        next: (msgs) => {
-          msgs.forEach(msg => {
-            msg.recipientName = null;
-            msg.loadingRecipientInfo = false;
-            msg.senderName = null;
-            msg.loadingSenderInfo = false;
-          });
-          
-          this.allMessages = msgs;
-          this.messages = msgs;
-          
-          if (this.activeFolder === 'sent') {
-            this.groupedSentMessages = this.groupSentMessagesByRecipient(msgs);
-          }
-          
-          this.loadUserInfoForMessages(msgs);
-          
-          console.log(`Cargados ${msgs.length} mensajes en carpeta ${this.activeFolder}`);
-        },
-        error: (err) => {
-          console.error('Error al cargar mensajes', err);
-          this.toast.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: 'No se pudieron cargar los mensajes. Intente nuevamente.', 
-            life: 3000 
-          });
-        }
-      });
+    if (this.activeFolder === 'sent') {
+      this.groupedSentMessages = this.groupSentMessagesByRecipient(msgs);
+    }
+    
+    this.loadUserInfoForMessages(msgs);
+  }
+
+  private resetMessageInfo(msgs: Message[]): void {
+    msgs.forEach(msg => {
+      msg.recipientName = null;
+      msg.loadingRecipientInfo = false;
+      msg.senderName = null;
+      msg.loadingSenderInfo = false;
+    });
+  }
+
+  private handleLoadError(err: any): void {
+    console.error('Error al cargar mensajes', err);
+    this.toast.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: 'No se pudieron cargar los mensajes. Intente nuevamente.', 
+      life: 3000 
+    });
   }
 
   private getMessageFolderEnum(): MessageFolder {
@@ -455,7 +555,8 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   }
   
   getMessagesByActiveFolder(): Observable<Message[]> {
-    return this.messageService.getMessagesByFolder(this.getMessageFolderEnum());
+    // Usar únicamente el endpoint de conversaciones
+    return this.messageService.getAllConversations();
   }
   
   filterByFolder(all: Message[]): Message[] {
@@ -534,11 +635,13 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     const message = Array.isArray(msg) ? msg[0] : msg;
     if (!message) return;
     
-    console.log('Iniciando visualización de conversación con mensaje:', message);
+    // Iniciando visualización de conversación
     
     this.selectedMessage = message;
     this.showConversationModal = true;
     this.quickReply = '';
+    this.conversationMessages = []; // Limpiar conversación anterior
+    this.isLoadingConversation = false; // Resetear bandera para nueva conversación
     
     setTimeout(() => {
       this.showConversationReplyInput = false;
@@ -556,87 +659,14 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     }
     
     const otherUserId = message.userFromId === this.userId ? message.userToId : message.userFromId;
-    if (otherUserId) {
-      const conversationMessages = this.getConversationHistory(message);
-      console.log('Mensajes en la conversación:', conversationMessages.length);
-      
-      conversationMessages.forEach(msg => {
-        if (msg.userFromId && msg.userFromId !== this.userId) {
-          this.userService.getUserById(msg.userFromId).subscribe({
-            next: (user) => {
-              if (user && user.fullName) {
-                console.log(`Actualizando nombre de remitente para mensaje ${msg.id}:`, user.fullName);
-                msg.sender = user.fullName;
-              }
-            },
-            error: (err) => {
-              console.error(`Error al obtener información del remitente para mensaje ${msg.id}:`, err);
-            }
-          });
-        }
-      });
+    if (otherUserId && !isNaN(Number(otherUserId))) {
+      // Cargar mensajes de ambas carpetas para obtener la conversación completa
+      this.isLoadingConversation = true;
+      this.loadCompleteConversation(Number(this.userId), Number(otherUserId));
     }
     
     if (!message.isRead) {
       this.markAsRead(message.id);
-    }
-  }
-  
-  onCloseConversationModal(): void {
-    this.showConversationModal = false;
-    
-    setTimeout(() => {
-      this.showConversationReplyInput = false;
-    });
-    
-    if (!this.showReplyDialog) {
-      this.quickReply = '';
-    }
-  }
-  
-  toggleConversationReplyInput(): void {
-    setTimeout(() => {
-      this.showConversationReplyInput = !this.showConversationReplyInput;
-    });
-  }
-
-  getConversationPartnerName(): string {
-    if (!this.selectedMessage) return 'Conversación';
-    
-    if (this.selectedMessage.userFromId === this.userId) {
-      if (this.recipientInfo && this.recipientInfo.fullName) {
-        return 'Conversación con ' + this.recipientInfo.fullName;
-      } else if (this.selectedMessage.userToId) {
-        this.userService.getUserById(this.selectedMessage.userToId).subscribe({
-          next: (user) => {
-            console.log('Información del destinatario obtenida (conversación partner):', user);
-            this.recipientInfo = user;
-          },
-          error: (err) => {
-            console.error('Error al obtener información del destinatario (conversación partner):', err);
-          }
-        });
-        return 'Conversación con ' + (this.selectedMessage.sender || 'Destinatario');
-      } else {
-        return 'Conversación';
-      }
-    } else {
-      if (this.senderInfo && this.senderInfo.fullName) {
-        return 'Conversación con ' + this.senderInfo.fullName;
-      } else if (this.selectedMessage.userFromId) {
-        this.userService.getUserById(this.selectedMessage.userFromId).subscribe({
-          next: (user) => {
-            console.log('Información del remitente obtenida (conversación partner):', user);
-            this.senderInfo = user;
-          },
-          error: (err) => {
-            console.error('Error al obtener información del remitente (conversación partner):', err);
-          }
-        });
-        return 'Conversación con ' + (this.selectedMessage.sender || 'Remitente');
-      } else {
-        return 'Conversación con ' + (this.selectedMessage.sender || 'Remitente');
-      }
     }
   }
   
@@ -771,18 +801,37 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
       this.newMessage.userToId = this.selectedStudent;
     }
     
-    if (!this.newMessage.userToId || !this.newMessage.subject || !this.newMessage.content) {
-      this.toast.add({ 
-        severity: 'warn', 
-        summary: 'Campos incompletos', 
-        detail: 'Por favor, complete todos los campos requeridos.', 
-        life: 3000 
-      });
+    if (!this.isValidMessage()) {
+      this.showValidationError();
       return;
     }
 
     this.isLoading = true;
-    const msg: Partial<Message> = {
+    const msg = this.createMessagePayload();
+
+    this.messageService.sendMessage(msg, this.fileToSend)
+      .pipe(finalize(() => this.resetSendingState()))
+      .subscribe({
+        next: () => this.handleSendSuccess(),
+        error: (err) => this.handleSendError(err)
+      });
+  }
+
+  private isValidMessage(): boolean {
+    return !!(this.newMessage.userToId && this.newMessage.subject && this.newMessage.content);
+  }
+
+  private showValidationError(): void {
+    this.toast.add({ 
+      severity: 'warn', 
+      summary: 'Campos incompletos', 
+      detail: 'Por favor, complete todos los campos requeridos.', 
+      life: 3000 
+    });
+  }
+
+  private createMessagePayload(): Partial<Message> {
+    return {
       ...this.newMessage,
       userFromId: this.userId,
       sender: 'Usuario actual',
@@ -791,55 +840,60 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
       responded: false,
       isRead: true
     };
+  }
 
-    this.messageService.sendMessage(msg, this.fileToSend)
-      .pipe(finalize(() => {
-        this.isLoading = false;
-        this.composerSubmitted = false;
-      }))
-      .subscribe({
-        next: () => {
-          const recipientType = this.getRoleDisplayName(this.selectedRole);
-          this.toast.add({ 
-            severity: 'success', 
-            summary: 'Mensaje enviado', 
-            detail: `Mensaje enviado correctamente al ${recipientType}`, 
-            life: 2500 
-          });
-          this.showComposer = false;
-          this.clearDraft();
-          this.refreshMessages();
-        },
-        error: (err) => {
-          console.error('Error al enviar mensaje', err);
-          
-          let errorMessage = 'No se pudo enviar el mensaje. Intente nuevamente.';
-          
-          if (err.status === 0) {
-            errorMessage = 'No se pudo conectar con el servidor. Verifique su conexión a internet.';
-          } else if (err.status === 400) {
-            errorMessage = 'Datos de mensaje inválidos. Verifique los campos e intente nuevamente.';
-          } else if (err.status === 401 || err.status === 403) {
-            errorMessage = 'No tiene permisos para enviar mensajes. Inicie sesión nuevamente.';
-          } else if (err.status >= 500) {
-            errorMessage = 'Error en el servidor. Por favor, intente más tarde.';
-          }
-          
-          this.toast.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: errorMessage, 
-            life: 5000 
-          });
-          
-          if (err.status === 200 && err.error instanceof SyntaxError) {
-            console.log('El mensaje probablemente se envió correctamente a pesar del error de parsing');
-            this.showComposer = false;
-            this.clearDraft();
-            this.refreshMessages();
-          }
-        }
-      });
+  private resetSendingState(): void {
+    this.isLoading = false;
+    this.composerSubmitted = false;
+  }
+
+  private handleSendSuccess(): void {
+    const recipientType = this.getRoleDisplayName(this.selectedRole);
+    this.toast.add({ 
+      severity: 'success', 
+      summary: 'Mensaje enviado', 
+      detail: `Mensaje enviado correctamente al ${recipientType}`, 
+      life: 2500 
+    });
+    this.completeSend();
+  }
+
+  private handleSendError(err: any): void {
+    console.error('Error al enviar mensaje', err);
+    
+    if (err.status === 200 && err.error instanceof SyntaxError) {
+      this.completeSend();
+      return;
+    }
+    
+    const errorMessage = this.getErrorMessage(err.status);
+    this.toast.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: errorMessage, 
+      life: 5000 
+    });
+  }
+
+  private getErrorMessage(status: number): string {
+    const errorMessages: { [key: number]: string } = {
+      0: 'No se pudo conectar con el servidor. Verifique su conexión a internet.',
+      400: 'Datos de mensaje inválidos. Verifique los campos e intente nuevamente.',
+      401: 'No tiene permisos para enviar mensajes. Inicie sesión nuevamente.',
+      403: 'No tiene permisos para enviar mensajes. Inicie sesión nuevamente.'
+    };
+    
+    if (status >= 500) {
+      return 'Error en el servidor. Por favor, intente más tarde.';
+    }
+    
+    return errorMessages[status] || 'No se pudo enviar el mensaje. Intente nuevamente.';
+  }
+
+  private completeSend(): void {
+    this.showComposer = false;
+    this.clearDraft();
+    this.refreshMessages();
   }
 
   saveDraft(): void {
@@ -946,7 +1000,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     if (this.showComposer && (this.newMessage.subject || this.newMessage.content || this.newMessage.userToId)) {
       const key = `message_draft_${this.userId}`;
       localStorage.setItem(key, JSON.stringify(this.newMessage));
-      console.log('Borrador guardado localmente:', new Date().toLocaleTimeString());
+      // Borrador guardado localmente
     }
   }
 
@@ -959,7 +1013,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
         if (this.newMessage.userToId) {
           this.selectedStudent = this.newMessage.userToId;
         }
-        console.log('Borrador cargado desde almacenamiento local');
+        // Borrador cargado desde almacenamiento local
       } catch (error) {
         console.error('Error al cargar el borrador:', error);
         localStorage.removeItem(key);
@@ -1021,12 +1075,175 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
 
 
 
+  loadCompleteConversation(userId: number, otherUserId: number): void {
+    // Validar parámetros antes de proceder
+    if (isNaN(userId) || isNaN(otherUserId) || !userId || !otherUserId) {
+      console.warn('IDs de usuario inválidos:', { userId, otherUserId });
+      return;
+    }
+    
+    // Evitar cargas duplicadas
+    if (this.isLoadingConversation) {
+      return;
+    }
+    
+    this.isLoadingConversation = true;
+    this.conversationMessages = [];
+    
+    // Verificar si tenemos caché válido
+    const now = Date.now();
+    if (this.messagesCache && (now - this.lastCacheUpdate) < this.CACHE_DURATION) {
+      // Usar caché para la conversación
+      const allMessages = [...(this.messagesCache.sent || []), ...(this.messagesCache.received || [])];
+      
+      this.conversationMessages = allMessages
+        .filter(msg => this.isConversationMessage(msg, userId, otherUserId))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      
+      this.loadSenderInfo(userId);
+      this.isLoadingConversation = false;
+      return;
+    }
+    
+    // Si no hay caché válido, usar endpoint optimizado de conversaciones
+    this.messageService.getConversationWithUser(otherUserId.toString()).subscribe({
+      next: (conversationMessages) => {
+        // Filtrar mensajes de la conversación específica
+        this.conversationMessages = conversationMessages
+          .filter(msg => this.isConversationMessage(msg, userId, otherUserId))
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        
+        // Actualizar caché parcialmente con los mensajes de conversación
+        if (!this.messagesCache) {
+          this.messagesCache = { sent: [], received: [] };
+        }
+        
+        // Agregar mensajes de conversación al caché apropiado
+        this.conversationMessages.forEach(msg => {
+          if (msg.userFromId === userId.toString()) {
+            const existingIndex = this.messagesCache!.sent.findIndex(m => m.id === msg.id);
+            if (existingIndex === -1) {
+              this.messagesCache!.sent.push(msg);
+            }
+          } else {
+            const existingIndex = this.messagesCache!.received.findIndex(m => m.id === msg.id);
+            if (existingIndex === -1) {
+              this.messagesCache!.received.push(msg);
+            }
+          }
+        });
+        
+        this.loadSenderInfo(userId);
+        this.isLoadingConversation = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar mensajes de conversación:', err);
+        this.fallbackToLocalMessages(userId, otherUserId);
+        this.isLoadingConversation = false;
+      }
+    });
+  }
+
+  private isConversationMessage(msg: Message, userId: number, otherUserId: number): boolean {
+    const fromId = Number(msg.userFromId);
+    const toId = Number(msg.userToId);
+    return ((fromId === userId && toId === otherUserId) || 
+            (fromId === otherUserId && toId === userId)) && !msg.deleted;
+  }
+
+  private loadSenderInfo(currentUserId: number): void {
+    this.conversationMessages.forEach(msg => {
+      if (Number(msg.userFromId) === currentUserId) {
+        msg.sender = 'Tú';
+      } else if (msg.userFromId) {
+        this.userService.getUserById(msg.userFromId.toString()).subscribe({
+          next: (user) => {
+            if (user?.fullName) {
+              msg.sender = user.fullName;
+              msg.senderName = user.fullName;
+            }
+          },
+          error: (err) => console.error(`Error al obtener usuario ${msg.userFromId}:`, err)
+        });
+      }
+    });
+  }
+
+  private fallbackToLocalMessages(userId: number, otherUserId: number): void {
+     this.conversationMessages = this.allMessages
+       .filter(msg => this.isConversationMessage(msg, userId, otherUserId))
+       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+   }
+
+   private setSenderInfo(msg: Message): void {
+     if (msg.userFromId === this.userId) {
+       msg.sender = msg.sender || 'Tú';
+       return;
+     }
+
+     if (!msg.userFromId) return;
+
+     if (msg.senderName) {
+       msg.sender = msg.senderName;
+       return;
+     }
+
+     const userInfo = this.getUserInfo(msg.userFromId);
+     if (userInfo?.fullName) {
+       msg.sender = userInfo.fullName;
+       msg.senderName = userInfo.fullName;
+       return;
+     }
+
+     if (!msg.loadingSenderInfo) {
+       msg.loadingSenderInfo = true;
+       this.userCacheService.getUserById(msg.userFromId).subscribe({
+         next: (user) => {
+           if (user?.fullName) {
+             msg.senderName = user.fullName;
+             msg.sender = user.fullName;
+           }
+           msg.loadingSenderInfo = false;
+         },
+         error: (err) => {
+           console.error('Error al obtener información del remitente:', err);
+           msg.loadingSenderInfo = false;
+         }
+       });
+     }
+   }
+
+   private getUserInfo(userId: string | number): any {
+     if (this.senderInfo?.id === userId) return this.senderInfo;
+     if (this.recipientInfo?.id === userId) return this.recipientInfo;
+     return null;
+   }
+
   getConversationHistory(message: Message): Message[] {
-    if (!message || !this.messages) {
+    if (!message) {
       return [];
     }
 
-    console.log('Obteniendo historial de conversación para mensaje:', message);
+    // Si ya tenemos conversationMessages cargados, usarlos
+    if (this.conversationMessages && this.conversationMessages.length > 0) {
+      return this.conversationMessages;
+    }
+
+    // Evitar múltiples llamadas simultáneas
+    if (this.isLoadingConversation) {
+      return [];
+    }
+
+    // Fallback: cargar conversación completa si no está disponible
+    const otherUserId = message.userFromId === this.userId ? message.userToId : message.userFromId;
+    if (otherUserId && !isNaN(Number(otherUserId)) && !this.isLoadingConversation) {
+      this.loadCompleteConversation(Number(this.userId), Number(otherUserId));
+    }
+
+    // Mientras se carga, usar método anterior como fallback
+    if (!this.allMessages) {
+      return [];
+    }
 
     const conversationMessages = this.allMessages.filter(msg => 
       ((msg.userFromId === message.userFromId && msg.userToId === message.userToId) ||
@@ -1034,45 +1251,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
       !msg.deleted
     );
 
-    console.log('Mensajes filtrados en la conversación:', conversationMessages.length);
-
-    conversationMessages.forEach(msg => {
-      if (msg.userFromId === this.userId) {
-        if (!msg.sender) {
-          msg.sender = 'Tú';
-        }
-      } 
-      else if (msg.userFromId) {
-        if (msg.senderName) {
-          msg.sender = msg.senderName;
-        }
-        else if (this.senderInfo && this.senderInfo.id === msg.userFromId && this.senderInfo.fullName) {
-          msg.sender = this.senderInfo.fullName;
-          msg.senderName = this.senderInfo.fullName;
-        } 
-        else if (this.recipientInfo && this.recipientInfo.id === msg.userFromId && this.recipientInfo.fullName) {
-          msg.sender = this.recipientInfo.fullName;
-          msg.senderName = this.recipientInfo.fullName;
-        }
-        else if (!msg.loadingSenderInfo) {
-          msg.loadingSenderInfo = true;
-          
-          this.userService.getUserById(msg.userFromId).subscribe({
-            next: (user) => {
-              if (user && user.fullName) {
-                msg.senderName = user.fullName;
-                msg.sender = user.fullName;
-              }
-              msg.loadingSenderInfo = false;
-            },
-            error: (err) => {
-              console.error('Error al obtener información del remitente:', err);
-              msg.loadingSenderInfo = false;
-            }
-          });
-        }
-      }
-    });
+    conversationMessages.forEach(msg => this.setSenderInfo(msg));
 
     return conversationMessages.sort((a, b) => {
       const dateA = new Date(a.date || 0).getTime();
@@ -1106,103 +1285,70 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   }
 
   sendQuickReply(): void {
-    if (!this.quickReply || !this.selectedMessage) {
-      if (this.toast) {
-        this.toast.add({ 
-          severity: 'warn', 
-          summary: 'Advertencia', 
-          detail: 'Por favor, escribe un mensaje antes de enviar.', 
-          life: 3000 
-        });
-      }
+    if (!this.selectedMessage || !this.quickReply?.trim()) {
       return;
     }
     
-    console.log('Enviando respuesta rápida al mensaje:', this.selectedMessage);
+    this.isLoading = true;
+    const reply = this.createQuickReplyPayload();
     
-    if (this.isLoading !== undefined) {
-      this.isLoading = true;
-    }
+    this.messageService.sendMessage(reply)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: () => this.handleQuickReplySuccess(),
+        error: (err) => this.handleQuickReplyError(err)
+      });
+  }
+
+  private createQuickReplyPayload(): Partial<Message> {
+    const recipientId = this.selectedMessage!.userFromId === this.userId ? 
+                       this.selectedMessage!.userToId : 
+                       this.selectedMessage!.userFromId;
     
-    const selectedMessage = this.selectedMessage;
-    const userId = this.userId;
-    
-    const otherUserId = selectedMessage.userFromId === userId ? 
-                selectedMessage.userToId : 
-                selectedMessage.userFromId;
-    
-    if (otherUserId && (!this.senderInfo || !this.recipientInfo)) {
-      const userType = selectedMessage.userFromId === userId ? 'recipient' : 'sender';
-      this.loadUserInfo(otherUserId, userType);
-    }
-    
-    const reply: Partial<Message> = {
-      userFromId: userId,
-      userToId: selectedMessage.userFromId === userId ? 
-                selectedMessage.userToId : 
-                selectedMessage.userFromId,
-      subject: `RE: ${selectedMessage.subject || ''}`,
-      content: this.quickReply || '',
+    return {
+      userFromId: this.userId,
+      userToId: recipientId,
+      subject: `Re: ${this.selectedMessage!.subject}`,
+      content: this.quickReply.trim(),
       date: new Date(),
       isDraft: false,
       responded: false,
       isRead: true
     };
+  }
+
+  private handleQuickReplySuccess(): void {
+    this.toast.add({ 
+      severity: 'success', 
+      summary: 'Mensaje enviado', 
+      detail: 'Tu mensaje ha sido enviado correctamente', 
+      life: 3000 
+    });
     
-    if (this.messageService) {
-      this.messageService.sendMessage(reply)
-        .pipe(finalize(() => {
-          if (this.isLoading !== undefined) {
-            this.isLoading = false;
-          }
-        }))
-        .subscribe({
-          next: () => {
-            if (this.toast) {
-              this.toast.add({ 
-                severity: 'success', 
-                summary: 'Mensaje enviado', 
-                detail: 'Tu mensaje ha sido enviado correctamente', 
-                life: 3000 
-              });
-            }
-            
-            if (selectedMessage) {
-              const messageId = selectedMessage.id;
-              if (messageId && this.messageService) {
-                this.messageService.markAsResponded(messageId).subscribe(() => {
-                  if (typeof this.refreshMessages === 'function') {
-                    this.refreshMessages();
-                  }
-                });
-              }
-            }
-            
-            if (this.quickReply !== undefined) {
-              this.quickReply = '';
-            }
-            
-            if (this.showViewer !== undefined) {
-              this.showViewer = false;
-            }
-            
-            if (typeof this.refreshMessages === 'function') {
-              this.refreshMessages();
-            }
-          },
-          error: (err: any) => {
-            console.error('Error al enviar mensaje', err);
-            if (this.toast) {
-              this.toast.add({ 
-                severity: 'error', 
-                summary: 'Error', 
-                detail: 'No se pudo enviar el mensaje. Intente nuevamente.', 
-                life: 3000 
-              });
-            }
-          }
-        });
+    this.markOriginalAsResponded();
+    this.resetQuickReplyState();
+    this.refreshMessages();
+  }
+
+  private markOriginalAsResponded(): void {
+    if (this.selectedMessage?.id) {
+      this.messageService.markAsResponded(this.selectedMessage.id).subscribe();
     }
+  }
+
+  private resetQuickReplyState(): void {
+    this.quickReply = '';
+    this.showViewer = false;
+  }
+
+  private handleQuickReplyError(err: any): void {
+    console.error('Error al enviar mensaje', err);
+    this.toast.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: 'No se pudo enviar el mensaje. Intente nuevamente.', 
+      life: 3000 
+    });
   }
 
   trackByMessageId(index: number, message: Message): any {
@@ -1249,6 +1395,44 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
     return message.sender || 'Usuario';
   }
 
+  getConversationPartnerName(): string {
+    if (!this.selectedMessage) return 'Usuario';
+    
+    const partnerId = this.selectedMessage.userFromId === this.userId ? 
+                     this.selectedMessage.userToId : 
+                     this.selectedMessage.userFromId;
+    
+    // Intentar obtener el nombre del cache primero
+    const cachedUsers = this.userCacheService.getCachedUsers();
+    const cachedUser = cachedUsers.get(partnerId || '');
+    
+    if (cachedUser?.fullName) {
+      return cachedUser.fullName;
+    }
+    
+    // Fallback a la información ya cargada
+    if (this.selectedMessage.userFromId === this.userId) {
+      return this.selectedMessage.recipientName || this.recipientInfo?.fullName || 'Usuario';
+    } else {
+      return this.selectedMessage.senderName || this.senderInfo?.fullName || 'Usuario';
+    }
+  }
 
+  onCloseConversationModal(): void {
+    this.showConversationModal = false;
+    this.showConversationReplyInput = false;
+    this.quickReply = '';
+    this.selectedMessage = null;
+    this.senderInfo = null;
+    this.recipientInfo = null;
+    this.conversationMessages = []; // Limpiar mensajes de conversación
+  }
+
+  toggleConversationReplyInput(): void {
+    this.showConversationReplyInput = !this.showConversationReplyInput;
+    if (!this.showConversationReplyInput) {
+      this.quickReply = '';
+    }
+  }
 
 }
