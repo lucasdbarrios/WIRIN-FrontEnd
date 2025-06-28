@@ -1,0 +1,243 @@
+<div class="general-stats-container">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Estadísticas Generales</h1>
+      <p class="text-gray-600">Vista general del rendimiento de voluntarios y revisores</p>
+    </div>
+    <div class="flex gap-3">
+      <p-button 
+        label="Actualizar" 
+        icon="pi pi-refresh" 
+        (onClick)="refreshStats()"
+        [loading]="isLoading"
+        severity="secondary">
+      </p-button>
+      <p-button 
+        label="Exportar" 
+        icon="pi pi-download" 
+        (onClick)="exportData()"
+        severity="info">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    <div class="text-center">
+      <i class="pi pi-spin pi-spinner text-4xl text-blue-500 mb-4"></i>
+      <p class="text-gray-600">Cargando estadísticas...</p>
+    </div>
+  </div>
+
+  <!-- Stats Content -->
+  <div *ngIf="!isLoading && !errorMessage">
+    
+    <!-- General Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Users -->
+      <p-card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <div class="text-center">
+          <i class="pi pi-users text-3xl mb-3 opacity-80"></i>
+          <div class="text-3xl font-bold mb-2">{{ generalStats.totalVolunteers + generalStats.totalReviewers }}</div>
+          <div class="text-sm opacity-90">Total Usuarios</div>
+          <div class="text-xs mt-1 opacity-75">
+            {{ generalStats.totalVolunteers }} Voluntarios • {{ generalStats.totalReviewers }} Revisores
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Total Tasks -->
+      <p-card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
+        <div class="text-center">
+          <i class="pi pi-list text-3xl mb-3 opacity-80"></i>
+          <div class="text-3xl font-bold mb-2">{{ generalStats.totalTasks }}</div>
+          <div class="text-sm opacity-90">Total Tareas</div>
+          <div class="text-xs mt-1 opacity-75">
+            {{ generalStats.averageTasksPerUser }} promedio por usuario
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Success Rate -->
+      <p-card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+        <div class="text-center">
+          <i class="pi pi-chart-line text-3xl mb-3 opacity-80"></i>
+          <div class="text-3xl font-bold mb-2">{{ generalStats.overallSuccessRate }}%</div>
+          <div class="text-sm opacity-90">Tasa de Éxito Global</div>
+          <p-progressBar 
+            [value]="generalStats.overallSuccessRate" 
+            [showValue]="false"
+            styleClass="mt-2 h-2">
+          </p-progressBar>
+        </div>
+      </p-card>
+
+      <!-- Priority Tasks -->
+      <p-card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+        <div class="text-center">
+          <i class="pi pi-star text-3xl mb-3 opacity-80"></i>
+          <div class="text-3xl font-bold mb-2">{{ generalStats.priorityTasksCompleted }}</div>
+          <div class="text-sm opacity-90">Tareas Prioritarias</div>
+          <div class="text-xs mt-1 opacity-75">Completadas exitosamente</div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Task Distribution Chart -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <p-card class="h-full">
+        <ng-template pTemplate="header">
+          <div class="p-4">
+            <h3 class="text-xl font-semibold text-gray-800">Distribución de Tareas</h3>
+          </div>
+        </ng-template>
+        <div class="flex flex-col justify-center items-center h-full min-h-[320px]">
+          <p-chart type="doughnut" [data]="chartData" [options]="chartOptions" class="w-full max-w-xs"></p-chart>
+          <div class="mt-4 text-center">
+            <p class="text-sm text-gray-600 mb-2">Total de tareas en el sistema</p>
+            <p class="text-2xl font-bold text-blue-600">{{ generalStats.totalTasks }}</p>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card class="h-full">
+        <ng-template pTemplate="header">
+          <div class="p-4">
+            <h3 class="text-xl font-semibold text-gray-800">Resumen por Estado</h3>
+          </div>
+        </ng-template>
+        <div class="space-y-6 h-full flex flex-col justify-center min-h-[320px] py-4">
+          <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+            <div class="flex items-center">
+              <i class="pi pi-check-circle text-green-600 mr-3"></i>
+              <span class="font-medium text-green-800">Completadas</span>
+            </div>
+            <span class="text-2xl font-bold text-green-600">{{ generalStats.completedTasks }}</span>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-emerald-50 rounded-lg">
+            <div class="flex items-center">
+              <i class="pi pi-verified text-emerald-600 mr-3"></i>
+              <span class="font-medium text-emerald-800">Aprobadas</span>
+            </div>
+            <span class="text-2xl font-bold text-emerald-600">{{ generalStats.approvedTasks }}</span>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+            <div class="flex items-center">
+              <i class="pi pi-clock text-yellow-600 mr-3"></i>
+              <span class="font-medium text-yellow-800">En Progreso</span>
+            </div>
+            <span class="text-2xl font-bold text-yellow-600">{{ generalStats.inProgressTasks }}</span>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+            <div class="flex items-center">
+              <i class="pi pi-times-circle text-red-600 mr-3"></i>
+              <span class="font-medium text-red-800">Denegadas</span>
+            </div>
+            <span class="text-2xl font-bold text-red-600">{{ generalStats.deniedTasks }}</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Volunteers Table -->
+    <p-card class="mb-6">
+      <ng-template pTemplate="header">
+        <div class="p-4">
+          <h3 class="text-xl font-semibold text-gray-800">Estadísticas de Voluntarios</h3>
+        </div>
+      </ng-template>
+      
+      <p-table [value]="volunteers" [paginator]="true" [rows]="10" [responsive]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fullName">Nombre <p-sortIcon field="fullName"></p-sortIcon></th>
+            <th pSortableColumn="totalTasks">Total Tareas <p-sortIcon field="totalTasks"></p-sortIcon></th>
+            <th pSortableColumn="tasksCompleted">Completadas <p-sortIcon field="tasksCompleted"></p-sortIcon></th>
+            <th pSortableColumn="tasksApproved">Aprobadas <p-sortIcon field="tasksApproved"></p-sortIcon></th>
+            <th pSortableColumn="successRate">Tasa de Éxito <p-sortIcon field="successRate"></p-sortIcon></th>
+            <th pSortableColumn="averageCompletionTime">Tiempo Promedio <p-sortIcon field="averageCompletionTime"></p-sortIcon></th>
+            <th pSortableColumn="priorityTasksCompleted">Prioritarias <p-sortIcon field="priorityTasksCompleted"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-volunteer>
+          <tr>
+            <td>{{ volunteer.fullName }}</td>
+            <td>{{ volunteer.totalTasks }}</td>
+            <td>{{ volunteer.tasksCompleted }}</td>
+            <td>{{ volunteer.tasksApproved }}</td>
+            <td>
+              <p-tag 
+                [value]="volunteer.successRate + '%'" 
+                [severity]="getSuccessRateSeverity(volunteer.successRate)">
+              </p-tag>
+            </td>
+            <td>{{ volunteer.averageCompletionTime }} días</td>
+            <td>{{ volunteer.priorityTasksCompleted }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center py-4 text-gray-500">
+              No hay voluntarios registrados
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+
+    <!-- Reviewers Table -->
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="p-4">
+          <h3 class="text-xl font-semibold text-gray-800">Estadísticas de Revisores</h3>
+        </div>
+      </ng-template>
+      
+      <p-table [value]="reviewers" [paginator]="true" [rows]="10" [responsive]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fullName">Nombre <p-sortIcon field="fullName"></p-sortIcon></th>
+            <th pSortableColumn="totalTasks">Total Tareas <p-sortIcon field="totalTasks"></p-sortIcon></th>
+            <th pSortableColumn="tasksCompleted">Completadas <p-sortIcon field="tasksCompleted"></p-sortIcon></th>
+            <th pSortableColumn="tasksApproved">Aprobadas <p-sortIcon field="tasksApproved"></p-sortIcon></th>
+            <th pSortableColumn="successRate">Tasa de Éxito <p-sortIcon field="successRate"></p-sortIcon></th>
+            <th pSortableColumn="averageCompletionTime">Tiempo Promedio <p-sortIcon field="averageCompletionTime"></p-sortIcon></th>
+            <th pSortableColumn="priorityTasksCompleted">Prioritarias <p-sortIcon field="priorityTasksCompleted"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-reviewer>
+          <tr>
+            <td>{{ reviewer.fullName }}</td>
+            <td>{{ reviewer.totalTasks }}</td>
+            <td>{{ reviewer.tasksCompleted }}</td>
+            <td>{{ reviewer.tasksApproved }}</td>
+            <td>
+              <p-tag 
+                [value]="reviewer.successRate + '%'" 
+                [severity]="getSuccessRateSeverity(reviewer.successRate)">
+              </p-tag>
+            </td>
+            <td>{{ reviewer.averageCompletionTime }} días</td>
+            <td>{{ reviewer.priorityTasksCompleted }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center py-4 text-gray-500">
+              No hay revisores registrados
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+</div>

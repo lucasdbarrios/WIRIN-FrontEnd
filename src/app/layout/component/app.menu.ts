@@ -36,6 +36,7 @@ export class AppMenu {
                         { label: 'Tareas', icon: 'pi pi-fw pi-list', routerLink: ['/wirin/tasks'] },
                     ...(this.isBibliotecario ? [{ label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/wirin/users'] }] : []),
                     ...(this.isBibliotecario || this.isVoluntario ? [{ label: 'Ranking Voluntarios', icon: 'pi pi-fw pi-chart-line', routerLink: ['/wirin/volunteer-ranking'] }] : []),
+                    ...(this.isBibliotecario ? [{ label: 'Estadísticas Generales', icon: 'pi pi-fw pi-chart-pie', routerLink: ['/wirin/general-stats'] }] : []),
                     ...(this.isVoluntario ? [{ label: 'Mis tareas', icon: 'pi pi-fw pi-clipboard', routerLink: ['/wirin/tasks-voluntario'] }] : []),
                     ...(this.isVoluntario ? [{ label: 'Mis Estadísticas', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/wirin/volunteer-stats'] }] : []),
                     // ...(this.isBibliotecario ? [{ label: 'Entregas', icon: 'pi pi-fw pi-send', routerLink: ['/wirin/deliveries'] }] : []),
