@@ -2,10 +2,10 @@
     <ng-template pTemplate="content">
         <div class="flex justify-between mb-3">
             <p-button [label]="showAnnotation ? 'Ocultar Anotación' : 'Mostrar anotaciones'"
-                (click)="onShowAnnotation()" class="p-button-secondary">
+                (click)="onShowAnnotation()" severity="help">
             </p-button>
             <p-button [label]="showPdfPreview ? 'Ocultar PDF' : 'Mostrar PDF'" (click)="togglePdfPreview()"
-                class="p-button-secondary">
+                severity="help">
             </p-button>
         </div>
         <p-panel header="Texto Procesado por el OCR:" [style]="{ minHeight: '400px', maxHeight: '75vh' }"
@@ -27,31 +27,28 @@
             </div>
 
             <!-- Advertencia de baja confianza -->
-            <div *ngIf="checkLowConfidence()" class="p-3 mb-4 bg-yellow-100 text-yellow-800 border border-yellow-400 rounded">
+            <div *ngIf="checkLowConfidence()"
+                class="p-3 mb-4 bg-yellow-100 text-yellow-800 border border-yellow-400 rounded">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <i class="pi pi-exclamation-triangle mr-2"></i>
-                        <p><strong>Advertencia:<br/></strong> La confianza del OCR es menor al 70%.<br/> Se recomienda utilizar un OCR externo para mejorar la precisión del texto.</p>
+                        <p><strong>Advertencia:<br /></strong> La confianza del OCR es menor al 70%.<br /> Se recomienda
+                            utilizar un OCR externo para mejorar la precisión del texto.</p>
                     </div>
-                    <p-button icon="pi pi-download" styleClass="p-button-warning" (click)="downloadPdf()" pTooltip="Descargar PDF"></p-button>
+                    <p-button icon="pi pi-download" styleClass="p-button-warning" (click)="downloadPdf()"
+                        pTooltip="Descargar PDF"></p-button>
                 </div>
             </div>
 
             <ng-container *ngIf="!isEditing">
                 <!-- Reemplazar el div de texto plano con TinyMCE en modo solo lectura -->
-                <editor 
-                    [ngModel]="currentPageText" 
-                    [init]="tinyMceViewConfig" 
-                    class="w-full mt-2"
+                <editor [ngModel]="currentPageText" [init]="tinyMceViewConfig" class="w-full mt-2"
                     [style]="{ 'min-height': '250px', 'max-height': '250px' }">
                 </editor>
             </ng-container>
 
             <ng-container *ngIf="isEditing">
-                <editor 
-                    [(ngModel)]="editingText" 
-                    [init]="tinyMceConfig" 
-                    class="w-full mt-2"
+                <editor [(ngModel)]="editingText" [init]="tinyMceConfig" class="w-full mt-2"
                     [style]="{ 'min-height': '250px' }">
                 </editor>
                 <div class="flex justify-end gap-4 mt-3">
@@ -66,9 +63,8 @@
     <ng-template pTemplate="footer">
 
         <div class="flex justify-end mt-3 gap-2">
-            <p-button label="Editar texto" class="p-button-primary" *ngIf="!isEditing"
-                (click)="onStartEditing()"></p-button>
-            <p-button label="Hacer anotación" class="p-button-primary" *ngIf="!isEditing && !isVoluntario"
+            <p-button label="Editar texto" severity="warn" *ngIf="!isEditing" (click)="onStartEditing()"></p-button>
+            <p-button label="Hacer anotación" *ngIf="!isEditing && !isVoluntario"
                 (click)="onStartAnnotation()"></p-button>
         </div>
 

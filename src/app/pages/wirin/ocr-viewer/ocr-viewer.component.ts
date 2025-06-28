@@ -138,13 +138,13 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
 confirmDenegarResultado(): void {
   this.confirmationService.confirm({
     message: '¿Estás seguro de que quieres denegar el resultado?',
+    acceptLabel: 'Sí',
+    rejectLabel: 'No',
     accept: () => {
       this.denegarResultado();
     }
   });
 }
-
-
 
 saveDocProcesed(pages: OcrPage[]): void {
   for (const page of pages) {

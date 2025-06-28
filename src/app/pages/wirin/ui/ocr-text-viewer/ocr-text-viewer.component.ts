@@ -163,6 +163,13 @@ export class OcrTextViewerComponent {
     getCurrentPage(): OcrPage | undefined {
         if (!this.ocrData) return undefined;
         var ocr = this.ocrData.pages.find((page: OcrPage) => page.number === this.currentPage);
+        if (!ocr) return undefined;
+
+        var text = ocr?.text || '';
+
+        ocr.words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+        ocr.characters = text.length;
+
         return ocr;
     }
 

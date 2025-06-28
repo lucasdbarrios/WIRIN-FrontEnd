@@ -56,7 +56,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
         this.orderDeliveryService.getOrderDeliveriesWithOrders().subscribe({
             next: (response) => {
-                console.log(response);
                 this.projects = response;
                 this.getFilterTasksByStatus(this.projects);
                 this.isLoading = false;

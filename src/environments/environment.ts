@@ -3,6 +3,8 @@
 // La lista de reemplazos de archivos se puede encontrar en angular.json.
 
 export const environment = {
+    // production: true,
+    // apiUrl: 'https://api.wirinadapta.com.ar/api'
     production: false,
     apiUrl: 'https://localhost:44342/api'
   };
