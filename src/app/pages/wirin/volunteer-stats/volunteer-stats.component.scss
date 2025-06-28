@@ -1,0 +1,116 @@
+.volunteer-stats-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .p-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .p-progressbar {
+    &.success .p-progressbar-value {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    &.warning .p-progressbar-value {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    &.danger .p-progressbar-value {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+  }
+
+  .grid {
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    
+    .grid {
+      gap: 1rem;
+    }
+
+    .text-4xl {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .text-3xl {
+      font-size: 1.875rem;
+    }
+
+    .text-4xl {
+      font-size: 2rem;
+    }
+
+    .chart-container {
+      height: 300px;
+    }
+  }
+}
+
+// Animaciones para las tarjetas
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.p-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+// Estilos para los iconos de estado
+.pi-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Estilos para las tarjetas de resumen
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+.bg-purple-50 {
+  background-color: #faf5ff;
+}
+
+// Responsive para el gráfico
+.chart-container canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}

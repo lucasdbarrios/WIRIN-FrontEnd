@@ -1,0 +1,158 @@
+<div class="volunteer-stats-container">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Mis Estadísticas</h1>
+    <p-tag 
+      [value]="currentUser?.fullName || 'Voluntario'" 
+      severity="info" 
+      icon="pi pi-user"
+      class="text-lg">
+    </p-tag>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="mb-4">
+    <p-card styleClass="bg-red-50 border-red-200">
+      <div class="flex items-center text-red-700">
+        <i class="pi pi-exclamation-triangle mr-2"></i>
+        <span>{{ error }}</span>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-8">
+    <i class="pi pi-spinner pi-spin text-4xl text-blue-500 mb-4"></i>
+    <p class="text-gray-600">Cargando estadísticas...</p>
+  </div>
+
+  <!-- Stats Content -->
+  <div *ngIf="!loading && !error" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Stats Cards -->
+    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Total Tasks Card -->
+      <p-card header="Tareas Totales" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-blue-600 mb-2">{{ stats.totalTasks }}</div>
+          <p class="text-gray-600">Tareas asignadas</p>
+        </div>
+      </p-card>
+
+      <!-- Completed Tasks Card -->
+      <p-card header="Tareas Completadas" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-green-600 mb-2">{{ stats.completedTasks }}</div>
+          <p class="text-gray-600">Tareas finalizadas</p>
+        </div>
+      </p-card>
+
+      <!-- Approved Tasks Card -->
+      <p-card header="Tareas Aprobadas" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-emerald-600 mb-2">{{ stats.approvedTasks }}</div>
+          <p class="text-gray-600">Tareas aprobadas</p>
+        </div>
+      </p-card>
+
+      <!-- Success Rate Card -->
+      <p-card header="Tasa de Éxito" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold mb-2" [ngClass]="{
+            'text-green-600': stats.successRate >= 80,
+            'text-yellow-600': stats.successRate >= 60 && stats.successRate < 80,
+            'text-red-600': stats.successRate < 60
+          }">{{ stats.successRate }}%</div>
+          <p-progressBar 
+            [value]="stats.successRate" 
+            [style]="{'height': '8px'}"
+            [styleClass]="getSuccessRateColor()">
+          </p-progressBar>
+          <p class="text-gray-600 mt-2">Aprobación vs Completadas</p>
+        </div>
+      </p-card>
+
+      <!-- In Progress Tasks Card -->
+      <p-card header="En Progreso" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-orange-600 mb-2">{{ stats.inProgressTasks }}</div>
+          <p class="text-gray-600">Tareas activas</p>
+        </div>
+      </p-card>
+
+      <!-- Priority Tasks Card -->
+      <p-card header="Tareas Prioritarias" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-purple-600 mb-2">{{ stats.priorityTasks }}</div>
+          <p class="text-gray-600">Completadas a tiempo</p>
+        </div>
+      </p-card>
+
+      <!-- Average Time Card -->
+      <p-card header="Tiempo Promedio" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-indigo-600 mb-2">{{ stats.averageCompletionTime }}</div>
+          <p class="text-gray-600">Días por tarea</p>
+        </div>
+      </p-card>
+
+      <!-- Denied Tasks Card -->
+      <p-card header="Tareas Denegadas" styleClass="h-full">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-red-600 mb-2">{{ stats.deniedTasks }}</div>
+          <p class="text-gray-600">Tareas rechazadas</p>
+        </div>
+      </p-card>
+
+    </div>
+
+    <!-- Chart Section -->
+    <div class="lg:col-span-1">
+      <p-card header="Distribución de Tareas" styleClass="h-full">
+        <div class="chart-container" style="height: 400px;">
+          <p-chart 
+            type="doughnut" 
+            [data]="chartData" 
+            [options]="chartOptions"
+            [style]="{'height': '100%'}">
+          </p-chart>
+        </div>
+      </p-card>
+    </div>
+
+  </div>
+
+  <!-- Performance Summary -->
+  <div *ngIf="!loading && !error" class="mt-6">
+    <p-card header="Resumen de Rendimiento">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <div class="text-center p-4 bg-blue-50 rounded-lg">
+          <i class="pi pi-chart-line text-3xl text-blue-600 mb-2"></i>
+          <h3 class="font-semibold text-blue-800">Productividad</h3>
+          <p class="text-sm text-blue-600 mt-1">
+            {{ stats.completedTasks }} de {{ stats.totalTasks }} tareas completadas
+          </p>
+        </div>
+
+        <div class="text-center p-4 bg-green-50 rounded-lg">
+          <i class="pi pi-check-circle text-3xl text-green-600 mb-2"></i>
+          <h3 class="font-semibold text-green-800">Calidad</h3>
+          <p class="text-sm text-green-600 mt-1">
+            {{ stats.successRate }}% de tasa de aprobación
+          </p>
+        </div>
+
+        <div class="text-center p-4 bg-purple-50 rounded-lg">
+          <i class="pi pi-clock text-3xl text-purple-600 mb-2"></i>
+          <h3 class="font-semibold text-purple-800">Eficiencia</h3>
+          <p class="text-sm text-purple-600 mt-1">
+            {{ stats.averageCompletionTime }} días promedio por tarea
+          </p>
+        </div>
+
+      </div>
+    </p-card>
+  </div>
+
+</div>

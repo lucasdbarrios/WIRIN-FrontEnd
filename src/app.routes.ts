@@ -22,6 +22,7 @@ import { AutoRefreshExampleComponent } from './app/pages/example/auto-refresh-ex
 import { DashboardComponent } from './app/pages/wirin/dashboard/dashboard.component';
 import { GmailStyleComponent } from './app/pages/wirin/message/message-inbox.component';
 import { VolunteerRankingComponent } from './app/pages/wirin/volunteer-ranking/volunteer-ranking.component';
+import { VolunteerStatsComponent } from './app/pages/wirin/volunteer-stats/volunteer-stats.component';
 
 export const appRoutes: Routes = [
     {
@@ -59,6 +60,7 @@ export const appRoutes: Routes = [
             { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
             { path: 'messages', component: GmailStyleComponent, canActivate: [AuthGuard] },
             { path: 'volunteer-ranking', component: VolunteerRankingComponent, canActivate: [AuthGuard] },
+            { path: 'volunteer-stats', component: VolunteerStatsComponent, canActivate: [AuthGuard] },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
