@@ -70,6 +70,33 @@ export class MessageService {
   getSentMessages(): Observable<Message[]> {
     return this.getMessagesByFolder(MessageFolder.SENT);
   }
+
+  /**
+   * Obtiene todas las conversaciones del usuario actual
+   * @returns Observable con la lista de todas las conversaciones
+   */
+  getAllConversations(): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.apiUrl}/conversations`, this.authService.getHeaders());
+  }
+
+  /**
+   * Obtiene la conversación entre el usuario actual y otro usuario específico
+   * @param otherUserId ID del otro usuario
+   * @returns Observable con la lista de mensajes de la conversación
+   */
+  getConversationWithUser(otherUserId: string): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.apiUrl}/conversation/${otherUserId}`, this.authService.getHeaders());
+  }
+
+  /**
+   * Obtiene los mensajes de conversación entre dos usuarios específicos
+   * @param currentUserId ID del usuario actual
+   * @param otherUserId ID del otro usuario
+   * @returns Observable con la lista de mensajes de la conversación
+   */
+  getConversationMessages(currentUserId: string, otherUserId: string): Observable<Message[]> {
+    return this.getConversationWithUser(otherUserId);
+  }
   
   /**
    * Obtiene todos los mensajes asociados a un usuario
@@ -228,4 +255,5 @@ export class MessageService {
   markAsResponded(messageId: number): Observable<any> {
     return this.updateMessageStatus(messageId, MessageUpdateType.RESPOND);
   }
+
 }
