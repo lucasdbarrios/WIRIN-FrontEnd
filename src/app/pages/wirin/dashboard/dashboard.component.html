@@ -41,7 +41,8 @@
                 aria-label="Cargando..."></div>
             <span>Cargando datos</span>
         </div>
-        <p-table class="h-full" *ngIf="!isLoading" [value]="projects" [scrollable]="true" scrollHeight="400px">
+        <p-table class="rounded-lg overflow-hidden shadow" *ngIf="!isLoading" [value]="projects" [scrollable]="true"
+            scrollHeight="420px">
             <ng-template pTemplate="header">
                 <tr>
                     <th>Bibliografias</th>

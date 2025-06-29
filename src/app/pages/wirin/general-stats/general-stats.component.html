@@ -6,18 +6,10 @@
       <p class="text-gray-600">Vista general del rendimiento de voluntarios y revisores</p>
     </div>
     <div class="flex gap-3">
-      <p-button 
-        label="Actualizar" 
-        icon="pi pi-refresh" 
-        (onClick)="refreshStats()"
-        [loading]="isLoading"
+      <p-button label="Actualizar" icon="pi pi-refresh" (onClick)="refreshStats()" [loading]="isLoading"
         severity="secondary">
       </p-button>
-      <p-button 
-        label="Exportar" 
-        icon="pi pi-download" 
-        (onClick)="exportData()"
-        severity="info">
+      <p-button label="Exportar" icon="pi pi-download" (onClick)="exportData()" severity="info">
       </p-button>
     </div>
   </div>
@@ -37,13 +29,13 @@
 
   <!-- Stats Content -->
   <div *ngIf="!isLoading && !errorMessage">
-    
+
     <!-- General Overview Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Total Users -->
-      <p-card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+      <p-card class="bg-gradient-to-r text-white">
         <div class="text-center">
-          <i class="pi pi-users text-3xl mb-3 opacity-80"></i>
+          <i class="pi pi-users mb-3 opacity-80 !text-[25px]"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.totalVolunteers + generalStats.totalReviewers }}</div>
           <div class="text-sm opacity-90">Total Usuarios</div>
           <div class="text-xs mt-1 opacity-75">
@@ -53,9 +45,9 @@
       </p-card>
 
       <!-- Total Tasks -->
-      <p-card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
+      <p-card class="bg-gradient-to-r text-white">
         <div class="text-center">
-          <i class="pi pi-list text-3xl mb-3 opacity-80"></i>
+          <i class="pi pi-list !text-[25px] mb-3 opacity-80"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.totalTasks }}</div>
           <div class="text-sm opacity-90">Total Tareas</div>
           <div class="text-xs mt-1 opacity-75">
@@ -65,23 +57,20 @@
       </p-card>
 
       <!-- Success Rate -->
-      <p-card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+      <p-card class="bg-gradient-to-r text-white">
         <div class="text-center">
-          <i class="pi pi-chart-line text-3xl mb-3 opacity-80"></i>
+          <i class="pi pi-chart-line !text-[25px] mb-3 opacity-80"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.overallSuccessRate }}%</div>
           <div class="text-sm opacity-90">Tasa de Éxito Global</div>
-          <p-progressBar 
-            [value]="generalStats.overallSuccessRate" 
-            [showValue]="false"
-            styleClass="mt-2 h-2">
+          <p-progressBar [value]="generalStats.overallSuccessRate" [showValue]="false" styleClass="mt-2 h-2">
           </p-progressBar>
         </div>
       </p-card>
 
       <!-- Priority Tasks -->
-      <p-card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+      <p-card class="bg-gradient-to-r text-white">
         <div class="text-center">
-          <i class="pi pi-star text-3xl mb-3 opacity-80"></i>
+          <i class="pi pi-star !text-[25px] mb-3 opacity-80"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.priorityTasksCompleted }}</div>
           <div class="text-sm opacity-90">Tareas Prioritarias</div>
           <div class="text-xs mt-1 opacity-75">Completadas exitosamente</div>
@@ -120,7 +109,7 @@
             </div>
             <span class="text-2xl font-bold text-green-600">{{ generalStats.completedTasks }}</span>
           </div>
-          
+
           <div class="flex justify-between items-center p-3 bg-emerald-50 rounded-lg">
             <div class="flex items-center">
               <i class="pi pi-verified text-emerald-600 mr-3"></i>
@@ -128,7 +117,7 @@
             </div>
             <span class="text-2xl font-bold text-emerald-600">{{ generalStats.approvedTasks }}</span>
           </div>
-          
+
           <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
             <div class="flex items-center">
               <i class="pi pi-clock text-yellow-600 mr-3"></i>
@@ -136,7 +125,7 @@
             </div>
             <span class="text-2xl font-bold text-yellow-600">{{ generalStats.inProgressTasks }}</span>
           </div>
-          
+
           <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
             <div class="flex items-center">
               <i class="pi pi-times-circle text-red-600 mr-3"></i>
@@ -155,7 +144,7 @@
           <h3 class="text-xl font-semibold text-gray-800">Estadísticas de Voluntarios</h3>
         </div>
       </ng-template>
-      
+
       <p-table [value]="volunteers" [paginator]="true" [rows]="10" [responsive]="true">
         <ng-template pTemplate="header">
           <tr>
@@ -164,8 +153,10 @@
             <th pSortableColumn="tasksCompleted">Completadas <p-sortIcon field="tasksCompleted"></p-sortIcon></th>
             <th pSortableColumn="tasksApproved">Aprobadas <p-sortIcon field="tasksApproved"></p-sortIcon></th>
             <th pSortableColumn="successRate">Tasa de Éxito <p-sortIcon field="successRate"></p-sortIcon></th>
-            <th pSortableColumn="averageCompletionTime">Tiempo Promedio <p-sortIcon field="averageCompletionTime"></p-sortIcon></th>
-            <th pSortableColumn="priorityTasksCompleted">Prioritarias <p-sortIcon field="priorityTasksCompleted"></p-sortIcon></th>
+            <th pSortableColumn="averageCompletionTime">Tiempo Promedio <p-sortIcon
+                field="averageCompletionTime"></p-sortIcon></th>
+            <th pSortableColumn="priorityTasksCompleted">Prioritarias <p-sortIcon
+                field="priorityTasksCompleted"></p-sortIcon></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-volunteer>
@@ -175,9 +166,7 @@
             <td>{{ volunteer.tasksCompleted }}</td>
             <td>{{ volunteer.tasksApproved }}</td>
             <td>
-              <p-tag 
-                [value]="volunteer.successRate + '%'" 
-                [severity]="getSuccessRateSeverity(volunteer.successRate)">
+              <p-tag [value]="volunteer.successRate + '%'" [severity]="getSuccessRateSeverity(volunteer.successRate)">
               </p-tag>
             </td>
             <td>{{ volunteer.averageCompletionTime }} días</td>
@@ -201,7 +190,7 @@
           <h3 class="text-xl font-semibold text-gray-800">Estadísticas de Revisores</h3>
         </div>
       </ng-template>
-      
+
       <p-table [value]="reviewers" [paginator]="true" [rows]="10" [responsive]="true">
         <ng-template pTemplate="header">
           <tr>
@@ -210,8 +199,10 @@
             <th pSortableColumn="tasksCompleted">Completadas <p-sortIcon field="tasksCompleted"></p-sortIcon></th>
             <th pSortableColumn="tasksApproved">Aprobadas <p-sortIcon field="tasksApproved"></p-sortIcon></th>
             <th pSortableColumn="successRate">Tasa de Éxito <p-sortIcon field="successRate"></p-sortIcon></th>
-            <th pSortableColumn="averageCompletionTime">Tiempo Promedio <p-sortIcon field="averageCompletionTime"></p-sortIcon></th>
-            <th pSortableColumn="priorityTasksCompleted">Prioritarias <p-sortIcon field="priorityTasksCompleted"></p-sortIcon></th>
+            <th pSortableColumn="averageCompletionTime">Tiempo Promedio <p-sortIcon
+                field="averageCompletionTime"></p-sortIcon></th>
+            <th pSortableColumn="priorityTasksCompleted">Prioritarias <p-sortIcon
+                field="priorityTasksCompleted"></p-sortIcon></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-reviewer>
@@ -221,9 +212,7 @@
             <td>{{ reviewer.tasksCompleted }}</td>
             <td>{{ reviewer.tasksApproved }}</td>
             <td>
-              <p-tag 
-                [value]="reviewer.successRate + '%'" 
-                [severity]="getSuccessRateSeverity(reviewer.successRate)">
+              <p-tag [value]="reviewer.successRate + '%'" [severity]="getSuccessRateSeverity(reviewer.successRate)">
               </p-tag>
             </td>
             <td>{{ reviewer.averageCompletionTime }} días</td>
