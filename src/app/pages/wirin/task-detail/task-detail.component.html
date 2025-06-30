@@ -27,7 +27,7 @@
             <div><strong>Rango de páginas:</strong> {{ task.rangePage }}</div>
             <div><strong>Prioridad:</strong> {{ task.isPriority ? 'Alta' : 'Normal' }}</div>
             <div><strong>Estado:</strong>
-                <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task).toUpperCase()"></p-tag>
+                <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task.status)"></p-tag>
             </div>
             <div><strong>Vencimiento:</strong> {{ task.limitDate | date:'dd/MM/yyyy' }}</div>
             <div><strong>Fecha de creación:</strong> {{ task.creationDate | date:'dd/MM/yyyy' }}</div>
