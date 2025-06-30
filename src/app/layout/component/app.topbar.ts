@@ -54,9 +54,8 @@ import { BadgeModule } from 'primeng/badge';
                     </button>
                     <button type="button" class="layout-topbar-action" (click)="router.navigate(['/wirin/messages'])" style="position: relative;">
                         <i class="pi pi-inbox"></i>
-                        <span class="p-badge p-badge-danger p-badge-dot" 
-                              *ngIf="unreadMessagesCount > 0" 
-                              style="position: absolute; top: -5px; right: 8px; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">
+                        <span *ngIf="unreadMessagesCount > 0" 
+                              style="position: absolute; top: -5px; right: 8px; background-color: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 1002;">
                             {{ unreadMessagesCount }}
                         </span>
                         <span>Messages</span>
