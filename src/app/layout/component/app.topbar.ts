@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -11,11 +11,13 @@ import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { OrderService } from '../../services/order/order.service';
 import { TagModule } from 'primeng/tag';
+import { MessageService } from '../../services/message/message.service';
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TagModule, CalendarModule, OverlayPanelModule, FormsModule],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TagModule, CalendarModule, OverlayPanelModule, FormsModule, BadgeModule],
     template: ` <div class="layout-topbar" style="display: flex; align-items: center; justify-content: center;">
     <div class="layout-topbar-logo-container" style="position: absolute; left: 1rem;">
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -50,8 +52,13 @@ import { TagModule } from 'primeng/tag';
                         <i class="pi pi-calendar"></i>
                         <span>Calendar</span>
                     </button>
-                    <button type="button" class="layout-topbar-action" (click)="router.navigate(['/wirin/messages'])">
+                    <button type="button" class="layout-topbar-action" (click)="router.navigate(['/wirin/messages'])" style="position: relative;">
                         <i class="pi pi-inbox"></i>
+                        <span class="p-badge p-badge-danger p-badge-dot" 
+                              *ngIf="unreadMessagesCount > 0" 
+                              style="position: absolute; top: -5px; right: 8px; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">
+                            {{ unreadMessagesCount }}
+                        </span>
                         <span>Messages</span>
                     </button>
                     <button type="button" class="layout-topbar-action" (click)="goToProfile()">
@@ -210,13 +217,14 @@ import { TagModule } from 'primeng/tag';
         </div>
     </p-overlayPanel>`
 })
-export class AppTopbar implements OnDestroy {
+export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
     userRoles: string[] = [];
     selectedDate: Date | null = null;
     tasks: any[] = [];
     currentCalendarMonth: number = new Date().getMonth();
     currentCalendarYear: number = new Date().getFullYear();
+    unreadMessagesCount: number = 0;
     
     // Propiedades para la optimización
     private updateTimeout: any = null;
@@ -231,6 +239,10 @@ export class AppTopbar implements OnDestroy {
     private taskIndicatorsCache: Map<string, number> = new Map();
     private readonly INDICATORS_CACHE_KEY = 'wirin_calendar_indicators';
     private calendarObserver?: MutationObserver;
+    
+    // Propiedades para polling de mensajes
+    private unreadMessagesInterval: any = null;
+    private readonly UNREAD_MESSAGES_POLL_INTERVAL = 30000; // 30 segundos
     
     // Configuración de idioma español para el calendario
     esLocale = {
@@ -248,10 +260,17 @@ export class AppTopbar implements OnDestroy {
         public layoutService: LayoutService,
         public router: Router,
         private authService: AuthService,
-        private orderService: OrderService
+        private orderService: OrderService,
+        private messageService: MessageService
     ) {
         this.userRoles = this.authService.getCurrentUserRole() || [];
         this.loadTasks();
+    }
+
+    ngOnInit() {
+        // Cargar mensajes no leídos después de que el componente esté inicializado
+        this.loadUnreadMessagesCount();
+        this.startUnreadMessagesPolling();
     }
 
     toggleDarkMode() {
@@ -362,6 +381,7 @@ export class AppTopbar implements OnDestroy {
         this.clearTasksCache();
         localStorage.removeItem(this.INDICATORS_CACHE_KEY);
         this.taskIndicatorsCache.clear();
+        this.stopUnreadMessagesPolling();
         this.authService.logout();
     }
     
@@ -646,9 +666,45 @@ export class AppTopbar implements OnDestroy {
         }, 1000);
     }
     
+    // Métodos para manejar mensajes no leídos
+    private loadUnreadMessagesCount(): void {
+        this.messageService.getReceivedMessages().subscribe({
+            next: (messages) => {
+                const unreadMessages = messages.filter(msg => {
+                    const isNotRead = msg.isRead === false || msg.isRead === undefined || msg.isRead === null;
+                    const isNotDeleted = msg.deleted === false || msg.deleted === undefined || msg.deleted === null;
+                    return isNotRead && isNotDeleted;
+                });
+                this.unreadMessagesCount = unreadMessages.length;
+            },
+            error: (error) => {
+                console.error('Error al cargar mensajes no leídos:', error);
+                this.unreadMessagesCount = 0;
+            }
+        });
+    }
+    
+    private startUnreadMessagesPolling(): void {
+        // Limpiar cualquier polling anterior
+        this.stopUnreadMessagesPolling();
+        
+        // Iniciar nuevo polling
+        this.unreadMessagesInterval = setInterval(() => {
+            this.loadUnreadMessagesCount();
+        }, this.UNREAD_MESSAGES_POLL_INTERVAL);
+    }
+    
+    private stopUnreadMessagesPolling(): void {
+        if (this.unreadMessagesInterval) {
+            clearInterval(this.unreadMessagesInterval);
+            this.unreadMessagesInterval = null;
+        }
+    }
+
     ngOnDestroy() {
         if (this.calendarObserver) {
             this.calendarObserver.disconnect();
         }
+        this.stopUnreadMessagesPolling();
     }
 }
