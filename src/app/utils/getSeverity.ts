@@ -1,16 +1,20 @@
 export const getSeverity = (state: string): string => {
     switch (state) {
         case 'En Proceso':
+        case 'EN PROCESO':
             return 'help';
         case 'En Revisión':
+        case 'EN REVISIÓN':
             return 'warn';
         case 'Completada':
-            return 'success';
+        case 'COMPLETADA':
         case 'Aprobada':
-            return 'success';
+        case 'APROBADA':
         case 'Entregado':
+        case 'ENTREGADO':
             return 'success';
         case 'Denegada':
+        case 'DENEGADA':
             return 'danger';
         default:
             return 'info';

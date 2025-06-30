@@ -13,6 +13,7 @@ import { OrderService } from '../../services/order/order.service';
 import { TagModule } from 'primeng/tag';
 import { MessageService } from '../../services/message/message.service';
 import { BadgeModule } from 'primeng/badge';
+import { getSeverity } from '../../utils/getSeverity';
 
 @Component({
     selector: 'app-topbar',
@@ -23,7 +24,7 @@ import { BadgeModule } from 'primeng/badge';
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
-        <div class="flex gap-2 hidden xs:hidden md:flex sm:flex lg:flex">
+        <div class="flex gap-2 xs:hidden md:flex sm:flex lg:flex">
             <p-tag *ngFor="let role of userRoles" [value]="role" severity="info"></p-tag>
         </div>
     </div>
@@ -185,7 +186,7 @@ import { BadgeModule } from 'primeng/badge';
                      style="padding: 0.75rem; margin: 0.5rem 0; background-color: #f8f9fa; border-radius: 6px; border-left: 4px solid #007ad9; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="font-weight: bold; font-size: 0.95rem; color: #333; margin-bottom: 0.25rem;">{{ task.name }}</div>
                     <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">
-                        <span style="background-color: #e3f2fd; padding: 2px 6px; border-radius: 3px;">{{ task.status }}</span>
+                        <p-tag [value]="task.status.toUpperCase()" [severity]="getSeverity(task.status)"></p-tag>
                     </div>
                     <div *ngIf="task.assignedUserName" style="font-size: 0.8rem; color: #888;">
                         <i class="pi pi-user" style="margin-right: 4px;"></i>{{ task.assignedUserName }}
@@ -358,6 +359,10 @@ export class AppTopbar implements OnInit, OnDestroy {
             return null;
         }
     }
+
+    getSeverity(status: string): string {
+    return getSeverity(status);
+  }
     
     private clearTasksCache(): void {
         try {
