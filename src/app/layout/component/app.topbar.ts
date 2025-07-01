@@ -13,6 +13,8 @@ import { OrderService } from '../../services/order/order.service';
 import { TagModule } from 'primeng/tag';
 import { MessageService } from '../../services/message/message.service';
 import { BadgeModule } from 'primeng/badge';
+import { ToastService } from '../../services/toast/toast.service';
+import { UserService } from '../../services/user/user.service';
 import { getSeverity } from '../../utils/getSeverity';
 
 @Component({
@@ -225,6 +227,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     currentCalendarMonth: number = new Date().getMonth();
     currentCalendarYear: number = new Date().getFullYear();
     unreadMessagesCount: number = 0;
+    private previousUnreadCount: number = 0;
     
     // Propiedades para la optimización
     private updateTimeout: any = null;
@@ -261,7 +264,9 @@ export class AppTopbar implements OnInit, OnDestroy {
         public router: Router,
         private authService: AuthService,
         private orderService: OrderService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private toastService: ToastService,
+        private userService: UserService
     ) {
         this.userRoles = this.authService.getCurrentUserRole() || [];
         this.loadTasks();
@@ -679,7 +684,31 @@ export class AppTopbar implements OnInit, OnDestroy {
                     const isNotDeleted = msg.deleted === false || msg.deleted === undefined || msg.deleted === null;
                     return isNotRead && isNotDeleted;
                 });
-                this.unreadMessagesCount = unreadMessages.length;
+                
+                const newUnreadCount = unreadMessages.length;
+                
+                // Detectar nuevos mensajes (solo después de la carga inicial)
+                if (this.previousUnreadCount > 0 && newUnreadCount > this.previousUnreadCount) {
+                    const newMessagesCount = newUnreadCount - this.previousUnreadCount;
+                    const latestMessages = unreadMessages.slice(0, newMessagesCount);
+                    
+                    // Mostrar notificación para cada nuevo mensaje
+                    latestMessages.forEach(async (message) => {
+                        try {
+                            const senderFullName = await this.userService.getUserName(message.userFromId);
+                            this.toastService.showSuccess(
+                                `Nuevo mensaje de ${senderFullName}: ${message.subject || 'Sin asunto'}`
+                            );
+                        } catch (error) {
+                            this.toastService.showSuccess(
+                                `Nuevo mensaje de ${message.senderName || 'Usuario'}: ${message.subject || 'Sin asunto'}`
+                            );
+                        }
+                    });
+                }
+                
+                this.previousUnreadCount = this.unreadMessagesCount;
+                this.unreadMessagesCount = newUnreadCount;
             },
             error: (error) => {
                 console.error('Error al cargar mensajes no leídos:', error);
