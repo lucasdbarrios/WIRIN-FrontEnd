@@ -34,6 +34,21 @@
       </div>
     </div>
 
+    <!-- Barra de búsqueda -->
+    <div class="mb-4">
+      <p-toolbar>
+        <ng-template #start>
+          <div style="flex: 1; width: 50%; text-align: center;">
+            <p-iconfield iconPosition="left">
+              <input pInputText type="text" placeholder="Buscar mensajes por asunto o contenido" 
+                     (input)="searchMessages($event)" style="width: 100%; min-width: 300px;" />
+              <p-inputicon class="pi pi-search"></p-inputicon>
+            </p-iconfield>
+          </div>
+        </ng-template>
+      </p-toolbar>
+    </div>
+
     <!-- Tabla de mensajes recibidos - Vista simple estilo Gmail -->
     <div class="card shadow-sm border-round-lg overflow-hidden" *ngIf="activeFolder === 'inbox'">
       <p-table [value]="messages" [paginator]="true" [rows]="10"

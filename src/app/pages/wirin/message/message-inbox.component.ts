@@ -16,6 +16,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { InputIconModule } from 'primeng/inputicon';
+import { IconFieldModule } from 'primeng/iconfield';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
@@ -56,6 +58,8 @@ interface GroupedMessage {
     TextareaModule,
     FileUploadModule,
     InputIconModule,
+    IconFieldModule,
+    ToolbarModule,
     ConfirmDialogModule,
     TooltipModule,
     TabViewModule,
@@ -70,6 +74,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   userId: string = '';
   messages: Message[] = [];
   allMessages: Message[] = [];
+  filteredMessagesBase: Message[] = []; // Para mantener los mensajes filtrados por carpeta
   conversationMessages: Message[] = [];
   groupedSentMessages: GroupedMessage[] = [];
   activeFolder: 'inbox' | 'sent' = 'inbox';
@@ -390,6 +395,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
           
           this.allMessages = msgs;
           const filteredMessages = this.filterByFolder(msgs);
+          this.filteredMessagesBase = filteredMessages;
           this.messages = filteredMessages;
           
           if (this.activeFolder === 'sent') {
@@ -470,6 +476,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
         // Actualizar vista actual si es necesario
         this.allMessages = messages;
         const filteredMessages = this.filterByFolder(messages);
+        this.filteredMessagesBase = filteredMessages;
         this.messages = filteredMessages;
         
         if (this.activeFolder === 'sent') {
@@ -516,6 +523,7 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
   private processLoadedMessages(msgs: Message[]): void {
     this.resetMessageInfo(msgs);
     this.allMessages = msgs;
+    this.filteredMessagesBase = msgs;
     this.messages = msgs;
     
     if (this.activeFolder === 'sent') {
@@ -571,6 +579,21 @@ export class GmailStyleComponent implements OnInit, OnDestroy {
         return all.filter(m => m.userFromId === this.userId && !m.isDraft);
       default:
         return all;
+    }
+  }
+
+  searchMessages(event: Event): void {
+    const query = (event.target as HTMLInputElement).value.toLowerCase();
+    this.messages = this.filteredMessagesBase.filter(message =>
+      message.subject.toLowerCase().includes(query) ||
+      message.content.toLowerCase().includes(query) ||
+      (message.senderName && message.senderName.toLowerCase().includes(query)) ||
+      (message.recipientName && message.recipientName.toLowerCase().includes(query))
+    );
+    
+    // Reagrupar mensajes enviados si es necesario
+    if (this.activeFolder === 'sent') {
+      this.groupedSentMessages = this.groupSentMessagesByRecipient(this.messages);
     }
   }
 
