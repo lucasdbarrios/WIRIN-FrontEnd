@@ -9,7 +9,7 @@
         No hay bibliografias disponibles en este momento.
     </div>
     <p-table *ngIf="!isLoading" #dt2 [value]="projects" [paginator]="true" [rows]="15"
-        [globalFilterFields]="['title', 'status', 'studentUserId']" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }"
+        [globalFilterFields]="['title', 'status', 'studentUserName']" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }"
         [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)">
 
         <ng-template #caption>
@@ -19,7 +19,7 @@
                     <p-inputicon>
                         <i class="pi pi-search"></i>
                     </p-inputicon>
-                    <input pInputText type="text" (input)="onFilter($event)" placeholder="Buscar" />
+                    <input pInputText type="text" (input)="onFilter($event)" placeholder="Buscar por título, estado o alumno" />
                 </p-iconfield>
             </div>
         </ng-template>
