@@ -65,7 +65,7 @@ export class ProyectsComponent implements OnInit {
         private userService: UserService,
     ) {
         this.initializeForms();
-        this.loadUsers();
+        // this.loadUsers();
     }
 
     ngOnInit(): void {
@@ -194,20 +194,20 @@ export class ProyectsComponent implements OnInit {
         this.showConfirmPopup = false;
     }
 
-    private loadUsers() {
-    this.userService.getAllStudents().subscribe({
-        next: (response) => {
-            this.dropdownItemsUsers = response.map((user: any) => ({
-            name: user.fullName,
-            value: user.id
-            }));
-        },
-        error: (error) => {
-            this.toastService.showError('Error al obtener los usuarios');
-            console.error('Error al obtener los usuarios:', error);
-        }
-        });
-    }
+    // private loadUsers() {
+    // this.userService.getAllStudents().subscribe({
+    //     next: (response) => {
+    //         this.dropdownItemsUsers = response.map((user: any) => ({
+    //         name: user.fullName,
+    //         value: user.id
+    //         }));
+    //     },
+    //     error: (error) => {
+    //         this.toastService.showError('Error al obtener los usuarios');
+    //         console.error('Error al obtener los usuarios:', error);
+    //     }
+    //     });
+    // }
 
     confirmEditProject(proyectId: number, event: Event) {
         event.stopPropagation();
