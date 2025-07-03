@@ -16,12 +16,235 @@
     justify-content: start !important;
 }
 
-@media screen and (max-width: 1024px) {
-    .ocr-pdf{
-        display: flex;
+/* OCR Viewer Responsive Styles */
+.ocr-viewer-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ocr-header {
+    flex-shrink: 0;
+    padding: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    background: var(--surface-card);
+}
+
+.ocr-main-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    gap: 1rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Layout cuando solo está el editor */
+.ocr-layout-single {
+    flex-direction: column;
+}
+
+/* Layout cuando está dividido con PDF al lado derecho */
+.ocr-layout-split {
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.ocr-editor-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    transition: all 0.3s ease;
+}
+
+/* Editor ocupando todo el ancho */
+.ocr-editor-full {
+    flex: 1;
+    width: 100%;
+}
+
+/* Editor compartiendo espacio con PDF */
+.ocr-editor-with-pdf {
+    flex: 1.5;
+    min-width: 400px;
+}
+
+.ocr-pdf-section {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* PDF al lado derecho */
+.ocr-pdf-right {
+    flex: 1;
+    min-width: 350px;
+    max-width: 600px;
+    height: fit-content;
+    max-height: calc(100vh - 200px);
+}
+
+.pdf-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pdf-header {
+    padding: 0.75rem 1rem;
+    background: var(--surface-100);
+    border-bottom: 1px solid var(--surface-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.pdf-iframe {
+    flex: 1;
+    border: none;
+    width: 100%;
+    min-height: 400px;
+}
+
+/* OCR Text Panel Styles */
+.ocr-text-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.tinymce-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tinymce-editor {
+    flex: 1;
+    min-height: 400px;
+}
+
+.tinymce-readonly {
+    background-color: var(--surface-50);
+}
+
+.tinymce-editable {
+    background-color: var(--surface-0);
+}
+
+.editor-actions {
+    padding: 1rem;
+    background: var(--surface-100);
+    border-top: 1px solid var(--surface-border);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .ocr-layout-split {
         flex-direction: column;
-        align-items: center;
-        width: 100%;
-        margin-bottom: 2em;
+        gap: 1rem;
     }
+    
+    .ocr-editor-with-pdf {
+        flex: 1;
+        min-width: 0;
+        order: 1;
+    }
+    
+    .ocr-pdf-right {
+        flex: none;
+        order: 2;
+        max-width: none;
+        min-width: 0;
+        max-height: 400px;
+    }
+    
+    .pdf-iframe {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .ocr-main-layout {
+        padding: 0.75rem;
+    }
+    
+    .ocr-layout-split {
+        gap: 0.75rem;
+    }
+    
+    .ocr-editor-with-pdf {
+        min-width: 0;
+    }
+    
+    .ocr-pdf-right {
+        min-width: 0;
+        max-height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .ocr-header {
+        padding: 0.75rem;
+    }
+    
+    .ocr-main-layout {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .editor-actions {
+        padding: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .pdf-iframe {
+        min-height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ocr-header {
+        padding: 0.5rem;
+    }
+    
+    .ocr-main-layout {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .editor-actions {
+        padding: 0.5rem;
+    }
+    
+    .editor-actions .p-button {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Legacy OCR PDF styles for backward compatibility */
+.ocr-pdf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
 }

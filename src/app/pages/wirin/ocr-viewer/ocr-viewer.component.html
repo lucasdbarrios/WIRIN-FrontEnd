@@ -1,10 +1,12 @@
-<div class="container w-3/4 mx-auto mb-4 dark:text-gray-200 flex flex-col min-h-screen">
+<div class="ocr-viewer-container mx-auto mb-4 dark:text-gray-200 flex flex-col min-h-screen">
   <p-confirmDialog header="Confirmación" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-semibold">{{ fileName }}</h2>
+  
+  <!-- Header optimizado para responsive -->
+  <div class="ocr-header flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+    <h2 class="text-xl sm:text-2xl font-semibold truncate max-w-full">{{ fileName }}</h2>
 
-    <div *ngIf="state != 'En Revisión' && state != 'Aprobada'" class="flex gap-4">
-      <p-button label="Finalizar proceso" severity="success" (click)="finalizarProceso()">
+    <div *ngIf="state != 'En Revisión' && state != 'Aprobada'" class="flex gap-2 flex-shrink-0">
+      <p-button label="Finalizar proceso" severity="success" (click)="finalizarProceso()" size="small">
       </p-button>
     </div>
   </div>
@@ -13,17 +15,39 @@
     <p class="text-blue-600 dark:text-blue-300 text-lg">No hay datos OCR disponibles.</p>
   </div>
 
-  <div class="flex flex-col gap-6 lg:flex-row lg:min-h-[70vh] ocr-pdf">
-    <app-ocr-text-viewer [ocrData]="ocrData" [isEditing]="isEditing" [editingText]="editingText"
-      [showPdfPreview]="showPdfPreview" [taskId]="task" [currentPage]="currentPage"
-      (showPdfPreviewChange)="showPdfPreview = $event" (pageChange)="goToPage($event)"
-      (pdfVisibilityChange)="showPdfPreview = $event" class="w-full"
-      [ngClass]="{ 'lg:w-1/2': showPdfPreview, 'lg:w-full': !showPdfPreview }">
-    </app-ocr-text-viewer>
+  <!-- Layout principal optimizado para mostrar PDF al lado derecho -->
+  <div class="ocr-main-layout" [ngClass]="{
+    'ocr-layout-single': !showPdfPreview,
+    'ocr-layout-split': showPdfPreview
+  }">
+    <!-- Editor de texto - Sección principal -->
+    <div class="ocr-editor-section" [ngClass]="{
+      'ocr-editor-full': !showPdfPreview,
+      'ocr-editor-with-pdf': showPdfPreview
+    }">
+      <app-ocr-text-viewer [ocrData]="ocrData" [isEditing]="isEditing" [editingText]="editingText"
+        [showPdfPreview]="showPdfPreview" [taskId]="task" [currentPage]="currentPage"
+        (showPdfPreviewChange)="onPdfVisibilityChange($event)" (pageChange)="goToPage($event)"
+        (pdfVisibilityChange)="onPdfVisibilityChange($event)" class="w-full h-full">
+      </app-ocr-text-viewer>
+    </div>
 
-    <iframe *ngIf="showPdfPreview" [src]="urlSafe" type="application/pdf"
-      class="h-[70vh] border rounded-lg shadow-lg transition-all duration-300 w-full lg:w-1/2">
-    </iframe>
+    <!-- PDF Viewer - Sección al lado derecho -->
+    <div *ngIf="showPdfPreview" class="ocr-pdf-section ocr-pdf-right">
+      <div class="pdf-container">
+        <div class="pdf-header flex justify-between items-center mb-2 p-3 bg-gray-100 dark:bg-gray-800 rounded-t border-b">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Vista previa del PDF</span>
+          <p-button icon="pi pi-times" (click)="onPdfVisibilityChange(false)" 
+                   class="p-button-text p-button-sm" 
+                   severity="secondary"
+                   pTooltip="Cerrar PDF">
+          </p-button>
+        </div>
+        <iframe [src]="urlSafe" type="application/pdf"
+          class="pdf-iframe w-full border-0 rounded-b">
+        </iframe>
+      </div>
+    </div>
   </div>
   <div class="flex justify-center gap-4 mt-6 p-4 border-t" *ngIf="state == 'En Revisión'">
     <p-button label="Denegar resultado" [severity]="'warn'" (click)="confirmDenegarResultado()"></p-button>

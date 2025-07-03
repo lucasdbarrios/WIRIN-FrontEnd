@@ -15,10 +15,10 @@ import { ToastModule } from 'primeng/toast';
 import { ProcessParagraph } from '../../../types/ProcessParagraph.interface';
 import { OrderParagraphService } from '../../../services/order-paragraph/orderParagraph.service';
 import { FileUploadService } from '../../../services/file-upload/file-upload.service';
-import { ToastService } from '../../../services/toast/toast.service';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 import { Subscription } from 'rxjs';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { LayoutService } from '../../../layout/service/layout.service';
 
 
 @Component({
@@ -31,6 +31,7 @@ import { Subscription } from 'rxjs';
 export class OcrViewerComponent implements OnInit, OnDestroy {
   @Input() ocrData: OcrResponse | null = null;
   showPdfPreview: boolean = false;
+  private originalMenuState: boolean = false;
   fileName: any;
   isEditing: boolean = false;
   editingText: string = '';
@@ -57,9 +58,9 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
     public sanitizer: DomSanitizer,
     private fileUploadService: FileUploadService,
     private orderParagraphService: OrderParagraphService,
-    private toastService: ToastService
-    
-  ) {}
+    private messageService: MessageService,
+    private layoutService: LayoutService) {
+  }
 
   ngOnInit(): void {
     this.task = Number(this.route.snapshot.paramMap.get('id'));
@@ -74,6 +75,8 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Cancelar todas las suscripciones al destruir el componente
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    // Restaurar el estado original del menú al destruir el componente
+    this.restoreMenuState();
   }
 
   private loadTaskWithAutoRefresh(): void {
@@ -84,7 +87,7 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error al cargar la tarea:', error);
-        this.toastService.showError('Error al cargar la información de la tarea.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar la información de la tarea.' });
       }
     });
     this.subscriptions.push(subscription);
@@ -101,7 +104,7 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error al procesar OCR:', error);
-        this.toastService.showError('Error al procesar el documento con OCR.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al procesar el documento con OCR.' });
       }
     });
     this.subscriptions.push(subscription);
@@ -115,7 +118,7 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
         this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
       },
       error: (error) => {
-        this.toastService.showError('Error al recuperar el archivo.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al recuperar el archivo.' });
         console.error('Error al recuperar el archivo:', error);
       }
     });
@@ -158,7 +161,7 @@ saveDocProcesed(pages: OcrPage[]): void {
 
       this.orderParagraphService.processParagraphs(pageData).subscribe({
           error: (error: any) => {
-            this.toastService.showError('Error al enviar los datos.');
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al enviar los datos.' });
             console.error('Error al enviar los datos:', error);
           }
       });
@@ -176,7 +179,7 @@ actualizarEstado(event: boolean): void {
         this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
-        this.toastService.showError('Error al cambiar el estado.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cambiar el estado.' });
         console.error('Error al cambiar el estado:', err);
       }
     });
@@ -189,7 +192,7 @@ actualizarEstado(event: boolean): void {
         this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
-        this.toastService.showError('Error al cambiar el estado.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cambiar el estado.' });
         console.error('Error al cambiar el estado:', err);
       }
     });
@@ -209,7 +212,7 @@ actualizarEstado(event: boolean): void {
         this.router.navigate(['/wirin/tasks']);
       },
       error: (err) => {
-        this.toastService.showError('Error al cambiar el estado.');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cambiar el estado.' });
         console.error('Error al cambiar el estado:', err);
       }
     });
@@ -226,6 +229,37 @@ actualizarEstado(event: boolean): void {
   goToPage(pageNumber: number): void {
     if (pageNumber >= 1 && pageNumber <= this.totalPages) {
       this.currentPage = pageNumber;
+    }
+  }
+
+  // Método para manejar la visibilidad del PDF y el menú
+  onPdfVisibilityChange(isVisible: boolean): void {
+    if (isVisible) {
+      // Guardar el estado actual del menú antes de cerrarlo
+      this.originalMenuState = this.layoutService.layoutState().staticMenuDesktopInactive || false;
+      // Cerrar el menú para dar más espacio al PDF
+      this.layoutService.layoutState.update((prev) => ({ 
+        ...prev, 
+        staticMenuDesktopInactive: true,
+        overlayMenuActive: false,
+        staticMenuMobileActive: false 
+      }));
+    } else {
+      // Restaurar el estado original del menú
+      this.restoreMenuState();
+    }
+    this.showPdfPreview = isVisible;
+  }
+
+  private restoreMenuState(): void {
+    // Solo restaurar si el PDF está visible
+    if (this.showPdfPreview) {
+      this.layoutService.layoutState.update((prev) => ({ 
+        ...prev, 
+        staticMenuDesktopInactive: this.originalMenuState,
+        overlayMenuActive: false,
+        staticMenuMobileActive: false 
+      }));
     }
   }
 

@@ -8,8 +8,8 @@
                 severity="help">
             </p-button>
         </div>
-        <p-panel header="Texto Procesado por el OCR:" [style]="{ minHeight: '400px', maxHeight: '75vh' }"
-            class="dark:bg-gray-700 text-gray-900 dark:text-gray-300 min-h-[400px] max-h-screen overflow-auto">
+        <p-panel header="Texto Procesado por el OCR:" 
+            class="ocr-text-panel dark:bg-gray-700 text-gray-900 dark:text-gray-300">
 
             <div class="grid sm:grid-cols-1 lg:grid-cols-3 gap-4 text-center font-mono text-lg mb-4 flex-wrap">
                 <div class="p-3 border border-blue-500 rounded shadow">
@@ -40,22 +40,24 @@
                 </div>
             </div>
 
-            <ng-container *ngIf="!isEditing">
-                <!-- Reemplazar el div de texto plano con TinyMCE en modo solo lectura -->
-                <editor [ngModel]="currentPageText" [init]="tinyMceViewConfig" class="w-full mt-2"
-                    [style]="{ 'min-height': '250px', 'max-height': '250px' }">
-                </editor>
-            </ng-container>
+            <!-- Editor TinyMCE optimizado -->
+            <div class="tinymce-container">
+                <ng-container *ngIf="!isEditing">
+                    <editor [ngModel]="currentPageText" [init]="tinyMceViewConfig" 
+                           class="tinymce-editor tinymce-readonly">
+                    </editor>
+                </ng-container>
 
-            <ng-container *ngIf="isEditing">
-                <editor [(ngModel)]="editingText" [init]="tinyMceConfig" class="w-full mt-2"
-                    [style]="{ 'min-height': '250px' }">
-                </editor>
-                <div class="flex justify-end gap-4 mt-3">
-                    <p-button label="Guardar cambios" class="p-button-success" (click)="onSaveChanges()"></p-button>
-                    <p-button label="Cancelar" class="p-button-secondary" (click)="isEditing = false"></p-button>
-                </div>
-            </ng-container>
+                <ng-container *ngIf="isEditing">
+                    <editor [(ngModel)]="editingText" [init]="tinyMceConfig" 
+                           class="tinymce-editor tinymce-editable">
+                    </editor>
+                    <div class="editor-actions flex flex-col sm:flex-row justify-end gap-2 mt-3">
+                        <p-button label="Guardar cambios" severity="success" (click)="onSaveChanges()" size="small"></p-button>
+                        <p-button label="Cancelar" severity="secondary" (click)="isEditing = false" size="small"></p-button>
+                    </div>
+                </ng-container>
+            </div>
         </p-panel>
     </ng-template>
 

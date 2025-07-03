@@ -55,27 +55,40 @@ export class OcrTextViewerComponent {
     tinyMceViewConfig = {
         base_url: '/tinymce',
         suffix: '.min',
-        plugins: '',
+        plugins: 'autoresize',
         toolbar: false,
         menubar: false,
-        height: 250,
+        min_height: 300,
+        max_height: 600,
         readonly: true,
+        resize: false,
+        autoresize_bottom_margin: 16,
+        autoresize_overflow_padding: 16,
         content_style: `
             body { 
                 font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; 
-                font-size: 14px; 
-                padding: 0.5rem;
+                font-size: 16px; 
+                line-height: 1.6;
+                padding: 1rem;
                 color: #374151;
-                background-color: #f3f4f6 !important; /* Fondo gris para modo visualización */
+                background-color: #f9fafb !important;
+                margin: 0;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
             body.dark-mode { 
                 background-color: #374151 !important; 
                 color: #E5E7EB; 
             }
-            p:after {
-                content: '';
-                color: #999;
-                margin-left: 5px;
+            p {
+                margin: 0 0 1em 0;
+                line-height: 1.6;
+            }
+            @media (max-width: 768px) {
+                body {
+                    font-size: 14px;
+                    padding: 0.75rem;
+                }
             }
         `,
         skin: document.body.classList.contains('app-dark') ? 'oxide-dark' : 'oxide',
@@ -83,36 +96,49 @@ export class OcrTextViewerComponent {
         promotion: false,
         browser_spellcheck: false,
         language: 'es',
-        language_url: '/tinymce/langs/es.js',
-        visualblocks_default_state: true,
-        visualchars_default_state: true
+        language_url: '/tinymce/langs/es.js'
     };
 
     // Configuración de TinyMCE para modo edición
     tinyMceConfig = {
         base_url: '/tinymce',
         suffix: '.min',
-        plugins: 'lists link image table code help wordcount visualchars charmap',
-        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help | visualblocks | visualchars | charmap',
-        height: 250,
+        plugins: 'autoresize lists link table code help wordcount visualchars charmap paste searchreplace',
+        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | searchreplace | help | visualchars | charmap',
+        min_height: 400,
+        max_height: 800,
         menubar: false,
         readonly: false,
+        resize: 'both' as const,
+        autoresize_bottom_margin: 16,
+        autoresize_overflow_padding: 16,
+        paste_as_text: true,
+        paste_remove_styles: false,
         content_style: `
             body { 
                 font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; 
-                font-size: 14px; 
-                padding: 0.5rem;
+                font-size: 16px; 
+                line-height: 1.6;
+                padding: 1rem;
                 color: #374151;
-                background-color: #ffffff !important; /* Fondo blanco para modo edición */
+                background-color: #ffffff !important;
+                margin: 0;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
             body.dark-mode { 
                 background-color: #1F2937 !important; 
                 color: #E5E7EB; 
             }
-            p:after {
-                content: '¶';
-                color: #999;
-                margin-left: 5px;
+            p {
+                margin: 0 0 1em 0;
+                line-height: 1.6;
+            }
+            @media (max-width: 768px) {
+                body {
+                    font-size: 14px;
+                    padding: 0.75rem;
+                }
             }
         `,
         skin: document.body.classList.contains('app-dark') ? 'oxide-dark' : 'oxide',
@@ -121,8 +147,11 @@ export class OcrTextViewerComponent {
         browser_spellcheck: true,
         language: 'es',
         language_url: '/tinymce/langs/es.js',
-        visualblocks_default_state: true,
-        visualchars_default_state: true
+        mobile: {
+            theme: 'mobile' as const,
+            plugins: 'autoresize lists link',
+            toolbar: 'undo redo | bold italic | bullist numlist'
+        }
     };
 
     constructor(
