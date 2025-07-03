@@ -87,8 +87,8 @@
     flex: 1;
     min-width: 350px;
     max-width: 600px;
-    height: fit-content;
-    max-height: calc(100vh - 200px);
+    height: calc(100vh - 150px);
+    max-height: calc(100vh - 150px);
 }
 
 .pdf-container {
@@ -111,7 +111,8 @@
     flex: 1;
     border: none;
     width: 100%;
-    min-height: 400px;
+    min-height: 500px;
+    height: calc(100vh - 200px);
 }
 
 /* OCR Text Panel Styles */
@@ -173,11 +174,13 @@
         order: 2;
         max-width: none;
         min-width: 0;
-        max-height: 400px;
+        max-height: 500px;
+        height: 500px;
     }
     
     .pdf-iframe {
-        min-height: 300px;
+        min-height: 400px;
+        height: 450px;
     }
 }
 
@@ -196,7 +199,8 @@
     
     .ocr-pdf-right {
         min-width: 0;
-        max-height: 350px;
+        max-height: 450px;
+        height: 450px;
     }
 }
 
@@ -216,7 +220,8 @@
     }
     
     .pdf-iframe {
-        min-height: 250px;
+        min-height: 350px;
+        height: 350px;
     }
 }
 
