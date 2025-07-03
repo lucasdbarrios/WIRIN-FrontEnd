@@ -23,6 +23,7 @@ import { StudentDeliveryService } from '../../../services/student-delivery/stude
 import { PopupComponent } from '../ui/popup/popup.component';
 import { DropDown } from '../../../types/dropDown';
 import { UserService } from '../../../services/user/user.service';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 
 @Component({
     selector: 'table-row-expansion-demo',
@@ -30,12 +31,13 @@ import { UserService } from '../../../services/user/user.service';
     standalone: true,
     imports: [TableModule, TagModule, ToastModule, RatingModule, ButtonModule, CommonModule, 
         FormsModule, IconFieldModule, InputIconModule, InputTextModule, DialogModule, 
-        TaskDetailComponent, ProgressBar, DropdownModule, PopupComponent, ReactiveFormsModule],
+        TaskDetailComponent, ProgressBar, DropdownModule, PopupComponent, ReactiveFormsModule, ToggleSwitch],
     providers: [ MessageService, InputIconModule]
 })
 
 export class ProyectsComponent implements OnInit {
     projects: OrderDelivery[] = [];
+    filteredProjects: OrderDelivery[] = [];
     @ViewChild('dt2') dt2!: Table;
     expandedRows = {};
     taskId: number = 0;
@@ -53,6 +55,7 @@ export class ProyectsComponent implements OnInit {
     deliveryForm!: FormGroup;
     dropdownItemsUsers: DropDown[] = [];
     private originalStatus: string = '';
+    showOnlyEnabledForDelivery: boolean = false;
 
     constructor(private messageService: MessageService, 
         private orderDeliveryService: OrderDeliveryService,
@@ -74,6 +77,7 @@ export class ProyectsComponent implements OnInit {
         this.orderDeliveryService.getOrderDeliveriesWithOrders().subscribe({
             next: (data: OrderDelivery[]) => {
                 this.projects = data;
+                this.applyDeliveryFilter();
                 console.log(data)
                 this.isLoading = false;
             },
@@ -248,6 +252,20 @@ export class ProyectsComponent implements OnInit {
                 console.error('Error al actualizar la entrega:', error);
             }
             });
+        }
+    }
+
+    toggleDeliveryFilter(): void {
+        this.applyDeliveryFilter();
+    }
+
+    private applyDeliveryFilter(): void {
+        if (this.showOnlyEnabledForDelivery) {
+            // Filtrar solo las bibliografías que están habilitadas para entregar (100% completadas)
+            this.filteredProjects = this.projects.filter(project => this.getPercent(project) === 100);
+        } else {
+            // Mostrar todas las bibliografías
+            this.filteredProjects = [...this.projects];
         }
     }
 }

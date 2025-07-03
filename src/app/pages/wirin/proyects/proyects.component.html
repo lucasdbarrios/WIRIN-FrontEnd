@@ -5,10 +5,22 @@
         <span>Cargando bibliografias</span>
     </div>
 
+    <div *ngIf="!isLoading && filteredProjects.length === 0 && projects.length > 0" style="text-align: center; color: #6B7280; margin-top: 1.5rem;">
+        No hay bibliografías que cumplan con el filtro seleccionado.
+    </div>
+
     <div *ngIf="!isLoading && projects.length === 0" style="text-align: center; color: #6B7280; margin-top: 1.5rem;">
         No hay bibliografias disponibles en este momento.
     </div>
-    <p-table *ngIf="!isLoading" #dt2 [value]="projects" [paginator]="true" [rows]="15"
+
+    <div *ngIf="!isLoading" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Bibliografías</h2>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span>Solo habilitadas para entregar</span>
+            <p-toggleswitch [(ngModel)]="showOnlyEnabledForDelivery" (onChange)="toggleDeliveryFilter()"></p-toggleswitch>
+        </div>
+    </div>
+    <p-table *ngIf="!isLoading" #dt2 [value]="filteredProjects" [paginator]="true" [rows]="15"
         [globalFilterFields]="['title', 'status', 'studentUserName']" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }"
         [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)">
 
