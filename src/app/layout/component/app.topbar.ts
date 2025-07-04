@@ -290,14 +290,14 @@ export class AppTopbar implements OnInit, OnDestroy {
         // Primero intentar cargar desde localStorage
         const cachedTasks = this.loadTasksFromCache();
         if (cachedTasks) {
-            console.log('Cargando tareas desde caché');
+
             this.tasks = cachedTasks;
             this.scheduleIndicatorUpdateOptimized();
             return;
         }
         
         // Si no hay caché válido, cargar desde API
-        console.log('Cargando tareas desde API');
+        
         this.orderService.getOrdersWithAutoRefresh().subscribe({
             next: (tasks) => {
                 this.tasks = tasks.filter(task => task.limitDate);
@@ -310,7 +310,7 @@ export class AppTopbar implements OnInit, OnDestroy {
                 // En caso de error, intentar usar caché expirado como fallback
                 const expiredCache = this.loadTasksFromCache(true);
                 if (expiredCache) {
-                    console.log('Usando caché expirado como fallback');
+    
                     this.tasks = expiredCache;
                     this.scheduleIndicatorUpdateOptimized();
                 }
@@ -326,7 +326,7 @@ export class AppTopbar implements OnInit, OnDestroy {
             localStorage.setItem(this.TASKS_CACHE_KEY, JSON.stringify(tasks));
             localStorage.setItem(this.CACHE_EXPIRY_KEY, expiryTime.toString());
             
-            console.log(`Tareas guardadas en caché. Expira en ${this.CACHE_DURATION / 60000} minutos`);
+
         } catch (error) {
             console.warn('Error al guardar tareas en localStorage:', error);
         }
@@ -347,14 +347,14 @@ export class AppTopbar implements OnInit, OnDestroy {
                 const expiry = parseInt(expiryTime);
                 
                 if (now > expiry) {
-                    console.log('Caché de tareas expirado');
+            
                     this.clearTasksCache();
                     return null;
                 }
             }
             
             const tasks = JSON.parse(cachedTasks);
-            console.log(`Tareas cargadas desde caché: ${tasks.length} elementos`);
+    
             return tasks;
             
         } catch (error) {
@@ -372,7 +372,7 @@ export class AppTopbar implements OnInit, OnDestroy {
         try {
             localStorage.removeItem(this.TASKS_CACHE_KEY);
             localStorage.removeItem(this.CACHE_EXPIRY_KEY);
-            console.log('Caché de tareas limpiado');
+    
         } catch (error) {
             console.warn('Error al limpiar caché:', error);
         }
@@ -380,7 +380,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     
     // Método para forzar actualización desde API (útil para botón de refresh)
     refreshTasksFromAPI(): void {
-        console.log('Forzando actualización desde API');
+
         this.clearTasksCache();
         this.loadTasks();
     }
@@ -436,12 +436,11 @@ export class AppTopbar implements OnInit, OnDestroy {
         }
         
         this.isUpdating = true;
-        console.log('Actualizando indicadores...');
-        console.log('Mes actual:', this.currentCalendarMonth, 'Año actual:', this.currentCalendarYear);
+
         
         try {
             const calendarCells = document.querySelectorAll('.custom-calendar .p-datepicker-calendar td');
-            console.log('Celdas encontradas:', calendarCells.length);
+    
             
             if (calendarCells.length === 0) {
                 setTimeout(() => {
@@ -465,7 +464,7 @@ export class AppTopbar implements OnInit, OnDestroy {
                         // Crear clave única para el día
                         const dayKey = `${this.currentCalendarYear}-${this.currentCalendarMonth}-${day}`;
                         
-                        console.log(`Día ${day}: ${taskCount} tareas`);
+    
                         
                         if (taskCount > 0) {
                             // Guardar en caché
@@ -474,7 +473,7 @@ export class AppTopbar implements OnInit, OnDestroy {
                             // Aplicar indicador
                             cell.classList.add('has-tasks');
                             cell.setAttribute('data-task-count', taskCount.toString());
-                            console.log(`Agregando indicador para día ${day} con ${taskCount} tareas`);
+    
                         } else {
                             cell.classList.remove('has-tasks');
                             cell.removeAttribute('data-task-count');
@@ -529,7 +528,7 @@ export class AppTopbar implements OnInit, OnDestroy {
                     if (taskCount && taskCount > 0) {
                         cell.classList.add('has-tasks');
                         cell.setAttribute('data-task-count', taskCount.toString());
-                        console.log(`Restaurando indicador para día ${day} con ${taskCount} tareas`);
+
                     }
                 }
             }
@@ -540,7 +539,7 @@ export class AppTopbar implements OnInit, OnDestroy {
         try {
             const indicatorsObj = Object.fromEntries(this.taskIndicatorsCache);
             localStorage.setItem(this.INDICATORS_CACHE_KEY, JSON.stringify(indicatorsObj));
-            console.log('Indicadores guardados en localStorage');
+
         } catch (error) {
             console.warn('Error al guardar indicadores en localStorage:', error);
         }
@@ -552,7 +551,7 @@ export class AppTopbar implements OnInit, OnDestroy {
             if (stored) {
                 const indicatorsObj = JSON.parse(stored);
                 this.taskIndicatorsCache = new Map(Object.entries(indicatorsObj).map(([key, value]) => [key, Number(value)]));
-                console.log('Indicadores cargados desde localStorage');
+
             }
         } catch (error) {
             console.warn('Error al cargar indicadores desde localStorage:', error);
@@ -562,7 +561,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     
     getTaskCountForDate(date: Date): number {
         if (!date || !this.tasks) {
-            console.log('No hay fecha o tareas');
+
             return 0;
         }
         
@@ -587,9 +586,7 @@ export class AppTopbar implements OnInit, OnDestroy {
             taskDate.setHours(0, 0, 0, 0);
             
             const matches = taskDate.getTime() === targetDate.getTime();
-            if (matches) {
-                console.log(`Tarea encontrada para ${targetDate.toDateString()}:`, task.name);
-            }
+
             
             return matches;
         }).length;
