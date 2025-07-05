@@ -1,25 +1,20 @@
 {
-    "version": 2,
-    "name": "wirin-frontend",
-    "builds": [
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "buildCommand": "npm run build:prod",
+    "outputDirectory": "dist/sakai-ng",
+    "framework": "angular",
+    "headers": [
         {
-            "src": "package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist/sakai-ng"
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
+            "source": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
             "headers": {
                 "Cache-Control": "public, max-age=31536000, immutable"
             }
-        },
+        }
+    ],
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "/index.html"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "trailingSlash": false,
