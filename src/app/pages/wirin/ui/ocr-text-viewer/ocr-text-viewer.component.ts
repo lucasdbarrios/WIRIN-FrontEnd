@@ -19,7 +19,7 @@ import { Annotation } from '../../../../types/annotation.interface';
 import { ParagraphAnnotationService } from '../../../../services/paragraph-annotation/paragraphAnnotation.service';
 import { ToastService } from '../../../../services/toast/toast.service';
 import { OrderService } from '../../../../services/order/order.service';
-import { saveAs } from 'file-saver';
+// Removed file-saver dependency - using native browser API instead
 
 @Component({
     selector: 'app-ocr-text-viewer',
@@ -218,7 +218,15 @@ export class OcrTextViewerComponent {
 
         this.orderService.downloadFile(this.taskId).subscribe({
             next: (blob) => {
-                saveAs(blob, fileName);
+                // Native browser download implementation
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
                 this.toastService.showSuccess('Archivo descargado correctamente');
             },
             error: (error) => {
