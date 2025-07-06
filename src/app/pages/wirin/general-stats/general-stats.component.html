@@ -1,4 +1,4 @@
-<div class="general-stats-container">
+<div class="p-6 bg-gray-50 min-h-screen">
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <div>
@@ -33,7 +33,7 @@
     <!-- General Overview Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Total Users -->
-      <p-card class="bg-gradient-to-r text-white">
+      <p-card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
         <div class="text-center">
           <i class="pi pi-users mb-3 opacity-80 !text-[25px]"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.totalVolunteers + generalStats.totalReviewers }}</div>
@@ -45,7 +45,7 @@
       </p-card>
 
       <!-- Total Tasks -->
-      <p-card class="bg-gradient-to-r text-white">
+      <p-card class="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
         <div class="text-center">
           <i class="pi pi-list !text-[25px] mb-3 opacity-80"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.totalTasks }}</div>
@@ -56,8 +56,8 @@
         </div>
       </p-card>
 
-      
-      <p-card class="bg-gradient-to-r text-white">
+      <!-- Success Rate -->
+      <p-card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
         <div class="text-center">
           <i class="pi pi-chart-line !text-[25px] mb-3 opacity-80"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.overallSuccessRate }}%</div>
@@ -68,7 +68,7 @@
       </p-card>
 
       <!-- Priority Tasks -->
-      <p-card class="bg-gradient-to-r text-white">
+      <p-card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
         <div class="text-center">
           <i class="pi pi-star !text-[25px] mb-3 opacity-80"></i>
           <div class="text-3xl font-bold mb-2">{{ generalStats.priorityTasksCompleted }}</div>
@@ -80,13 +80,13 @@
 
     <!-- Task Distribution Chart -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <p-card class="h-full">
+      <p-card class="h-full shadow-lg hover:shadow-xl transition-all duration-300">
         <ng-template pTemplate="header">
-          <div class="p-4">
+          <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
             <h3 class="text-xl font-semibold text-gray-800">Distribución de Tareas</h3>
           </div>
         </ng-template>
-        <div class="flex flex-col justify-center items-center h-full min-h-[320px]">
+        <div class="flex flex-col justify-center items-center h-full min-h-[320px] p-4">
           <p-chart type="doughnut" [data]="chartData" [options]="chartOptions" class="w-full max-w-xs"></p-chart>
           <div class="mt-4 text-center">
             <p class="text-sm text-gray-600 mb-2">Total de tareas en el sistema</p>
@@ -95,13 +95,13 @@
         </div>
       </p-card>
 
-      <p-card class="h-full">
+      <p-card class="h-full shadow-lg hover:shadow-xl transition-all duration-300">
         <ng-template pTemplate="header">
-          <div class="p-4">
+          <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50">
             <h3 class="text-xl font-semibold text-gray-800">Resumen por Estado</h3>
           </div>
         </ng-template>
-        <div class="space-y-6 h-full flex flex-col justify-center min-h-[320px] py-4">
+        <div class="space-y-6 h-full flex flex-col justify-center min-h-[320px] py-4 px-4">
           <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
             <div class="flex items-center">
               <i class="pi pi-check-circle text-green-600 mr-3"></i>
@@ -138,9 +138,9 @@
     </div>
 
     <!-- Volunteers Table -->
-    <p-card class="mb-6">
+    <p-card class="mb-6 shadow-lg hover:shadow-xl transition-all duration-300">
       <ng-template pTemplate="header">
-        <div class="p-4">
+        <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
           <h3 class="text-xl font-semibold text-gray-800">Estadísticas de Voluntarios</h3>
         </div>
       </ng-template>
@@ -184,9 +184,9 @@
     </p-card>
 
     <!-- Reviewers Table -->
-    <p-card>
+    <p-card class="shadow-lg hover:shadow-xl transition-all duration-300">
       <ng-template pTemplate="header">
-        <div class="p-4">
+        <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50">
           <h3 class="text-xl font-semibold text-gray-800">Estadísticas de Revisores</h3>
         </div>
       </ng-template>
