@@ -69,32 +69,7 @@
             "destination": "/index.html"
         }
     ],
-    "routes": [
-        {
-            "src": "/login",
-            "dest": "/index.html"
-        },
-        {
-            "src": "/wirin/(.*)",
-            "dest": "/index.html"
-        },
-        {
-            "src": "/landing",
-            "dest": "/index.html"
-        },
-        {
-            "src": "/notfound",
-            "dest": "/index.html"
-        },
-        {
-            "src": "/auth/(.*)",
-            "dest": "/index.html"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/index.html"
-        }
-    ],
+ 
     "trailingSlash": false,
     "cleanUrls": true,
     "functions": {
