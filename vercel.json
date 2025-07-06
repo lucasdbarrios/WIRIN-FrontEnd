@@ -74,11 +74,6 @@
  
     "trailingSlash": false,
     "cleanUrls": true,
-    "functions": {
-        "app/api/**/*.js": {
-            "runtime": "nodejs18.x"
-        }
-    },
     "redirects": [
         {
             "source": "/index.html",
