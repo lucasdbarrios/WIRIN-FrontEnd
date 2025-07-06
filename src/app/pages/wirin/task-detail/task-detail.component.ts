@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../services/order/order.service';
 import { AuthService } from '../../../services/auth/auth.service';
-import { saveAs } from 'file-saver';
+// Removed file-saver dependency - using native browser API instead
 import { FileUploadService } from '../../../services/file-upload/file-upload.service';
 import { OrderManagmentService } from '../../../services/order-managment/orderManagment.service';
 import { CardModule } from 'primeng/card';
@@ -157,7 +157,17 @@ export class TaskDetailComponent implements OnInit, OnChanges, OnDestroy  {
     }
 
     this.orderService.downloadFile(taskId).subscribe({
-      next: (blob) => saveAs(blob, fileName),
+      next: (blob) => {
+        // Native browser download implementation
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
       error: (error) => {
         this.toastService.showError('Error al descargar el archivo');
         console.error('Error al descargar el archivo:', error);
