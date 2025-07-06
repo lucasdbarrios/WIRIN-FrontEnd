@@ -130,6 +130,10 @@ export class OcrTextViewerComponent {
                 background-color: #1F2937 !important; 
                 color: #E5E7EB; 
             }
+            p:after {
+                content: '¶';
+                color: #999;
+                margin-left: 5px;
             p {
                 margin: 0 0 1em 0;
                 line-height: 1.6;
