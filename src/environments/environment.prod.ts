@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.wirinadapta.com.ar/api'
+  apiUrl: 'https://wirinapi-fsddagcggreaacd5.centralus-01.azurewebsites.net/api'
 };
