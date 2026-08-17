@@ -2,164 +2,214 @@
 
 ## 1. Visión general
 
-La aplicación sigue una arquitectura basada en Angular con una organización funcional por carpetas y un enfoque de capas:
+La app está construida con Angular 19 y sigue un modelo por capas con un eje principal en el módulo WIRIN. La lógica se organiza así:
 
-- capa de presentación: componentes y páginas
-- capa de acceso a datos: servicios y clientes HTTP
-- capa de dominio: tipos e interfaces
-- capa de infraestructura: guards, cache, configuración global, utilidades
+- capa de presentación: componentes y plantillas
+- capa de negocio: servicios, validaciones, filtros y acciones del dominio
+- capa de acceso a datos: HttpClient contra la API
+- capa transversal: guarda de autenticación, env config, auto-refresh, cache de sesión
 
-La idea general es mantener la lógica de negocio y el acceso a datos fuera de los componentes, para que las pantallas se centren en la renderización y la interacción del usuario.
+La intención es que el componente muestre UI y reciba datos del servicio, pero no encapsule lógica compleja del negocio ni llamadas HTTP directas.
 
 ## 2. Configuración global
 
 ### app.config.ts
 
-Este archivo centraliza la configuración global de la app:
+Este archivo centraliza la configuración de la app:
 
-- `provideRouter(...)`: habilita el enrutamiento con scroll restoration y navegación bloqueante.
-- `provideHttpClient(withFetch())`: habilita el cliente HTTP moderno.
-- `provideAnimationsAsync()`: incorpora animaciones del framework.
-- `providePrimeNG(...)`: configura el tema visual de PrimeNG.
-- `MessageService`: servicio para toasts y mensajes de UI.
-- `UserCacheService`: servicio global de cache de información del usuario.
-- `TINYMCE_SCRIPT_SRC`: carga TinyMCE desde assets públicos.
+- `provideRouter(...)`: router global con scroll y navegación bloqueante
+- `provideHttpClient(withFetch())`: cliente HTTP moderno
+- `provideAnimationsAsync()`: animaciones
+- `providePrimeNG(...)`: tema visual y estilos de PrimeNG
+- `MessageService`: toasts del sistema
+- `UserCacheService`: almacenamiento de datos del usuario
+- `TINYMCE_SCRIPT_SRC`: carga TinyMCE en la app
 
-## 3. Enrutamiento
+## 3. Enrutamiento y acceso
 
 ### app.routes.ts
 
-El archivo de rutas define dos niveles clave:
+El router principal tiene varios grupos:
 
-- una zona principal con `AppLayout` y `AuthGuard`
-- una zona WIRIN con vistas específicas del proyecto
+- rutas públicas: login, landing, auth, notfound
+- layout principal con `AppLayout`
+- módulo WIRIN con rutas protegidas por `AuthGuard`
 
-La estructura por rutas sugiere que la app tiene:
+Estructura relevante:
 
-- navegación principal
-- navegación de autenticación
-- navegación de dominio WIRIN
-- fallback a `notfound`
+- `/login`
+- `/wirin/tasks`
+- `/wirin/task-detail/:id`
+- `/wirin/ocr-viewer/:id`
+- `/wirin/users`
+- `/wirin/proyects`
+- `/wirin/dashboard`
+- `/wirin/messages`
+- `/wirin/volunteer-ranking`
+- `/wirin/general-stats`
 
-### Patrón observado
+## 4. Seguridad y autenticación
 
-```ts
-{
-  path: 'wirin',
-  component: AppLayout,
-  canActivate: [AuthGuard],
-  children: [
-    { path: 'tasks', component: TasksComponent, canActivate: [AuthGuard] }
-  ]
-}
-```
+### AuthGuard
 
-Esto mantiene consistencia: toda ruta sensible pasa por la guarda y el layout compartido.
+La ruta protegida exige sesión activa. Si no hay token, redirige al login. Si se intenta ir al login con usuario autenticado, redirige a una vista interna.
 
-## 4. Layout y composición visual
+### AuthService
 
-La app usa un layout general, posiblemente con:
+Este servicio:
 
-- topbar
-- sidebar
-- menu
-- footer
-- configurator
+- guarda el token JWT en localStorage
+- decodifica el token para extraer roles
+- expone información del usuario actual
+- aporta headers con Authorization para las llamadas HTTP
+- controla logout y renovación del estado de sesión
 
-Los componentes de layout están en:
+## 5. Servicios clave y su rol
 
-- src/app/layout/component/
-- src/app/layout/service/
+### OrderService
 
-Esto permite un patrón de UI reutilizable para todas las páginas y evita duplicación de estructura visual.
+Se encarga de:
 
-## 5. Organización funcional
+- listar tareas y órdenes
+- obtener una tarea por ID
+- descargar un archivo
+- recuperar un archivo para mostrarlo en la vista OCR
+- obtener órdenes por estado o entregadas
 
-### Estructura sugerida por dominio
+### OrderManagmentService
 
-- `src/app/pages/`: pantallas por módulo o sección.
-- `src/app/services/`: logica de acceso a backend, caché, mensajería, autenticación, archivos, etc.
-- `src/app/types/`: interfaces para modelos de negocio.
-- `src/app/guards/`: reglas de acceso.
-- `src/app/utils/`: utilidades genéricas.
+Es el servicio de control de estados y asignación.
 
-Este patrón es apropiado para una app de mediana a grande escala y facilita crecimiento sin mezclar responsabilidades.
+- cambia estados de la tarea
+- guarda voluntario/revisor asignado
+- gestiona transiciones de flujo Operativo
 
-## 6. Servicios
+### FileUploadService
 
-Los servicios parecen agruparse por dominio:
+Responsable de:
 
-- auth
-- user
-- user-cache
-- order
-- subject
-- file-upload
-- message
-- toast
-- auto-refresh
-- api
-- base
-- env
+- subir documentos
+- invocar OCR
+- reutilizar respuesta del backend para la revisión escrita
 
-Esto es una buena práctica porque cada servicio encapsula una responsabilidad concreta, reduce acoplamiento y facilita pruebas.
+### UserService
+
+Maneja usuarios, roles, usuarios por rol y resolución de nombres de usuarios por ID.
+
+### OrderDeliveryService
+
+Controla entregas y la relación entre proyectos y tareas entregadas.
+
+### StudentDeliveryService
+
+Maneja asignación de estudiantes a entregas.
+
+### BaseService / AutoRefreshService
+
+Este patrón permite que ciertos servicios emitan datos inmediatamente y luego se actualicen cada 60 segundos. Es una capa transversal importante para UI con live data.
+
+## 6. Patrón de auto-refresh
+
+El proyecto usa un patrón regular de `createAutoRefreshObservable`:
+
+- se ejecuta inmediatamente
+- luego emite cada 60 segundos
+- sirve para dashboards, listas de tareas y estados de orden
+
+Esto ayuda a no necesitar polling manual en cada componente.
 
 ## 7. Tipado y modelos
 
-El directorio `src/app/types` contiene interfaces y tipos reutilizables como:
+Los tipos importantes están en `src/app/types`:
 
-- user.interface.ts
-- order.interface.ts
-- paragraph.Interface.ts
-- annotation.interface.ts
-- orderDelivery.interface.ts
-- message.interface.ts
+- User
+- Order
+- OrderStatus
+- OrderDelivery
+- Annotation
+- ProcessParagraph
+- OcrResponse / OcrPage
 
-Este enfoque ayuda a mantener consistencia de datos entre backend, servicios y pantallas.
+Esto ayuda a mantener contratos claros entre backend y frontend.
 
-## 8. Seguridad
+## 8. Estructura del módulo WIRIN
 
-El uso de `AuthGuard` en rutas protegidas muestra un enfoque centralizado de autorización. La comprobación de sesión o tokens se debería mantener en este punto para que otras rutas no tengan que implementar controles manuales.
+El dominio principal está bajo `src/app/pages/wirin` con vistas como:
 
-Recomendación: si en el futuro se agregan roles, conviene centralizar la lógica de roles en un guard o servicio dedicado en lugar de duplicarla por vista.
+- dashboard
+- tasks
+- task-detail
+- ocr-viewer
+- users-list
+- profile
+- proyects
+- volunteer-ranking
+- volunteer-stats
+- general-stats
+- message
 
-## 9. Dependencias clave
+Dicho módulo concentra la parte de negocio más fuerte del sistema.
 
-### PrimeNG
+## 9. Vista OCR como caso especial
 
-Se usa para componentes UI, toasts, formularios y temas visuales.
+La vista OCR es uno de los puntos más importantes:
 
-### Angular Router
+- se dispara desde una tarea
+- recupera el documento PDF desde el backend
+- obtiene los datos OCR
+- muestra texto procesado
+- permite edición manual o corrección
+- habilita la revisión por estado o aprobación
 
-Se usa para navegación modular, rutas protegidas y carga de páginas.
+La parte visual incluye:
 
-### RxJS
+- editor de texto con TinyMCE
+- vista previa del PDF
+- navegación de páginas OCR
+- descarga del archivo original
 
-Es probable que se use para flujos y observables de datos, especialmente en servicios de actualización y mensajes.
+## 10. Layout y composición visual
 
-### TinyMCE
+La app usa un layout base compartido con:
 
-Se usa en flujos donde se requiere edición de texto enriquecido.
+- topbar
+- sidebar
+- menu lateral
+- footer
+- configuración visual
 
-## 10. Buenas prácticas recomendadas para continuar
+Esto permite que cada pantalla use la misma estructura sin repetir HTML base.
 
-- Crear nuevos componentes bajo el dominio correcto en `src/app/pages/...`.
-- Mantener servicios especializados por funcionalidad, no centralizar todo en un único servicio.
-- Usar interfaces y tipos en `src/app/types` para contratos claros.
-- Mantener guards para autenticación y autorización.
-- Si agregas nuevas pantallas, integrar la ruta en `app.routes.ts` y mantener la estructura del layout.
-- Evitar lógica de negocio compleja dentro de componentes; moverla a servicios.
+## 11. Relación entre componentes y servicios
 
-## 11. Mapa de archivos clave
+El patrón general es:
 
-- `src/app.routes.ts` – rutas globales
-- `src/app.config.ts` – configuración global
-- `src/app/guards/auth.guard.ts` – protección de rutas
-- `src/app/layout/` – estructura visual reutilizable
-- `src/app/services/` – acceso a datos y lógica transversal
-- `src/app/types/` – modelos del dominio
-- `src/environments/` – configuraciones por entorno
+- componente de página solicita datos al servicio
+- servicio realiza HTTP al backend
+- la respuesta se modela con interfaces
+- la vista renderiza la respuesta y maneja eventos del usuario
 
-## 12. Resumen
+La lógica más compleja no debe vivir en el template ni en la clase de render. Debe moverse a servicio o a un helper reutilizable.
 
-La arquitectura actual es una aplicación Angular modular, con un layout global, rutas protegidas, servicios bien segmentados y un esquema funcional claro. Es una base sólida para ampliar funcionalidades sin perder orden ni consistencia.
+## 12. Observaciones de arquitectura
+
+La estructura actual es clara y escalable, pero presenta algunas características típicas de apps en evolución:
+
+- no hay feature modules completos, sino carpetas funcionales
+- la lógica del negocio está dispersa por varios servicios y componentes
+- algunos componentes manejan varias responsabilidades al mismo tiempo
+- hay un patrón de UI más “panel administrativo” que de app de consumo pura
+
+Esto es válido para un proyecto real en crecimiento, pero requiere disciplina para no duplicar lógica entre pantallas.
+
+## 13. Recomendaciones para mantener la arquitectura
+
+- seguir usando un servicio por dominio, no un servicio único gigante
+- mantener la autenticación y roles en AuthService / UserRoleService
+- centralizar filtros de estado en servicios o utils
+- usar modelos y tipos para cada payload del backend
+- ir consolidando vistas complejas en submódulos o módulos funcionales si la app crece
+
+## 14. Conclusión
+
+La arquitectura actual corresponde a una SPA Angular con UI de gestión, acceso protegido por JWT, flujo de tareas y revisión OCR. Es una estructura razonable para un sistema de administración documental y de validación, aunque aún mantiene algunas responsabilidades mezcladas en componentes.

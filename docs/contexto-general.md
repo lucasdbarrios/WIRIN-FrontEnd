@@ -1,85 +1,115 @@
 # Contexto general de la aplicación
 
-## 1. Descripción del proyecto
+## 1. Propósito del sistema
 
-Esta aplicación es una interfaz web construida con Angular 19 y PrimeNG. Su finalidad principal es gestionar procesos y flujo de trabajo del proyecto WIRIN, con vistas orientadas a tareas, usuarios, proyectos, mensajes, estadísticas y entregas.
+WIRIN es una aplicación web para gestionar tareas, entregas y validaciones relacionadas con documentos, documentos OCR y flujo de revisión académica o operativa. La parte visible en el frontend muestra una lógica orientada a:
 
-La estructura del proyecto y la navegación indican que la app está enfocada en un panel administrativo o de gestión, con autenticación y rutas protegidas por guardas.
+- carga y seguimiento de tareas
+- asignación de usuarios por rol
+- procesamiento de archivos con OCR
+- revisión de texto extraído
+- validación de entregas y aprobación o rechazo de resultados
+- visualización de métricas y dashboards
 
-## 2. Stack técnico principal
+La app tiene un enfoque de administración interna con distintos perfiles, donde cada tipo de usuario ve y puede operar sobre distintas partes del flujo.
+
+## 2. Stack principal
 
 - Angular 19
 - TypeScript
-- PrimeNG + PrimeIcons
-- Tailwind CSS
 - RxJS
 - Angular Router
 - Angular HttpClient
-- TinyMCE (usado en algunos formularios o editor de texto)
-- Chart.js para visualización de métricas
+- PrimeNG
+- Tailwind CSS
+- TinyMCE
+- Chart.js
+- JWT para autenticación
 
-## 3. Estructura principal
+## 3. Mapa funcional del proyecto
 
-- src/app.routes.ts: configuración global de rutas y protección por autenticación.
-- src/app.config.ts: configuración de Angular, router, HTTP, animaciones y tema visual.
-- src/app/: módulos funcionales principales.
-- src/app/services/: servicios API, cache, autenticación, mensajes, uploads, etc.
-- src/app/types/: interfaces y tipos reutilizables.
-- src/environments/: configuración por entorno.
+### 3.1. Autenticación y control de acceso
 
-## 4. Modelo de navegación
+- Los usuarios inician sesión con email y contraseña.
+- El token JWT se guarda en localStorage.
+- El servicio AuthService decodifica el token para obtener roles y datos del usuario.
+- El AuthGuard protege las rutas internas y redirige al login si no hay sesión.
 
-La app tiene dos niveles principales:
+### 3.2. Roles de usuario
 
-- Rutas públicas: login, landing, auth, notfound.
-- Rutas protegidas: layout principal con AuthGuard.
+La app identifica perfiles como:
 
-Las rutas del módulo WIRIN están agrupadas bajo /wirin y contienen páginas como:
+- Voluntario
+- Voluntario Administrativo
+- Bibliotecario
+- Admin
+- Alumno
 
-- tareas
-- usuarios
-- proyectos
-- perfil
-- dashboard
-- mensajes
-- ranking de voluntarios
-- estadísticas
-- visor OCR
+Esto se observa en UserRoleService y en la lógica que filtra tareas por rol.
 
-Esto sugiere una lógica de negocio de gestión documental y operativa con una interfaz de trabajo multi-rol.
+### 3.3. Flujos principales
 
-## 5. Patrones de diseño observados
+- tareas pendientes
+- tareas en proceso
+- revisión de OCR
+- aprobación / denegación
+- entregas por proyecto o grupo
+- dashboard con métricas
+- gestión de usuarios
+- mensajes / notificaciones
 
-- Uso de rutas con `canActivate: [AuthGuard]` para validar sesión.
-- Separación en `services`, `types`, `guards`, `pages` y `layout`.
-- Estructura modular por dominio funcional.
-- Uso de componentes reutilizables y layout compartido para toda la app.
-- Dependencia de servicios para interacción con backend y almacenamiento local / caché de usuario.
+## 4. Estructura de carpetas relevante
 
-## 6. Flujo general del usuario
+- src/app/routes: rutas globales y modularizadas.
+- src/app/pages/wirin: páginas del negocio principal.
+- src/app/layout: estructura visual común (sidebar, topbar, menú, layout base).
+- src/app/services: lógica de backend, auth, cache, auto-refresh, entidades, archivos y utilidades.
+- src/app/types: modelos y enums para tareas, usuarios, entregas, OCR, mensajes y roles.
+- src/environments: configuración de la API según entorno.
 
-1. El usuario accede a la pantalla de login.
-2. Si la autenticación es válida, se permite entrar a la vista principal.
-3. El sistema carga el layout base y navega a distintas secciones según el rol o acceso del usuario.
-4. Los servicios manejan datos provenientes del backend y la UI consume esos datos para mostrar dashboards, listas y formularios.
-5. La aplicación mantiene información del usuario y del estado de la sesión en servicios centralizados.
+## 5. Flujo general de uso
 
-## 7. Consideraciones para futuras modificaciones
+1. El usuario entra a login.
+2. Se valida el token y se cargan los roles.
+3. La app decide qué pantallas puede ver según el perfil.
+4. El usuario se mueve dentro del dashboard y la gestión de tareas.
+5. Cuando se carga una tarea, el sistema obtiene datos del backend, estados y archivos relacionados.
+6. En la vista OCR, se recupera el PDF, se extrae el texto OCR y el usuario puede revisarlo, corregirlo o aprobarlo.
+7. El estado de la tarea se actualiza según la validación del contenido.
 
-- Mantener la lógica de autenticación en guardas y servicios dedicados.
-- Preferir añadir nuevos módulos dentro de `src/app/pages/...` según funcionalidad.
-- Reusar tipos e interfaces de `src/app/types` para evitar duplicación.
-- Mantener la separación entre UI, servicios API y utilidades.
-- Cuando se agreguen nuevas rutas, revisar tanto `src/app.routes.ts` como la estructura del layout para mantener el patrón actual.
+## 6. Patrones del proyecto
 
-## 8. Comandos útiles
+- separación por dominios funcionales
+- servicios por entidad o proceso
+- auto-refresh con BaseService y AutoRefreshService
+- rutas protegidas por `canActivate`
+- uso de interfaces y enums para tipos de negocio
+- estado de UI centralizado en la vista o manejado por signals/propiedades del componente
 
-- Iniciar app: `npm start`
-- Build de desarrollo: `npm run build`
-- Build producción: `npm run build:prod`
-- Lint: `npm run lint`
-- Tests: `npm test`
+## 7. Observaciones internas relevantes
 
-## 9. Observaciones generales
+- La lista de tareas cambia según el rol del usuario.
+- El servicio OrderService y OrderManagmentService son fundamentales para flujo de órdenes y estados.
+- El servicio FileUploadService gestiona el OCR.
+- Los componentes dentro de `src/app/pages/wirin` muestran un dominio muy concreto de negocio, no solo una UI genérica.
+- La estructura no es un patrón puro de feature modules, pero sí es consistente con un diseño por dominio funcional.
 
-La app parece estar orientada a una solución de administración y supervisión operativa, con trabajo específico alrededor de documentos, entregas y colaboración de voluntarios. El valor de esta guía es servir como mapa inicial para futuras entregas, refactors y nuevas funcionalidades.
+## 8. Consideraciones para futuras modificaciones
+
+- Mantener la autenticación y permisos centralizados en AuthService y UserRoleService.
+- No mezclar lógica de negocio en componentes visuales.
+- Añadir nuevas pantallas dentro del dominio `wirin` o bajo un submódulo más específico.
+- Preferir reutilizar servicios y tipos ya existentes antes de crear nuevas entidades duplicadas.
+- Si se cambia el estado de tareas o se agregan roles, revisar los filtros en TasksComponent y el guardado de estados en OrderManagmentService.
+
+## 9. Comandos útiles
+
+- `npm install`
+- `npm start`
+- `npm run build`
+- `npm run build:prod`
+- `npm run lint`
+
+## 10. Conclusión
+
+La app es un sistema de gestión documental y operativa con un flujo de tareas, revisiones OCR y validación por roles. La estructura principal está bien organizada para crecer, pero conviene mantener la lógica de negocio en servicios y no dispersarla en componentes.

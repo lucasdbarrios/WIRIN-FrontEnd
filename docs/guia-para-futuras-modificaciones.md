@@ -1,74 +1,160 @@
 # Guía para futuras modificaciones
 
-## 1. Cómo trabajar con esta base
+## 1. Principio general
 
-Cuando vayas a modificar la app, conviene mantener la misma estructura que ya usa el proyecto:
+Antes de tocar una funcionalidad, conviene saber en qué capa vive:
 
-- pantallas en `src/app/pages`
-- servicios en `src/app/services`
-- tipos en `src/app/types`
-- utilidades en `src/app/utils`
-- rutas en `src/app.routes.ts`
+- componente visual
+- servicio de negocio
+- servicio HTTP
+- tipo / modelo
+- guard o autorización
+- enrutamiento
 
-## 2. Reglas recomendadas
+Esto reduce errores de mantenimiento y evita duplicar lógica.
+
+## 2. Estructura recomendada para cambios
+
+### UI / pantalla
+
+Ubicación sugerida:
+
+- src/app/pages/
+- src/app/pages/wirin/
+
+### Lógica del dominio
+
+Ubicación sugerida:
+
+- src/app/services/
+- src/app/utils/
+
+### Modelos y contratos
+
+Ubicación sugerida:
+
+- src/app/types/
+
+### Seguridad
+
+Ubicación sugerida:
+
+- src/app/guards/
+- src/app/services/auth/
+
+## 3. Flujo recomendado para una nueva Feature
+
+1. Confirmar el flujo de negocio.
+2. Definir los roles involucrados.
+3. Revisar si ya existe un servicio similar.
+4. Identificar la entidad y su modelo.
+5. Crear o reutilizar el tipo.
+6. Implementar o extender el servicio.
+7. Crear la vista/componente bajo la ruta correcta.
+8. Añadir o ajustar la ruta en `src/app.routes.ts`.
+9. Validar el comportamiento con auth, permisos y estado de la tarea.
+10. Probar el flujo de happy path y error path.
+
+## 4. Reglas de mantenimiento
 
 ### Mantener separación de responsabilidades
 
-- Los componentes deben enfocarse en la vista.
-- Los servicios deben manejar llamadas HTTP, caché, estado y lógica compartida.
-- Las interfaces deben vivir en `src/app/types`.
+- Los componentes no deben cargar datos directamente sin un servicio.
+- Los servicios no deben depender de la vista para resolver estados.
+- Los modelos deben mantenerse centralizados en `src/app/types`.
 
-### Evitar lógica duplicada
+### Reutilizar antes de duplicar
 
-Si una misma lógica aparece en varios componentes, es mejor extraerla a un servicio o utilidad.
+Si ya existe un patrón para:
 
-### Tener en cuenta la autenticación
+- carga de tareas
+- estados de orden
+- roles
+- PDF / OCR
+- mensajes toast
 
-Toda nueva ruta que requiera seguridad debe ir acompañada de `canActivate: [AuthGuard]` o de la validación equivalente que siga el patrón del proyecto.
+es mejor reutilizar ese servicio o utilitario.
 
-## 3. Flujo recomendado para nuevas funcionalidades
+### Controlar roles
 
-1. Definir el modelo de datos y añadir interfaces si hace falta.
-2. Crear o reutilizar el servicio asociado.
-3. Crear el componente o vista dentro de `src/app/pages/...`.
-4. Añadir la ruta al router principal si corresponde.
-5. Validar que la navegación y la autenticación sigan funcionando.
-6. Probar el comportamiento básico y revisar errores de Angular/TypeScript.
+Muy importante en este proyecto:
 
-## 4. Patrones de nombres
+- la visibilidad del contenido depende del role
+- algunos filtros de tareas los decide UserRoleService
+- algunos estados permiten o restringen acciones según el rol
 
-- Componentes: `*.component.ts` o `*.ts` según el proyecto.
-- Servicios: `*.service.ts`
-- Guards: `*.guard.ts`
-- Interfaces: `*.interface.ts` o `*.type.ts`
+## 5. Checklist antes de merge o PR
 
-Mantener estos nombres ayuda a que el proyecto siga siendo claro para futuras personas que trabajen en él.
+- ¿La ruta quedó en `src/app.routes.ts`?
+- ¿La carga de datos usa un servicio?
+- ¿Hay un tipo para la respuesta del backend?
+- ¿Se respetan los roles y permisos?
+- ¿La tarea tiene estado válido para la acción realizada?
+- ¿Se manejan errores HTTP y toasts?
+- ¿Se validó el flujo con el backend real o con mocks de datos?
+- ¿Se revisó el comportamiento del PDF/OCR si toco ese dominio?
 
-## 5. Checklist antes de hacer un cambio relevante
+## 6. Puntos de atención en este proyecto
 
-- ¿La ruta está en `src/app.routes.ts`?
-- ¿La pantalla pertenece al módulo correcto?
-- ¿Se reutiliza un servicio existente?
-- ¿Hay un tipo para el modelo?
-- ¿La lógica quedó fuera del componente?
-- ¿Se preservó la estructura del layout?
-- ¿La funcionalidad sigue protegiéndose con autenticación cuando aplica?
+### 6.1. Autenticación
 
-## 6. Sugerencia de documentación
+Si cambias login, JWT, roles o headers, revisar:
 
-Cuando se agregue una nueva funcionalidad, conviene actualizar esta carpeta `docs/` con una nota breve sobre:
+- AuthService
+- AuthGuard
+- UserRoleService
+- env configuration
 
-- objetivo de la funcionalidad
-- pantallas involucradas
-- servicios y endpoints usados
-- reglas de negocio relevantes
-- puntos de extensión futuros
+### 6.2. Estados de tareas
 
-## 7. Estructura recomendada para futuras notas
+Si modificás estado, fíjate en:
 
-- `contexto-general.md`
-- `arquitectura.md`
-- `guia-para-futuras-modificaciones.md`
-- `feature/<nombre-feature>.md` cuando se agreguen funcionalidades específicas
+- OrderStatus enum
+- OrderManagmentService
+- TasksComponent
+- TaskDetailComponent
+- DashboardComponent
 
-Esto ayuda a que el proyecto evolucione con memoria técnica sin depender solo de comentarios en código.
+### 6.3. OCR / PDF
+
+Si modificás el flujo OCR o el render del PDF, validar:
+
+- FileUploadService
+- OrderService
+- OcrViewerComponent
+- OcrTextViewerComponent
+- response del backend
+- headers y tipos de blob
+
+### 6.4. Entregas / proyectos
+
+Si tocas las entregas, revisar:
+
+- OrderDeliveryService
+- StudentDeliveryService
+- ProyectsComponent
+- DashboardComponent
+
+## 7. Recomendaciones para documentación
+
+Cuando agregues una feature nueva, conviene seguir este patrón:
+
+- resumen del problema o objetivo
+- rutas y pantallas involucradas
+- servicios usados
+- roles que intervienen
+- estados o condiciones relevantes
+- riesgos conocidos
+
+## 8. Estructura sugerida para futuras notas
+
+- context-general.md
+- arquitectura.md
+- guia-para-futuras-modificaciones.md
+- flujo-de-negocio.md
+- modulos-wirin.md
+- feature/<nombre-feature>.md
+
+## 9. Conclusión
+
+Este proyecto tiene una lógica bastante clara de negocio y un dominio de tareas + revisión documental. La mejor estrategia para evolucionarlo es seguir la separación actual por servicios, roles y tipos, y documentar los cambios a medida que se agregan ventanas de negocio o flujos de validación.
