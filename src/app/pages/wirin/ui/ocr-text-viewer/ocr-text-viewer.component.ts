@@ -217,11 +217,8 @@ export class OcrTextViewerComponent {
             return;
         }
 
-        // Obtener el nombre del archivo desde los metadatos del OCR si está disponible
-        const fileName = this.ocrData?.metadata?.fileName.split("\\").pop() || 'documento.pdf';
-
         this.orderService.downloadFile(this.taskId).subscribe({
-            next: (blob) => {
+            next: ({ blob, fileName }) => {
                 saveAs(blob, fileName);
                 this.toastService.showSuccess('Archivo descargado correctamente');
             },

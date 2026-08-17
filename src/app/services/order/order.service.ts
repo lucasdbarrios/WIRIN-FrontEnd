@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { EnvService } from '../env/env.service';
 import { Paragraph } from '../../types/paragraph.Interface';
 import { AuthService } from '../auth/auth.service';
@@ -55,20 +56,53 @@ export class OrderService extends BaseService {
     });
   }
 
-  downloadFile(id: number): Observable<Blob> {
+  downloadFile(id: number): Observable<{ blob: Blob; fileName: string }> {
     const downloadUrl = `${this.apiUrl}/download/${id}`;
     return this.http.get(downloadUrl, {
       ...this.authService.getHeaders(),
-      responseType: 'blob'
-    });
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map((response: HttpResponse<Blob>) => {
+        const responseBlob = response.body ?? new Blob([], { type: 'application/pdf' });
+        const fileName = this.extractFileNameFromDisposition(response.headers.get('content-disposition')) ?? 'document.pdf';
+        return { blob: responseBlob, fileName };
+      })
+    );
   }
 
   recoveryFile(id: number): Observable<Blob> {
     const downloadUrl = `${this.apiUrl}/recovery/${id}`;
     return this.http.get(downloadUrl, {
       ...this.authService.getHeaders(),
-      responseType: 'blob'
-    });
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map((response: HttpResponse<Blob>) => response.body ?? new Blob([], { type: 'application/pdf' }))
+    );
+  }
+
+  private extractFileNameFromDisposition(contentDisposition: string | null): string | null {
+    if (!contentDisposition) {
+      return null;
+    }
+
+    const encodedMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (encodedMatch && encodedMatch[1]) {
+      const rawName = encodedMatch[1].replace(/['"]/g, '').trim();
+      try {
+        return decodeURIComponent(rawName);
+      } catch {
+        return rawName;
+      }
+    }
+
+    const regularMatch = contentDisposition.match(/filename\s*=\s*"?([^";]+)"?/i);
+    if (regularMatch && regularMatch[1]) {
+      return regularMatch[1].trim();
+    }
+
+    return null;
   }
 
   deleteOrder(id: number): Observable<any> {

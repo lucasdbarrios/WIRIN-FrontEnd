@@ -150,14 +150,11 @@ export class TaskDetailComponent implements OnInit, OnChanges, OnDestroy  {
       alert('ID de tarea inválido. No se puede descargar el archivo.');
       return;
     }
-  
-    if (!fileName) {
-      alert('No hay un nombre de archivo válido para descargar.');
-      return;
-    }
 
     this.orderService.downloadFile(taskId).subscribe({
-      next: (blob) => saveAs(blob, fileName),
+      next: ({ blob, fileName: realFileName }) => {
+        saveAs(blob, fileName || realFileName || 'document.pdf');
+      },
       error: (error) => {
         this.toastService.showError('Error al descargar el archivo');
         console.error('Error al descargar el archivo:', error);
