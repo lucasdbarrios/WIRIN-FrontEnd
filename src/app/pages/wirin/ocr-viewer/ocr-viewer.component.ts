@@ -47,6 +47,7 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
   task: any;
   taskId: string  = '';
   private subscriptions: Subscription[] = [];
+  private pdfObjectUrl: string | null = null;
   estado: string | null = null;
 
   constructor(private router: Router,
@@ -75,6 +76,10 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Cancelar todas las suscripciones al destruir el componente
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    if (this.pdfObjectUrl) {
+      URL.revokeObjectURL(this.pdfObjectUrl);
+      this.pdfObjectUrl = null;
+    }
     // Restaurar el estado original del menú al destruir el componente
     this.restoreMenuState();
   }
@@ -112,10 +117,13 @@ export class OcrViewerComponent implements OnInit, OnDestroy {
 
   private recoverFileWithAutoRefresh(): void {
     const subscription = this.orderService.recoveryFile(this.task).subscribe({
-      next: (data) => {
-        const blob = new Blob([data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      next: (data: Blob) => {
+        if (this.pdfObjectUrl) {
+          URL.revokeObjectURL(this.pdfObjectUrl);
+        }
+
+        this.pdfObjectUrl = URL.createObjectURL(data);
+        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.pdfObjectUrl);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al recuperar el archivo.' });
