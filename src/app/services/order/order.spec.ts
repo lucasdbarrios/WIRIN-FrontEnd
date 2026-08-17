@@ -85,16 +85,24 @@ describe('OrderService', () => {
   });
 
   it('debería descargar un archivo por ID', (done) => {
-    const mockResponse = new Blob(['archivo contenido'], { type: 'application/pdf' });
+    const blob = new Blob(['archivo contenido'], { type: 'application/pdf' });
+    const expected = {
+      blob,
+      fileName: 'documento.pdf'
+    };
 
     service.downloadFile(1).subscribe(response => {
-      expect(response).toEqual(mockResponse);
+      expect(response).toEqual(expected);
       done();
     });
 
     const req = httpMock.expectOne(`${envService.getApiUrl()}/Order/download/1`);
     expect(req.request.method).toBe('GET');
-    req.flush(mockResponse);
+    req.flush(blob, {
+      headers: { 'Content-Disposition': "inline; filename*=UTF-8''documento.pdf" },
+      status: 200,
+      statusText: 'OK'
+    });
   });
 
   it('debería recuperar un archivo por ID', (done) => {
