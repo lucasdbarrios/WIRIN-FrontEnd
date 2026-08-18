@@ -13,19 +13,20 @@ import { MessageModule } from 'primeng/message';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,ButtonModule, CheckboxModule, InputTextModule, PasswordModule, 
+  imports: [CommonModule, FormsModule, ButtonModule, CheckboxModule, InputTextModule, PasswordModule,
     FormsModule, RouterModule, RippleModule, MessageModule],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
   loginData: LoginRequest = {
+    username: '',
     email: '',
     password: ''
   };
   errorMessage: string = '';
   isLoading: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit(): void {
     this.isLoading = true;

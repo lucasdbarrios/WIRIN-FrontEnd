@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 
 export interface LoginRequest {
   email: string;
+  username: string;
   password: string;
 }
 
@@ -20,7 +21,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  
+
   private apiUrl: string;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -39,7 +40,7 @@ export class AuthService {
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        
+
         const rolesClaim = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
         const user: User = {
@@ -105,7 +106,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
-  
+
     this.currentUserSubject.next(null);
     this.userRoleSubject.next(null);
     this.userDataLoaded = false;
@@ -158,24 +159,24 @@ export class AuthService {
     const roles = this.getCurrentUserRole();
     return roles ? roles.includes(role) : false;
   }
-  
+
   hasAnyRole(roles: string[]): boolean {
     const userRoles = this.getCurrentUserRole();
     return userRoles ? roles.some(role => userRoles.includes(role)) : false;
   }
-  
+
   getUserId(): string | null {
     return this.currentUserSubject.value?.id || null;
   }
-  
+
   getUserFullName(): string | null {
     return this.currentUserSubject.value?.fullName || null;
   }
-  
+
   getUserEmail(): string | null {
     return this.currentUserSubject.value?.email || null;
   }
-  
+
   refreshUserData(): Observable<User | null> {
     this.userDataLoaded = true;
     return this.getUserProfile().pipe(

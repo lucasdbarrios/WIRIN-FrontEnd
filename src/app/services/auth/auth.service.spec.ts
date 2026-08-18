@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient } from '@angular/common/http';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import {
+  provideHttpClientTesting,
+  HttpTestingController
+} from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 import { EnvService } from '../env/env.service';
 import { provideRouter } from '@angular/router';
@@ -33,11 +35,20 @@ describe('AuthService', () => {
 
   afterEach(() => {
     httpMock.verify();
+    localStorage.clear();
   });
 
   it('debería hacer login y guardar el token', (done) => {
-    const mockResponse = { token: 'testToken', userId: '123' };
-    const credentials = { email: 'test@example.com', password: 'password123' };
+    const mockResponse = {
+      token: 'testToken',
+      userId: '123'
+    };
+
+    const credentials = {
+      username: 'testUser',
+      email: 'test@example.com',
+      password: 'password123'
+    };
 
     service.login(credentials).subscribe(response => {
       expect(response.token).toBe('testToken');
@@ -45,8 +56,14 @@ describe('AuthService', () => {
       done();
     });
 
-    const req = httpMock.expectOne(`${envService.getApiUrl()}/auth/login`);
+    const req = httpMock.expectOne(
+      `${envService.getApiUrl()}/auth/login`
+    );
+
     expect(req.request.method).toBe('POST');
+
+    expect(req.request.body).toEqual(credentials);
+
     req.flush(mockResponse);
   });
 
@@ -66,8 +83,12 @@ describe('AuthService', () => {
       done();
     });
 
-    const req = httpMock.expectOne(`${envService.getApiUrl()}/auth/register`);
+    const req = httpMock.expectOne(
+      `${envService.getApiUrl()}/auth/register`
+    );
+
     expect(req.request.method).toBe('POST');
+
     req.flush(mockUser);
   });
 
@@ -89,8 +110,12 @@ describe('AuthService', () => {
       done();
     });
 
-    const req = httpMock.expectOne(`${envService.getApiUrl()}/user/me`);
+    const req = httpMock.expectOne(
+      `${envService.getApiUrl()}/user/me`
+    );
+
     expect(req.request.method).toBe('GET');
+
     req.flush(mockUserProfile);
   });
 
@@ -105,13 +130,19 @@ describe('AuthService', () => {
       roles: ['admin']
     };
 
+    localStorage.setItem('auth_token', 'testToken');
+
     service.refreshUserData().subscribe(response => {
       expect(response).toEqual(updatedUser);
       done();
     });
 
-    const req = httpMock.expectOne(`${envService.getApiUrl()}/user/me`);
+    const req = httpMock.expectOne(
+      `${envService.getApiUrl()}/user/me`
+    );
+
     expect(req.request.method).toBe('GET');
+
     req.flush(updatedUser);
   });
 });
