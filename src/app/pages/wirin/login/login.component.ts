@@ -19,7 +19,6 @@ import { MessageModule } from 'primeng/message';
 })
 export class LoginComponent {
   loginData: LoginRequest = {
-    username: '',
     email: '',
     password: ''
   };

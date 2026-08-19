@@ -14,14 +14,6 @@
                 </div>
 
                 <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-                    <div>
-                        <label for="username"
-                            class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
-                            Nombre de Usuario
-                        </label>
-                        <input pInputText id="username" name="username" type="text" [(ngModel)]="loginData.username"
-                            required placeholder="Username" class="w-full md:w-[30rem] mb-8" />
-                    </div>
 
                     <div>
                         <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
@@ -31,7 +23,7 @@
                             email placeholder="Email address" class="w-full md:w-[30rem] mb-8" />
                     </div>
 
-                    <div>
+                    <div class="mb-4">
                         <label for="password1"
                             class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">
                             Contraseña
